@@ -15,14 +15,27 @@ class CombatHandler:
   
   def tryBlockBreak(self, attacker, defender, dmg):
     if dmg >= defender.stats["health"]:
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} was so strong, they broke through {self.ui.coloredString(defender.name, "yellow")}'s defense!");
       self.ui.animatedPrint(f"{self.ui.coloredString(defender.name, "yellow")} couldn't block {self.ui.coloredString(attacker.name, "yellow")} attack.");
       return True;
     return False;
     
-  def handleAttack(self, attacker, defender, dmg, hit_msg, block_msg): # improve this to handle multiple msgs
-    if defender.status["blocking"] is True and self.tryBlockBreak(attacker, defender, dmg) is False:
+  def handleAttack(self, attacker, defender, dmg, hit_msg, block_msg):
+    random_event = choices([None, "slipped"], [0.8, 0.2])[0];
+    
+    if attacker.status["blocking"] is True:
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} dropped their block!");
+      attacker.status["blocking"] = False;
+
+    elif defender.status["blocking"] is True and self.tryBlockBreak(attacker, defender, dmg) is False:
       self.ui.animatedPrint(block_msg);
+      attacker.attackEnemy(max(0, dmg - defender.stats["defense"]));
       defender.status["blocking"] = False;
+    
+    elif random_event == "slipped":
+      slip_dmg = attacker.stats["strength"] / randint(3, 5);
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} slipped and recieved {self.ui.coloredString(slip_dmg, "red")} damage!");
+    
     else:
       attacker.attackEnemy(dmg);
       self.ui.animatedPrint(hit_msg);
@@ -31,7 +44,10 @@ class CombatHandler:
     result = choices(["critical", None], [attacker.stats["luck"], 0.5])[0];
     if result == "critical":
       multiplier = round(uniform(1.1, 2), 2);
-      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} will deal a {self.ui.coloredString("Critical Hit!", "red")} {self.ui.coloredString(multiplier, "green")}x damage");
+      self.ui.randomAnimatedPrint(
+        [f"{self.ui.coloredString(attacker.name, "yellow")} aims for a weak spot.", f"{self.ui.coloredString(attacker.name, "yellow")} found a opening!"]
+      );
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} will now deal a {self.ui.coloredString("CRITICAL HIT!", "red")} {self.ui.coloredString(multiplier, "green")}x damage.");
       return round(dmg * multiplier);
     else:
       return dmg
@@ -62,11 +78,15 @@ class CombatHandler:
       return False;
     return True;
     
-  def combatLoop(self): # optimize and refactor formatting colors
+  def combatLoop(self, auto = False): # optimize and refactor formatting colors
+    option = None;
     while True:
       self.ui.showCombatMenu(self.attacker);
-      option = self.ui.getInput();
-      enemy_option = choices(["attack", "defend"])[0]; # improve this later
+      if auto is False:
+        option = self.ui.getInput();
+      else:
+        option = choices(["attack", "defend"], [0.8, 0.3])[0];
+      enemy_option = choices(["attack", "defend"], [self.defender.attack_chance, self.defender.defend_chance])[0]; # improve this later
       
       #==========#
       
@@ -77,7 +97,7 @@ class CombatHandler:
           self.defender,
           dmg,
           f"{self.ui.coloredString("you", "yellow")} hit {self.ui.coloredString(self.defender.name, "yellow")} and dealt {self.ui.coloredString(dmg, "red")} damage!",
-          f"{self.ui.coloredString("you", "yellow")} tried to hit {self.ui.coloredString(self.defender.name, "yellow")}, but they blocked and negated {self.ui.coloredString(dmg, "red")} damage!",
+          f"{self.ui.coloredString("you", "yellow")} tried to hit {self.ui.coloredString(self.defender.name, "yellow")}, but they blocked and reduced it to {self.ui.coloredString(max(0, dmg - self.defender.stats["defense"]), "red")} damage!",
         );
       elif option == "defend":
         self.attacker.status["blocking"] = True;
@@ -96,7 +116,7 @@ class CombatHandler:
           self.attacker, 
           dmg,
           f"{self.ui.coloredString(self.defender.name, "yellow")} hit {self.ui.coloredString("you", "yellow")} and dealt {self.ui.coloredString(dmg, "red")} damage!",
-          f"{self.ui.coloredString(self.defender.name, "yellow")} tried to hit {self.ui.coloredString("you", "yellow")} but {self.ui.coloredString("you", "yellow")} blocked, negating {self.ui.coloredString(dmg, "red")} damage!",
+          f"{self.ui.coloredString(self.defender.name, "yellow")} tried to hit {self.ui.coloredString("you", "yellow")} but {self.ui.coloredString("you", "yellow")} blocked and reduced it to {self.ui.coloredString(max(0, dmg - self.defender.stats["defense"]), "red")} damage!",
         );
       elif enemy_option == "defend":
         self.defender.status["blocking"] = True;
@@ -107,4 +127,5 @@ class CombatHandler:
       if self.handleDeath() is True:
         break;
       
-      self.ui.awaitKey();
+      if auto is False:
+        self.ui.awaitKey();

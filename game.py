@@ -72,4 +72,9 @@ class Game:
   def initiateCombat(self, name):
     combat_handler = CombatHandler(self.player, self);
     combat_handler.initiateCombat(name);
-    combat_handler.combatLoop();
+    
+    self.ui.compareStats(combat_handler.attacker, combat_handler.defender);
+    self.ui.awaitKey();
+    
+    combat_handler.combatLoop(auto = True);
+    

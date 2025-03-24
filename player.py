@@ -75,7 +75,7 @@ class Player:
   
   def statLevelUp(self):
     for stat in self.stats:
-      if stat == "health":
+      if stat == "max health":
         self.stats[stat] += 10;
       elif stat == "luck":
         self.stats[stat] = round(self.stats[stat] + 0.01, 4);

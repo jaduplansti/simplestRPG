@@ -64,17 +64,14 @@ class UI:
       return colorama.Fore.CYAN;
     elif color == "magenta":
       return colorama.Fore.MAGENTA;
-    elif color == "grey":
-      return colorama.Fore.GREY;
-      
     else:
       return "err";
   
   def rarityPrint(self, item):
     if item.rarity == "common":
-      return self.coloredString("common", "grey");
+      return self.coloredString("common", "yellow");
     elif item.rarity == "uncommon":
-      return self.coloredString("uncommon", "grey");
+      return self.coloredString("uncommon", "yellow");
     elif item.rarity == "rare":
       return self.coloredString("rare", "blue");
     elif item.rarity == "epic":
@@ -107,8 +104,11 @@ class UI:
   
   def randomDialogue(self, name, dialogues):
     self.showDialogue(name, choices(dialogues)[0]);
+  
+  def randomAnimatedPrint(self, msgs):
+    self.animatedPrint(choices(msgs)[0]);
     
-  def showBar(self, bar_name, n, max_n, color = "white"):
+  def showBar(self, bar_name, n, max_n, end_str, color = "white", bar_color = "yellow"):
     bar_length = 6;
     filled_length = (n / max_n) * bar_length;
     empty_length = bar_length - filled_length;
@@ -116,13 +116,14 @@ class UI:
     filled_bar = self.getColor(color) + "█" * round(filled_length);
     empty_bar = self.getColor("white") + "░" * round(empty_length);
     
-    self.normalPrint(f"{self.coloredString(bar_name + " :" , "yellow")} {filled_bar}{empty_bar} ({n} hp)");
+    self.normalPrint(f"{self.coloredString(bar_name + " :" , bar_color)} {filled_bar}{empty_bar}{end_str}");
   
   def showHealthBar(self, player):
     self.showBar(
       f"{player.name} health",
       player.stats["health"],
       player.stats["max health"],
+      f" ({player.stats["health"]} hp)",
       "green",
     );
     
@@ -148,15 +149,28 @@ class UI:
     self.normalPrint("🛠️================🛠️\n")
     
   def showPlayerStats(self, player):
-    self.normalPrint("\\&--&/");
-    self.normalPrint(self.coloredString(f"{player.name} Stats", "green"));
-    self.normalPrint("\\&--&/\n");
+    self.normalPrint("{===================}");
+    self.normalPrint("        Stats         ");
+    self.normalPrint("{===================}\n");
     
+    self.normalPrint(f"level {self.coloredString(player.level, "green")}\n");
+    self.showBar("(exp)", player.exp, (player.level * 100), f" ({round(player.exp, 2)} exp)", "yellow", "cyan");
+
     for stat in player.stats:
       if stat == "health":
-        self.showBar("(health)", player.stats["health"], player.stats["max health"], "green");
-      else:
-        self.normalPrint(f"({self.coloredString(stat, "yellow")}) is {self.coloredString(player.stats[stat], "green")}");
+        self.showBar("(health)", player.stats["health"], player.stats["max health"], f" ({player.stats[stat]} hp)\n", "green", "red");
+      else:  
+        self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player.stats[stat], "green")}");
+    self.newLine();
+  
+  def compareStats(self, player1, player2):
+    self.normalPrint("{========================}");
+    self.normalPrint("        Comparison        ");
+    self.normalPrint("{========================}\n");
+    
+    self.normalPrint(f"{player1.name} <-> {player2.name}\n");
+    for stat in player1.stats: # this assumes the stat of player 1 = player 2
+      self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player1.stats[stat], "blue")} <-> {self.coloredString(player2.stats[stat], "cyan")}");
     self.newLine();
     
   def showHomeMenu(self):
@@ -185,7 +199,7 @@ class UI:
       for info in item_obj:
         self.normalPrint(f"- {info}: {item_obj[info]}");
       self.newLine();
-      
+    
   def showDynamicMenu(self, player):
     self.clear();
     if player.location == "home":
@@ -220,7 +234,8 @@ class UI:
       self.normalPrint(f"- ({self.coloredString('list foods', 'yellow')})");
       self.normalPrint(f"- ({self.coloredString('buy food', 'blue')})");
       self.normalPrint(f"- ({self.coloredString('sell food', 'green')})");
-
+      
+      self.normalPrint(f"- ({self.coloredString('attack', 'red')})");
       self.normalPrint(f"- ({self.coloredString('go back', 'red')})\n");
 
       self.normalPrint("-========================-\n")

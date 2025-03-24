@@ -1,0 +1,27 @@
+[version 1.1]
+• added basic combat system
+• added critical hits
+• added blocking
+• added basic exploration
+• added enemy (slime)
+• added bakery
+• added item class
+
+[version 1.2] 
+• fixed and improved stats menu
+• added bakery interactions
+• added more baker dialogues, specically in buying foods, sold out and listing foods
+• added loot system
+• improved overall layout
+• added leveling system 
+• improved input system, input blocking
+• added enemy (goblin, skeleton)
+• made enemy actions like attacking and defending unique
+• added baker fight
+• added block break (when overall damage exceeds enemy health)
+• added block cancel (when attacking after doing a block)
+• added random slip event
+• blocking revamp (block now uses reduces incoming damage by defense)
+• added a new line on block break
+• added auto feature (auto combat)
+• added better emphasis in critical hits
