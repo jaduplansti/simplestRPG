@@ -58,7 +58,7 @@ class Bakery:
       
     self.player.money -= self.getStock(item)["price"];
     self.getStock(item)["amount"] -= 1;
-    self.player.inventory.update({item : self.getStock(item)["item"]})
+    self.player.addItemToInventory(self.getStock(item)["item"]);
     self.ui.showDialogue("baker", f"here is your {self.ui.coloredString(item, "red")} for {self.ui.coloredString(self.getStock(item)["price"], "green")} gold.");
 
     if self.getStock(item)["amount"] <= 0:

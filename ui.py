@@ -33,7 +33,7 @@ class UI:
         import termios
         termios.tcflush(sys.stdin, termios.TCIFLUSH)
         
-  def animatedPrint(self, s, type_speed = 0.008, delay = 0.3, end = "\n"): # type writer effect
+  def animatedPrint(self, s, type_speed = 0.008, delay = 0.7, end = "\n"): # type writer effect
     self.__noEcho();
     for ch in s:
       print(ch, end = "", flush = True);
@@ -45,7 +45,7 @@ class UI:
     
   def showDialogue(self, name, s, name_color = "white"): # turns str to a valid colorama color
     print(f"[{self.coloredString(name, name_color)}] : ", end = "");
-    self.animatedPrint(s);
+    self.animatedPrint(s, type_speed = 0.09);
     
   def getColor(self, color):
     if color == "red":
@@ -99,7 +99,7 @@ class UI:
     
     _input = self.getInput().lower();
     if _input in dialogues.keys():
-      self.animatedPrint(dialogues[_input]);
+      self.animatedPrint(dialogues[_input], type_speed = 0.09);
     return _input;
   
   def randomDialogue(self, name, dialogues):
@@ -118,6 +118,16 @@ class UI:
     
     self.normalPrint(f"{self.coloredString(bar_name + " :" , bar_color)} {filled_bar}{empty_bar}{end_str}");
   
+  def showStarBar(self, bar_name, n, max_n, end_str, color = "white", bar_color = "yellow"):
+    bar_length = 6;
+    filled_length = min((n / max_n) * bar_length, bar_length);
+    empty_length = bar_length - filled_length;
+    
+    filled_bar = self.getColor(color) + "★" * round(filled_length);
+    empty_bar = self.getColor(color) + "☆" * round(empty_length);
+    
+    self.normalPrint(f"{self.coloredString(bar_name + " :" , bar_color)} {filled_bar}{empty_bar}{end_str}");
+  
   def showHealthBar(self, player):
     self.showBar(
       f"{player.name} health",
@@ -126,7 +136,7 @@ class UI:
       f" ({player.stats["health"]} hp)",
       "green",
     );
-    
+  
   def showMainMenu(self):
     self.clear();
     
@@ -160,7 +170,8 @@ class UI:
       if stat == "health":
         self.showBar("(health)", player.stats["health"], player.stats["max health"], f" ({player.stats[stat]} hp)\n", "green", "red");
       else:  
-        self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player.stats[stat], "green")}");
+        self.showStarBar(f"({stat})", player.stats[stat], max(player.level * 10, player.stats[stat]), f" ({player.stats[stat]})", "blue", "magenta");
+        #self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player.stats[stat], "green")}");
     self.newLine();
   
   def compareStats(self, player1, player2):
@@ -168,9 +179,9 @@ class UI:
     self.normalPrint("        Comparison        ");
     self.normalPrint("{========================}\n");
     
-    self.normalPrint(f"{player1.name} <-> {player2.name}\n");
+    self.normalPrint(f"{player1.name}(lv {self.coloredString(player1.level, "yellow")}) <-> {player2.name}(lv {self.coloredString(player2.level, "yellow")})\n");
     for stat in player1.stats: # this assumes the stat of player 1 = player 2
-      self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player1.stats[stat], "blue")} <-> {self.coloredString(player2.stats[stat], "cyan")}");
+      self.normalPrint(f"({self.coloredString(stat, "yellow")}) •=• {self.coloredString(player1.stats[stat], "blue")} ⚔️ {self.coloredString(player2.stats[stat], "cyan")}");
     self.newLine();
     
   def showHomeMenu(self):
@@ -191,11 +202,12 @@ class UI:
   def showInventory(self, player): # improve this
     if len(player.inventory) <= 0:
       self.animatedPrint(f"you dont have {self.coloredString("items", "red")}!");
-      return;
+      return -1;
     
-    for n, item in enumerate(player.inventory):
-      self.normalPrint(f"({item})");
-      item_obj = player.inventory[item]["item"].__dict__;
+    for item in player.inventory:
+      self.normalPrint(f"({item}) {player.getAmountOfItem(item)}x");
+      item_obj = player.getItem(item).__dict__;
+      
       for info in item_obj:
         self.normalPrint(f"- {info}: {item_obj[info]}");
       self.newLine();
@@ -254,10 +266,15 @@ class UI:
     self.normalPrint("============\n");
     
     self.normalPrint(f"× {self.coloredString("attack", "blue")}");
-    self.normalPrint(f"× {self.coloredString("defend", "cyan")}");
+    self.normalPrint(f"× {self.coloredString("block", "cyan")}");
     self.normalPrint(f"× {self.coloredString("stats", "green")}");
-    self.normalPrint(f"× {self.coloredString("inventory", "yellow")}\n");
-
+    self.normalPrint(f"× {self.coloredString("inventory", "yellow")}");
+    
+    if player.stats["health"] <= (player.stats["max health"] * 0.25):
+      self.normalPrint(f"× {self.coloredString("flee", "red")}");
+    
+    self.newLine();
+    
   def showLevelUp(self, player):
     previous_level = player.level;
     previous_stats = {key: value for key, value in player.stats.items()};
@@ -267,5 +284,6 @@ class UI:
       for stat in previous_stats:
         self.normalPrint(f"{self.coloredString(stat, "blue")} : {self.coloredString(previous_stats[stat], "green", )} -> {self.coloredString(player.stats[stat], "yellow")}");
       self.newLine();
+      
     
     

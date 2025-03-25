@@ -1,5 +1,8 @@
 from enemy import Enemy, getEnemyByName;
 from random import randint, choices, uniform;
+from player import Player;
+
+from attack import AttackHandler;
 
 class CombatHandler:
   def __init__(self, attacker, game):
@@ -7,6 +10,7 @@ class CombatHandler:
     self.defender = None;
     self.game = game;
     self.ui = game.ui;
+    self.attack_handler = AttackHandler(self);
     
   def initiateCombat(self, name):
     self.defender = getEnemyByName(name);
@@ -16,39 +20,27 @@ class CombatHandler:
   def tryBlockBreak(self, attacker, defender, dmg):
     if dmg >= defender.stats["health"]:
       self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} was so strong, they broke through {self.ui.coloredString(defender.name, "yellow")}'s defense!");
-      self.ui.animatedPrint(f"{self.ui.coloredString(defender.name, "yellow")} couldn't block {self.ui.coloredString(attacker.name, "yellow")} attack.");
+      self.ui.animatedPrint(f"{self.ui.coloredString(defender.name, "yellow")} couldn't block {self.ui.coloredString(attacker.name, "yellow")}'s attack.");
       return True;
     return False;
-    
-  def handleAttack(self, attacker, defender, dmg, hit_msg, block_msg):
-    random_event = choices([None, "slipped"], [0.8, 0.2])[0];
-    
-    if attacker.status["blocking"] is True:
-      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} dropped their block!");
-      attacker.status["blocking"] = False;
-
-    elif defender.status["blocking"] is True and self.tryBlockBreak(attacker, defender, dmg) is False:
-      self.ui.animatedPrint(block_msg);
-      attacker.attackEnemy(max(0, dmg - defender.stats["defense"]));
-      defender.status["blocking"] = False;
-    
-    elif random_event == "slipped":
-      slip_dmg = attacker.stats["strength"] / randint(3, 5);
-      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} slipped and recieved {self.ui.coloredString(slip_dmg, "red")} damage!");
-    
-    else:
-      attacker.attackEnemy(dmg);
-      self.ui.animatedPrint(hit_msg);
   
-  def tryCriticalHit(self, attacker, dmg):
-    result = choices(["critical", None], [attacker.stats["luck"], 0.5])[0];
+  def handleAttack(self, attacker, defender):
+    self.attack_handler.handleAttack(attacker, defender);
+    
+  def tryModifyHit(self, attacker, dmg):
+    result = choices(["critical", "lucky hit", None], [attacker.stats["luck"], 0.05, 0.5])[0];
     if result == "critical":
       multiplier = round(uniform(1.1, 2), 2);
       self.ui.randomAnimatedPrint(
-        [f"{self.ui.coloredString(attacker.name, "yellow")} aims for a weak spot.", f"{self.ui.coloredString(attacker.name, "yellow")} found a opening!"]
+        [f"{self.ui.coloredString(attacker.name, "yellow")} aims for a weak spot.", f"{self.ui.coloredString(attacker.name, "yellow")} found an opening!"]
       );
       self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} will now deal a {self.ui.coloredString("CRITICAL HIT!", "red")} {self.ui.coloredString(multiplier, "green")}x damage.");
       return round(dmg * multiplier);
+    
+    elif result == "lucky hit":
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} is feeling lucky, {self.ui.coloredString("LUCKY HIT!", "cyan")} {self.ui.coloredString("10", "green")}x damage.");
+      return dmg * 10;
+      
     else:
       return dmg
    
@@ -74,57 +66,61 @@ class CombatHandler:
       self.giveLoot();
     elif self.attacker.isDead() is True:
       self.ui.animatedPrint(f"{self.ui.coloredString(self.defender.name, "yellow")} has killed {self.ui.coloredString("you", "yellow")}!");
+      self.attacker.stats["health"] = self.attacker.stats["max health"];
     else:
       return False;
     return True;
+  
+  def handleFlee(self, attacker, defender):
+    random_event = choices(["ran", "grabbed"])[0];
     
+    if random_event == "grabbed":
+      dmg = attacker.stats["health"] / 2;
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} tried to flee from {self.ui.coloredString(defender.name, "yellow")}, but {self.ui.coloredString(defender.name, "red")} grabbed them!");
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} recieved {self.ui.coloredString(dmg, "red")} dmg!");
+      attacker.giveDamage(dmg);
+    else:
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} ran away from {self.ui.coloredString(defender.name, "yellow")}!");
+    
+    return random_event;
+  
+  def handleOption(self, option, attacker, defender):
+    if option == "attack":
+      self.handleAttack(attacker, defender);
+    elif option == "block":
+      attacker.status["blocking"] = True;
+      self.ui.animatedPrint(f"{self.ui.coloredString(attacker.name, "yellow")} gets ready to {self.ui.coloredString("block", "red")}!")
+    elif option == "inventory" and isinstance(attacker, Player):
+      self.game.useInventory();
+    elif option == "stats" and isinstance(attacker, Player):
+      self.ui.showPlayerStats(attacker);
+    elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25):
+      return self.handleFlee(attacker, defender);
+  
+  def getOption(self, auto):
+    if auto is False:
+      return self.ui.getInput();
+    else:
+      return choices(["attack", "block", "flee"], [0.8, 0.3, 0.1])[0];
+      
   def combatLoop(self, auto = False): # optimize and refactor formatting colors
     option = None;
     while True:
       self.ui.showCombatMenu(self.attacker);
-      if auto is False:
-        option = self.ui.getInput();
-      else:
-        option = choices(["attack", "defend"], [0.8, 0.3])[0];
-      enemy_option = choices(["attack", "defend"], [self.defender.attack_chance, self.defender.defend_chance])[0]; # improve this later
+      option = self.getOption(auto);
+      enemy_option = choices(["attack", "block", "flee"], [self.defender.attack_chance, self.defender.defend_chance, 0.01])[0]; # improve this later
       
-      #==========#
-      
-      if option == "attack":
-        dmg = self.tryCriticalHit(self.attacker, self.attacker.stats["strength"]);
-        self.handleAttack(
-          self.attacker, 
-          self.defender,
-          dmg,
-          f"{self.ui.coloredString("you", "yellow")} hit {self.ui.coloredString(self.defender.name, "yellow")} and dealt {self.ui.coloredString(dmg, "red")} damage!",
-          f"{self.ui.coloredString("you", "yellow")} tried to hit {self.ui.coloredString(self.defender.name, "yellow")}, but they blocked and reduced it to {self.ui.coloredString(max(0, dmg - self.defender.stats["defense"]), "red")} damage!",
-        );
-      elif option == "defend":
-        self.attacker.status["blocking"] = True;
-        self.ui.animatedPrint(f"{self.ui.coloredString("you", "yellow")} put your arms up to {self.ui.coloredString("block", "red")}.");
-      elif option == "stats":
-        self.ui.showPlayerStats(self.attacker);
-      #==========# 
-      
-      if self.handleDeath() is True:
+      self.ui.clear();
+      self.ui.normalPrint("----------------");
+      self.ui.normalPrint(" ⚔️ Combat Log ⚔️");
+      self.ui.normalPrint("----------------\n");
+    
+      outcome = self.handleOption(option, self.attacker, self.defender);
+      if self.handleDeath() is True or outcome == "ran":
         break;
-        
-      if enemy_option == "attack":
-        dmg = self.tryCriticalHit(self.defender, self.defender.stats["strength"]);
-        self.handleAttack(
-          self.defender, 
-          self.attacker, 
-          dmg,
-          f"{self.ui.coloredString(self.defender.name, "yellow")} hit {self.ui.coloredString("you", "yellow")} and dealt {self.ui.coloredString(dmg, "red")} damage!",
-          f"{self.ui.coloredString(self.defender.name, "yellow")} tried to hit {self.ui.coloredString("you", "yellow")} but {self.ui.coloredString("you", "yellow")} blocked and reduced it to {self.ui.coloredString(max(0, dmg - self.defender.stats["defense"]), "red")} damage!",
-        );
-      elif enemy_option == "defend":
-        self.defender.status["blocking"] = True;
-        self.ui.animatedPrint(f"{self.ui.coloredString(self.defender.name, "yellow")} gets ready to {self.ui.coloredString("block", "red")}.");
-      
-      #==========# 
-      
-      if self.handleDeath() is True:
+      outcome = self.handleOption(enemy_option, self.defender, self.attacker);
+
+      if self.handleDeath() is True or outcome == "ran":
         break;
       
       if auto is False:

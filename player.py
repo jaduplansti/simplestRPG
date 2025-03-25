@@ -21,14 +21,22 @@ class Player:
       "luck" : round(uniform(0.1, 0.5), 4),
     };
     
-    self.skills = {
-      
+    self.equipment = {
+      "head" : None,
+      "chest" : None,
+      "left arm" : None,
+      "right arm" : None,
+      "boots" : None,
     };
     
-    self.inventory = {
-      
-    }
+    self.attack_style = "basic";
+    self.inventory = {};
+    self.skills = {};
+    self.magic = {};
     
+    for n in range(1, 10):
+      self.addItemToInventory(Item("health potion"));
+  
   def rerollStats(self):
     for stat in self.stats:
       if stat not in ["health"]:
@@ -43,14 +51,26 @@ class Player:
       
   def addItemToInventory(self, item):
     if self.itemExists(item.name) is True:
-      self.inventory[item.name]["amount"];
+      self.inventory[item.name]["amount"] += 1;
     else:
       self.inventory.update({
         item.name : {"amount" : 1, "item" : item}
       });
+  
+  def getAmountOfItem(self, item):
+    return self.inventory[item]["amount"];
+  
+  def getItem(self, item):
+    return self.inventory[item]["item"];
+  
+  def usedItem(self, item):
+    if self.getAmountOfItem(item) <= 1:
+      del self.inventory[item];
+    else:
+      self.inventory[item]["amount"] -= 1;
       
   def giveDamage(self, dmg):
-    self.stats["health"] -= dmg;
+    self.stats["health"] -= max(0, dmg);
     
   def attackEnemy(self, dmg):
     self.enemy.giveDamage(dmg);
@@ -89,3 +109,16 @@ class Player:
   
   def setLocation(self, location):
     self.location = location;
+  
+  def healPlayer(self, heal):
+    self.stats["health"] = min(self.stats["health"] + heal, self.stats["max health"]);
+  
+  def isEquipped(self, item):
+    if self.equipment[item.bodypart].name == item.name:
+      return True;
+    return False;
+    
+  def equipItem(self, item): # todo check if already equipped
+    if item.bodypart in self.equipment:
+      self.equipment[item.bodypart] = item;
+    

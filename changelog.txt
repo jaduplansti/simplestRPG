@@ -25,3 +25,18 @@
 • added a new line on block break
 • added auto feature (auto combat)
 • added better emphasis in critical hits
+
+[version 1.3]
+• added item uses
+• improved inventory
+• added items bread, apple pie and health potion
+• improved combat handling, majorly
+• added flee (appears when health is at 25%)
+• enemies can grab you upon fleeing
+• improved stats menu
+• improved combat logs 
+• added lucky hit (10x damage)
+• added equipment system 
+• added attack styles (major update, changed how attacks work)
+• adjusted type speed to 0.008 and delay speed to 0.7
+• temporarily removed slips

@@ -42,11 +42,20 @@ class Game:
     
     self.ui.showDialogue("hestia", "Not bad right?!");
     _ = self.ui.dynamicDialogue({
-      "what the fuck" : f"[hestia] : {self.ui.coloredString("Calm Down!", "red")} also it cant be that bad right.",
+      "what the fuck" : f"[hestia] : {self.ui.coloredString("Chill Out!", "red")}, it cant be that bad right?",
       "looks good to me" : f"[hestia] : Yayy, im glad you liked your stats.",
     });
-    self.ui.showDialogue("hestia", "Unfortunately i dont have the powers to change your stats");
     
+    self.ui.showDialogue("hestia", "Unfortunately for us i cant keep you in this dimension for long..");
+    self.ui.showDialogue("hestia", "Ill be sending you away now!");
+    
+    _ = self.ui.dynamicDialogue({
+      "wanna fuck" : f"[hestia] : No Thanks, well ill consider it once you grow stronger ;)",
+      "will i ever see you again" : f"[hestia] : Yeah definitely!",
+    });
+    
+    self.ui.showDialogue("hestia", "Remember reach level 20 ;)");
+    self.ui.awaitKey();
   def homeMenu(self):
     while True:
       self.ui.showHomeMenu();
@@ -55,16 +64,30 @@ class Game:
       if option == "move":
         self.goTravel();
       elif option == "inventory":
-        self.ui.showInventory(self.player);
+        self.useInventory();
       elif option == "stats":
         self.ui.showPlayerStats(self.player);
       elif option == "train":
-        self.initiateCombat(choices(["slime", "skeleton", "goblin"])[0]);
+        self.initiateCombat(choices(["slime", "goblin", "skeleton"])[0]);
       elif option == "exit":
         return;
         
       self.ui.awaitKey();
   
+  def useInventory(self):
+    if self.ui.showInventory(self.player) is -1:
+      return;
+      
+    self.ui.animatedPrint("what item to use? say nothing to cancel.");
+    item_name = self.ui.getInput();
+    
+    if item_name != "":
+      if self.player.itemExists(item_name) is True:
+        item = self.player.getItem(item_name);
+        item.use(self);
+        return;
+      self.ui.animatedPrint(f"{self.ui.coloredString(item_name, "red")} does not exist in your inventory!");
+      
   def goTravel(self):
     move_handler = MoveMenuHandler(self);
     move_handler.homeTravelMenu();
@@ -76,5 +99,5 @@ class Game:
     self.ui.compareStats(combat_handler.attacker, combat_handler.defender);
     self.ui.awaitKey();
     
-    combat_handler.combatLoop(auto = True);
+    combat_handler.combatLoop(auto = False);
     
