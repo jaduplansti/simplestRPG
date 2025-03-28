@@ -1,0 +1,28 @@
+{
+  "basic style" : {
+    "normal punch" : [
+      "[bold yellow]{0}[reset] threw a jab at [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] threw a solid jab to [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] slammed their fists into [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!"
+    ],
+    "strong punch" : [
+      "[bold yellow]{0}[reset] unleashed a brutal punch at [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] let his inner demons out to [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] slammed their fists into [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!"
+    ]
+  },
+  
+  "damage handler" : {
+    "defense ignored" : [
+      "[bold yellow]{1}[reset] let their guard down!",
+      "[bold yellow]{0}[reset] found a gap in [bold yellow]{1}[reset]'s defense and will hit hard!",
+      "[bold yellow]{0}[reset] overwhelmed [bold yellow]{1}[reset]'s guard, [bold yellow]{0}[reset] gets ready to land a devastating hit!"
+    ],
+    
+    "no damage" : [
+      "[bold yellow]{0}[reset] struck with all their might, but it barely scratched [bold yellow]{1}[reset]!",
+      "[bold yellow]{1}[reset] stood firm as [bold yellow]{0}[reset]'s blow bounced off harmlessly!",
+      "[bold yellow]{0}[reset]'s attack was utterly ineffective against [bold yellow]{1}[reset]'s impenetrable defense!"
+    ]
+  }
+}

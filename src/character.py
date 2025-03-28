@@ -1,13 +1,15 @@
 from random import randint, uniform;
 from item import Item;
 
-class Player:
+class Character:
   def __init__(self, name):
     self.name = name;
     self.level = 1;
     self.exp = 0;
+    
     self.location = "home";
     self.money = 1;
+    self.energy = 100;
     
     self.status = {
       "blocking" : False,
@@ -16,8 +18,8 @@ class Player:
     self.stats = {
       "health" : 100,
       "max health" : 100,
-      "strength" : randint(1, 10),
-      "defense" : randint(1, 10),
+      "strength" : randint(5, 10),
+      "defense" : randint(5, 10),
       "luck" : round(uniform(0.1, 0.5), 4),
     };
     
@@ -34,9 +36,6 @@ class Player:
     self.skills = {};
     self.magic = {};
     
-    for n in range(1, 10):
-      self.addItemToInventory(Item("health potion"));
-  
   def rerollStats(self):
     for stat in self.stats:
       if stat not in ["health"]:
@@ -70,7 +69,7 @@ class Player:
       self.inventory[item]["amount"] -= 1;
       
   def giveDamage(self, dmg):
-    self.stats["health"] -= max(0, dmg);
+    self.stats["health"] -= min(self.stats["health"], dmg);
     
   def attackEnemy(self, dmg):
     self.enemy.giveDamage(dmg);
@@ -121,4 +120,50 @@ class Player:
   def equipItem(self, item): # todo check if already equipped
     if item.bodypart in self.equipment:
       self.equipment[item.bodypart] = item;
+  
+  def getMaxStat(self):
+    return (10 * self.level);
+  
+  def getIncreasedStat(self):
+    return (2 * self.level);
+  
+  def getColorBasedOnStat(self, stat):
+    if self.stats[stat] <= self.getMaxStat() * 0.25:
+      return "red";
+    elif self.stats[stat] <= self.getMaxStat() * 0.5:
+      return "yellow";
+    elif self.stats[stat] <= self.getMaxStat() * 1:
+      return "green";
+    if self.stats[stat] > self.getMaxStat() * 1:
+      return "cyan";
+  
+  def getRankBasedOnStat(self, stat):
+    ratio = self.stats[stat] / self.getMaxStat()
+    
+    if ratio <= 0.05:
+        return "E"
+    elif ratio <= 0.15:
+        return "F"
+    elif ratio <= 0.3:
+        return "D"
+    elif ratio <= 0.45:
+        return "C"
+    elif ratio <= 0.6:
+        return "B"
+    elif ratio <= 0.75:
+        return "A"
+    elif ratio <= 0.9:
+        return "S"
+    elif ratio <= 1.0:
+        return "S+"
+    elif ratio <= 1.15:
+        return "SS"
+    elif ratio <= 1.3:
+        return "SS+"
+    elif ratio <= 1.5:
+        return "SSS"
+    elif ratio <= 1.75:
+        return "SSS+"
+    else:
+        return "???"
     

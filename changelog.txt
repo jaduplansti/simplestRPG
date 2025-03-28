@@ -40,3 +40,22 @@
 • added attack styles (major update, changed how attacks work)
 • adjusted type speed to 0.008 and delay speed to 0.7
 • temporarily removed slips
+
+[version 1.4]
+• changed lucky hit chance 0.5 -> 0.1
+• improved combat logs
+• multiple bug fixes (health exceeding 0)
+• added new attack style (swordsman) obtainable by equiping swords
+
+[version 1.5]
+• deleted game, ui, combat and exploration
+• changed ui into textual
+
+[version 1.6]
+• scratched existing exploration, ui and combst systems
+• reverted ui back to rich
+• ui revamp (took an entire day)
+• implemented better attack handling, combat system
+• made defense more useful (defense is considered on every attack),
+• 2 new events on defense handling, (defense too high and defense break)
+• polished stats menu

@@ -6,15 +6,13 @@ class Item:
   durability = 1, 
   rank = "E", 
   rarity = "common", 
-  weight = 0.1, 
-  stat_bonus = None, 
+  weight = 0.1,
   bodypart = None):
     
     self.name = name;
     self.durability = durability;
     self.rarity = rarity;
     self.weight = weight;
-    self.stat_bonus = stat_bonus;
     self.bodypart = bodypart;
   
   def getRarityMultiplier(self):
@@ -36,10 +34,15 @@ class Item:
     elif self.name == "wooden sword":
       game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} equipped a wooden sword.");
       game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} gained +10 strength");
+      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} had learned the way of the sword.");
       game.player.equipItem(self);
       game.player.stats["strength"] += 10;
+      game.player.attack_style = "swordsman";
       
     game.player.usedItem(self.name);
+  
+  def consumeDurability(self, n):
+    self.durability = min(self.durability, n);
     
 def createItem(name, durability = 1, rank = "E", rarity = "common", weight = 0.1, stat_bonus = None, bodypart = None):
     return Item(
