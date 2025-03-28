@@ -24,5 +24,42 @@
       "[bold yellow]{1}[reset] stood firm as [bold yellow]{0}[reset]'s blow bounced off harmlessly!",
       "[bold yellow]{0}[reset]'s attack was utterly ineffective against [bold yellow]{1}[reset]'s impenetrable defense!"
     ]
+  },
+  
+  "fatigue handler" : {
+    "tired": [
+      "[yellow]{0}[reset] starts to feel the strain but keeps going.",
+      "[yellow]{0}[reset] breathes heavily, fatigue creeping in.",
+     "[yellow]{0}[reset] wipes sweat from their face, determination burning."
+    ],
+  
+    "fatigued": [
+      "[yellow]{0}[reset] struggles to maintain their stance, exhaustion setting in.",
+      "[yellow]{0}[reset] grits their teeth, pushing through the fatigue.",
+      "[yellow]{0}[reset] sways slightly, their movements slowing."
+    ],
+  
+   "exhausted": [
+      "[yellow]{0}[reset] is barely standing, every breath a battle.",
+      "[yellow]{0}[reset] stumbles, their strength nearly gone.",
+      "[yellow]{0}[reset] fights to stay conscious, exhaustion overwhelming them."
+    ]
+  },
+  
+  "taunt" : {
+    "debuff" : [
+      "[yellow]{0}[reset] yelled kill yourself, [yellow]{1}[reset]'s defense dropped!",
+      "[yellow]{0}[reset] gave [yellow]{1}[reset] a fuck you gesture, [yellow]{1}[reset]'s defense dropped!",
+      "[yellow]{0}[reset] said 'L You Suck' to [yellow]{1}[reset], their defense dropped!"
+    ]
+  },
+  
+  "taunt success response" : {
+    "debuff slime" : [
+      "[yellow]{0}[reset] wobbles angrily, clearly offended!",
+      "[yellow]{0}[reset] tries to speak back, but it cant!",
+      "[yellow]{0}[reset] lets out a noise!"
+    ]
   }
 }
+  

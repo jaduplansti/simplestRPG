@@ -48,7 +48,7 @@ class UI:
     else:
       print(s);
   
-  def animatedPrint(self, key, n, args, type_speed = 0.01, delay = 1, center = False):
+  def animatedPrintFile(self, key, n, args, type_speed = 0.01, delay = 1, center = False):
     self.disableEcho();
     formatted_s = self.getString(key, n).format(*args)
     parsed_s = Text.from_markup(formatted_s);
@@ -62,7 +62,20 @@ class UI:
     
     self.enableEcho();
     self.clearStdinBuffer();
-  
+
+  def animatedPrint(self, s, type_speed = 0.01, delay = 1, center = False):
+    self.disableEcho();
+    parsed_s = Text.from_markup(s);
+    for ch in parsed_s:
+      print(ch, end = "");
+      sleep(type_speed)
+    self.newLine();
+    self.newLine();
+    sleep(delay);
+    
+    self.enableEcho();
+    self.clearStdinBuffer();
+    
   def randomizeColorPrint(self, s, center = False):
     colored_string = "";
     for ch in s:
@@ -160,10 +173,15 @@ class UI:
     self.newLine();
     
   def showStatCompareMenu(self, character1, character2):
-    self.showStatsMenu(character1);
-    self.normalPrint("vs");
-    self.showStatsMenu(character2);
-
+    stats_table = Table(f"Stat", box = box.DOUBLE);
+    stats_table.add_column("You");
+    stats_table.add_column(f"{character2.name}");
+    for stat in character1.stats:
+      stats_table.add_row(f"[yellow]{stat}[reset]", f"[{character1.getColorBasedOnStat(stat)}]{character1.stats[stat]}[reset]", f"[{character2.getColorBasedOnStat(stat)}]{character2.stats[stat]}[reset]");
+    self.normalPrint(stats_table);
+    self.newLine();
+    self.awaitKey();
+    
   def showMainMenu(self):
     self.clear();
     self.normalPrint("×××××××××××××××");
@@ -184,7 +202,6 @@ class UI:
     self.normalPrint("× [cyan]rank[reset]");
     self.normalPrint("× [red]back[reset]\n");
 
-    
   def showHomeMenu(self):
     self.clear();
     self.normalPrint("••••••••••••••");
@@ -206,6 +223,7 @@ class UI:
     
     self.normalPrint("× [yellow]attack[reset]");
     self.normalPrint("× [cyan]block[reset]");
+    self.normalPrint("× [blue]taunt[reset]");
     self.normalPrint("× [green]items[reset]");
       
     if character.stats["health"] <= character.stats["max health"] * 0.25:

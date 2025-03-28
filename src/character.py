@@ -166,4 +166,16 @@ class Character:
         return "SSS+"
     else:
         return "???"
-    
+  
+  def getFatigueMultiplier(self):
+    if self.energy <= 25:
+      return 0.25;
+    elif self.energy <= 50:
+      return 0.5;
+    elif self.energy <= 75:
+      return 0.8;
+    else:
+      return 1;
+      
+  def deductEnergy(self): # 10 energy per move
+    self.energy = max(0, self.energy - 10 / self.getFatigueMultiplier());

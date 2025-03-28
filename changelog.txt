@@ -59,3 +59,12 @@
 • made defense more useful (defense is considered on every attack),
 • 2 new events on defense handling, (defense too high and defense break)
 • polished stats menu
+
+[version 1.7]
+• added a fatigue/energy system, (75%, 50% and 20%)
+• players and npcs can now pass out
+• now specifies what each dialogue does 
+• added a stat comparison table 
+• stats menu is now seperated into 3 categories (stat, evaluation and rank)
+• planning to add multiplayer
+• added a taunt system 

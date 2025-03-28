@@ -20,21 +20,22 @@ class Game:
       elif option == "quit":
         return;
   
-  def handleStatQueryMenu(self):
+  def handleStatQueryMenu(self, character):
     while True:
       self.ui.showStatsQueryMenu();
       option = self.ui.getInput();
       
       if option == "stats":
-        self.ui.showStatsMenu(self.player);
+        self.ui.showStatsMenu(character);
       elif option == "evaluation":
-        self.ui.showStatsEvaluationMenu(self.player);
+        self.ui.showStatsEvaluationMenu(character);
       elif option == "rank":
-        self.ui.showStatsRankMenu(self.player);
+        self.ui.showStatsRankMenu(character);
       elif option == "back":
         return;
         
       self.ui.awaitKey();
+      
   def handleHomeMenu(self):
     while True:
       self.ui.showHomeMenu();
@@ -43,7 +44,7 @@ class Game:
       if option == "go outside":
         pass;
       elif option == "stats":
-        self.handleStatQueryMenu();
+        self.handleStatQueryMenu(self.player);
       elif option == "practice":
         combat_handler = CombatHandler(self);
         combat_handler.initiateFightNpc(self.player, "slime");
