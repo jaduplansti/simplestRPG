@@ -8,7 +8,7 @@ check_root() {
   fi
 }
 
-check_root 
+#check_root 
 echo "Starting Setup Script"
 apt update
 apt upgrade
