@@ -8,11 +8,11 @@ check_root() {
   fi
 }
 
-check_root 
+#check_root 
 echo "Starting Setup Script"
 apt update
 apt upgrade
-apt install python3-pip python3-dev patchelf
+apt install python-pip patchelf
 pip install nuitka
 
 if [[ $? -eq 0 ]]; then
