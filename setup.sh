@@ -28,6 +28,7 @@ echo "Compling simplestRPG now.."
 mkdir build
 cd build
 nuitka ../src/main.py --onefile --follow-imports -o simplestRPG
+cd ../../
 
 if [[ $? -eq 0 ]]; then
   cd ..
