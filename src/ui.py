@@ -14,6 +14,8 @@ import select;
 import json;
 import shutil;
 
+from pathlib import Path;
+
 class UI:
   def __init__(self, game):
     self.game = game;
@@ -34,8 +36,9 @@ class UI:
       sys.stdin.read(1);
   
   def loadStrings(self):
-    with open("game_strings.json", "r") as file:
+    with open(str(Path.home()) + "/simplestRPG/src/game_strings.json", "r") as file:
       self.strings = json.load(file);
+  
   
   def getString(self, key, n):
     if isinstance(self.strings[key][n], list):
