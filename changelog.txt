@@ -68,3 +68,16 @@
 • stats menu is now seperated into 3 categories (stat, evaluation and rank)
 • planning to add multiplayer
 • added a taunt system 
+
+[version 1.8]
+• taunts now decrease a stat randomly
+• added sleep
+• refined ui
+• fixed bug where enemy fatigue death transfer to the player
+• seperated stat query and misc to YOU menu
+
+[version 1.9]
+• added simple local multiplayer, experimental
+• improved combat logs
+• added a basic block system
+• tried to port to web (failed attempt no. 21)

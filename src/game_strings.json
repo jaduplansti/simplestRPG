@@ -1,65 +1,110 @@
 {
-  "basic style" : {
-    "normal punch" : [
-      "[bold yellow]{0}[reset] threw a jab at [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset] threw a solid jab to [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset] slammed their fists into [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!"
+  "basic style": {
+    "normal punch": [
+      "[bold yellow]{0}[reset] launched a quick strike at [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] swung a swift punch, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] jabbed fiercely at [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] threw a clean right hook at [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] snapped a punch toward [bold yellow]{1}[reset], delivering [bold red]{2}[reset] damage!"
     ],
-    "strong punch" : [
-      "[bold yellow]{0}[reset] unleashed a brutal punch at [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset] let his inner demons out to [bold yellow]{1}[reset], dealt [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset] slammed their fists into [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!"
+    "strong punch": [
+      "[bold yellow]{0}[reset] delivered a thunderous punch to [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] unleashed raw strength in a massive blow, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] smashed their fist into [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] poured every ounce of strength into a devastating strike, crushing [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] slammed their knuckles into [bold yellow]{1}[reset] with unstoppable force, delivering [bold red]{2}[reset] damage!"
     ]
   },
-  
-  "damage handler" : {
-    "defense ignored" : [
-      "[bold yellow]{1}[reset] let their guard down!",
-      "[bold yellow]{0}[reset] found a gap in [bold yellow]{1}[reset]'s defense and will hit hard!",
-      "[bold yellow]{0}[reset] overwhelmed [bold yellow]{1}[reset]'s guard, [bold yellow]{0}[reset] gets ready to land a devastating hit!"
+
+  "damage handler": {
+    "defense ignored": [
+      "[bold yellow]{0}[reset] capitalized on [bold yellow]{1}[reset]'s weak guard!",
+      "[bold yellow]{1}[reset] left themselves vulnerable, and [bold yellow]{0}[reset] wasted no time!",
+      "[bold yellow]{0}[reset] bypassed the defenses of [bold yellow]{1}[reset] with a cunning strike!",
+      "[bold yellow]{1}[reset] failed to react, leaving a clear opening for [bold yellow]{0}[reset]!",
+      "[bold yellow]{0}[reset] exploited the moment, delivering a punishing blow to [bold yellow]{1}[reset]!"
     ],
     
-    "no damage" : [
-      "[bold yellow]{0}[reset] struck with all their might, but it barely scratched [bold yellow]{1}[reset]!",
-      "[bold yellow]{1}[reset] stood firm as [bold yellow]{0}[reset]'s blow bounced off harmlessly!",
-      "[bold yellow]{0}[reset]'s attack was utterly ineffective against [bold yellow]{1}[reset]'s impenetrable defense!"
+    "no damage": [
+      "[bold yellow]{0}[reset] struck hard, but [bold yellow]{1}[reset] barely felt it!",
+      "[bold yellow]{1}[reset] smirked as [bold yellow]{0}[reset]'s punch glanced harmlessly away!",
+      "[bold yellow]{0}[reset] threw a mighty punch, but it was completely ineffective against [bold yellow]{1}[reset]!",
+      "[bold yellow]{1}[reset] shrugged off the attack like it was nothing!",
+      "[bold yellow]{0}[reset]'s strike was met with a solid defense, causing no harm to [bold yellow]{1}[reset]!"
     ]
   },
-  
-  "fatigue handler" : {
+
+  "fatigue handler": {
     "tired": [
-      "[yellow]{0}[reset] starts to feel the strain but keeps going.",
-      "[yellow]{0}[reset] breathes heavily, fatigue creeping in.",
-     "[yellow]{0}[reset] wipes sweat from their face, determination burning."
+      "[yellow]{0}[reset] breathes deeply, fighting against the mounting fatigue.",
+      "[yellow]{0}[reset] wipes the sweat from their eyes, trying to regain their focus.",
+      "[yellow]{0}[reset] moves with effort, their energy slowly draining.",
+      "[yellow]{0}[reset] tries to shake off the exhaustion, determination flickering in their eyes.",
+      "[yellow]{0}[reset] is clearly tiring, but refuses to give up."
     ],
-  
+
     "fatigued": [
-      "[yellow]{0}[reset] struggles to maintain their stance, exhaustion setting in.",
-      "[yellow]{0}[reset] grits their teeth, pushing through the fatigue.",
-      "[yellow]{0}[reset] sways slightly, their movements slowing."
+      "[yellow]{0}[reset] can barely stand straight, each breath labored.",
+      "[yellow]{0}[reset] wobbles slightly, their legs struggling to support them.",
+      "[yellow]{0}[reset] clutches their side, fighting through the growing fatigue.",
+      "[yellow]{0}[reset] breathes raggedly, their chest heaving with exertion.",
+      "[yellow]{0}[reset] looks pale and weak, the strain of the battle evident."
     ],
-  
-   "exhausted": [
-      "[yellow]{0}[reset] is barely standing, every breath a battle.",
-      "[yellow]{0}[reset] stumbles, their strength nearly gone.",
-      "[yellow]{0}[reset] fights to stay conscious, exhaustion overwhelming them."
+
+    "exhausted": [
+      "[yellow]{0}[reset] stumbles and nearly collapses, strength drained to its limit.",
+      "[yellow]{0}[reset] gasps desperately for air, their limbs trembling uncontrollably.",
+      "[yellow]{0}[reset] looks on the verge of collapse, their body refusing to move.",
+      "[yellow]{0}[reset] groans, every fiber of their being screaming in protest.",
+      "[yellow]{0}[reset] fights to remain conscious, the battle against fatigue almost lost."
+    ]
+  },
+
+  "taunt": {
+    "debuff": [
+      "[yellow]{0}[reset] ridiculed [yellow]{1}[reset], causing their confidence to falter!",
+      "[yellow]{0}[reset] delivered a cutting insult, rattling [yellow]{1}[reset]!",
+      "[yellow]{0}[reset] taunted [yellow]{1}[reset] mercilessly, breaking their focus!",
+      "[yellow]{0}[reset] verbally shredded [yellow]{1}[reset], reducing their fighting spirit!",
+      "[yellow]{0}[reset] unleashed a barrage of mockery, leaving [yellow]{1}[reset] utterly flustered!"
     ]
   },
   
-  "taunt" : {
-    "debuff" : [
-      "[yellow]{0}[reset] yelled kill yourself, [yellow]{1}[reset]'s defense dropped!",
-      "[yellow]{0}[reset] gave [yellow]{1}[reset] a fuck you gesture, [yellow]{1}[reset]'s defense dropped!",
-      "[yellow]{0}[reset] said 'L You Suck' to [yellow]{1}[reset], their defense dropped!"
-    ]
+ "sleep": { 
+   "cant sleep": [
+     "[yellow]{0}[reset] tries to sleep, but their energy is too high to rest.", 
+     "[yellow]{0}[reset] lays down, but they feel too awake to drift off.", 
+     "[yellow]{0}[reset] closes their eyes, but their mind races with energy.", 
+     "[yellow]{0}[reset] tosses and turns, unable to calm down enough to sleep.", 
+     "[yellow]{0}[reset] remains restless, far too energized to find sleep.", 
+     "[yellow]{0}[reset] groans in frustration, the desire to sleep clashing with their restless body.", 
+     "[yellow]{0}[reset] tries counting imaginary sheep, but it doesn't help.", 
+     "[yellow]{0}[reset] sighs, staring at the ceiling as their mind refuses to quiet.", 
+     "[yellow]{0}[reset] rolls over repeatedly, unable to find a comfortable spot.", 
+     "[yellow]{0}[reset] rubs their eyes, but the exhaustion they hoped for never comes." 
+     ] 
+     
+    "rested": [
+      "[yellow]{0}[reset] awakens feeling refreshed and ready to face the day.", 
+      "[yellow]{0}[reset] stretches, the night's rest rejuvenating their spirit.", 
+      "[yellow]{0}[reset] slept soundly, the warmth of the morning sun greeting them.", 
+      "[yellow]{0}[reset] yawns and smiles, the peaceful night bringing clarity to their mind.", 
+      "[yellow]{0}[reset] rises well-rested, strength renewed.", 
+      "[yellow]{0}[reset] wakes up feeling energized, their body fully restored.", 
+      "[yellow]{0}[reset] rubs their eyes and smiles, grateful for a restful sleep.", 
+      "[yellow]{0}[reset] breathes deeply, savoring the refreshing feeling of a good night's rest.", 
+      "[yellow]{0}[reset] stretches their arms wide, ready to embrace the new day.", 
+      "[yellow]{0}[reset] rises with renewed determination, the fatigue of the previous day washed away." 
+    ] 
   },
-  
-  "taunt success response" : {
-    "debuff slime" : [
-      "[yellow]{0}[reset] wobbles angrily, clearly offended!",
-      "[yellow]{0}[reset] tries to speak back, but it cant!",
-      "[yellow]{0}[reset] lets out a noise!"
+
+  "taunt success response": {
+    "debuff slime": [
+      "[yellow]{0}[reset] jiggled aggressively, its frustration evident!",
+      "[yellow]{0}[reset] bubbled furiously, reacting to the taunt!",
+      "[yellow]{0}[reset] quivered with indignation, though it could do little to respond!",
+      "[yellow]{0}[reset] sloshed angrily, unable to form a coherent retort!",
+      "[yellow]{0}[reset] vibrated violently, its oozy form expressing pure irritation!"
     ]
   }
 }
-  

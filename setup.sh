@@ -36,3 +36,9 @@ else
     echo "Failed to compile simplestRPG!"
   exit 1
 fi
+
+export LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib"
+touch $HOME/.bashrc
+echo export LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib" > $HOME/.bashrc
+alias simplestrpg="$PWD/simplestRPG/build/simplestRPG"
+echo alias simplestrpg="$PWD/simplestRPG/build/simplestRPG" > $HOME/.bashrc

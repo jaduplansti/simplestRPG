@@ -1,5 +1,6 @@
 from random import randint, uniform;
 from item import Item;
+import json;
 
 class Character:
   def __init__(self, name):
@@ -35,7 +36,7 @@ class Character:
     self.inventory = {};
     self.skills = {};
     self.magic = {};
-    
+  
   def rerollStats(self):
     for stat in self.stats:
       if stat not in ["health"]:
@@ -178,4 +179,22 @@ class Character:
       return 1;
       
   def deductEnergy(self): # 10 energy per move
-    self.energy = max(0, self.energy - 10 / self.getFatigueMultiplier());
+    self.energy = max(0, round(self.energy - 10 / self.getFatigueMultiplier()));
+  
+  def loadData(self, path):
+    with open(path, "r") as file:
+      data = json.load(file);
+      self.name = data["name"];
+      self.energy = data["energy"];
+      self.stats = data["stats"];
+  
+  def loadDataFromJson(self, s):
+    data = json.loads(s);
+    self.name = data["name"];
+    self.energy = data["energy"];
+    self.stats = data["stats"];
+    return self;
+    
+  def getData(self):
+    return json.dumps(self.__dict__);
+    

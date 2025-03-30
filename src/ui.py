@@ -2,7 +2,7 @@ from rich import print, box;
 from rich.align import Align;
 from os import system;
 
-from random import choices;
+from random import choices, uniform;
 from rich.prompt import Prompt;
 from rich.text import Text;
 
@@ -14,11 +14,23 @@ import select;
 import json;
 import shutil;
 
+from pathlib import Path;
+from rich.panel import Panel;
+from rich.progress import Progress, TextColumn, BarColumn;
+
+import time;
+from rich.console import Console;
+from rich.live import Live;
+
 class UI:
   def __init__(self, game):
     self.game = game;
+    self.console = Console();
     self.strings = {};
     self.loadStrings();
+  
+  def beep(self):
+    system("echo -n -e \a");
     
   def clear(self):
     system("clear");
@@ -34,7 +46,7 @@ class UI:
       sys.stdin.read(1);
   
   def loadStrings(self):
-    with open("game_strings.json", "r") as file:
+    with open(str(Path.home()) + "/simplestRPG/src/game_strings.json", "r") as file:
       self.strings = json.load(file);
   
   def getString(self, key, n):
@@ -48,31 +60,48 @@ class UI:
     else:
       print(s);
   
-  def animatedPrintFile(self, key, n, args, type_speed = 0.01, delay = 1, center = False):
+  def barPrint(self, s, n, n_max, speed = 0.01):
     self.disableEcho();
-    formatted_s = self.getString(key, n).format(*args)
-    parsed_s = Text.from_markup(formatted_s);
-    
-    for ch in parsed_s:
-      print(ch, end = "");
-      sleep(type_speed)
+    with Progress(TextColumn(f"({s}): "), BarColumn()) as progress:
+      for _ in progress.track(range(n, n_max)):
+        sleep(speed);
     self.newLine();
-    self.newLine();
-    sleep(delay);
-    
     self.enableEcho();
-    self.clearStdinBuffer();
-
-  def animatedPrint(self, s, type_speed = 0.01, delay = 1, center = False):
+    
+  def panelPrint(self, s):
+    self.normalPrint(Panel(s));
+    self.newLine();
+  
+  def panelAnimatedPrint(self, text, title, type_delay=0.05):
+    current_text = ""
+    formatted_text = Text.from_markup(text)
+    panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0])
+    with Live(panel, console=self.console, refresh_per_second=60) as live:
+      for n, ch in enumerate(formatted_text):
+        panel.renderable = formatted_text[0:n];
+        live.update(panel);
+        time.sleep(type_delay);
+    self.newLine();
+    
+  def animatedPrintFile(self, key, n, args, delay=1):
+	  formatted_s = self.getString(key, n).format(*args);
+	  self.animatedPrint(formatted_s, delay);
+  
+  def panelAnimatedPrintFile(self, key, n, args, title, delay=1):
+	  formatted_s = self.getString(key, n).format(*args);
+	  self.panelAnimatedPrint(formatted_s, title);
+  
+  def animatedPrint(self, s, delay=1):
     self.disableEcho();
-    parsed_s = Text.from_markup(s);
+    parsed_s = Text.from_markup(s)
+    print("~ ", end = "");
     for ch in parsed_s:
-      print(ch, end = "");
-      sleep(type_speed)
+      print(ch, end='', flush=True)
+      self.beep();
+      sleep(uniform(0.01, 0.06));
     self.newLine();
     self.newLine();
     sleep(delay);
-    
     self.enableEcho();
     self.clearStdinBuffer();
     
@@ -88,7 +117,7 @@ class UI:
   
   def awaitKey(self):
     self.normalPrint("(press enter to continue)\n");
-    _ = input(">");
+    self.getInput();
     self.newLine();
     
   def getInput(self):
@@ -115,7 +144,7 @@ class UI:
       
     evaluation_bar = f"[{color}]" + "★" * filled_length + "☆" * (bar_length - filled_length) + "[/]"
     return evaluation_bar;
-	  
+    
   def showHealthBar(self, character):
 	  name = character.name
 	  current_hp = character.stats["health"]
@@ -134,7 +163,7 @@ class UI:
 		  color = "red"
 
 	  health_bar = f"[{color}]" + "█" * filled_length + "░" * (bar_length - filled_length) + "[/]"
-	  self.normalPrint(f"{name} HP: {current_hp}/{max_hp}\n({health_percentage*100:.2f}%) {health_bar}\n")
+	  self.normalPrint(f"{name} HP: {round(current_hp)}/{max_hp}\n({health_percentage*100:.2f}%) {health_bar}\n")
 	
   def showHeader(self, title, ch):
     header = "";
@@ -186,11 +215,12 @@ class UI:
     self.clear();
     self.normalPrint("×××××××××××××××");
     self.normalPrint("× [bold cyan]simplestRpg[reset] ×");
-    self.normalPrint("×××××××××××××××\n");
-    
+    self.normalPrint("×××××××××××××××");
+    self.normalPrint("\n• version [green]1.9[reset] •\n")
+
     self.normalPrint("× [green]start[reset]");
     self.normalPrint("× [red]quit[reset]\n");
-  
+    
   def showStatsQueryMenu(self):
     self.clear();
     self.normalPrint("••••••••••••••");
@@ -208,11 +238,18 @@ class UI:
     self.normalPrint("• [italic yellow]Your House[reset] •");
     self.normalPrint("••••••••••••••\n");
     
-    self.normalPrint("× [yellow]go outside[reset]");
+    self.normalPrint("× [yellow]you[reset]");
     self.normalPrint("× [purple]practice[reset]");
-    self.normalPrint("× [cyan]stats[reset]");
-    self.normalPrint("× [green]items[reset]\n");
+    self.normalPrint("× [blue]sleep[reset]\n");
+  
+  def showYouMenu(self):
+    self.clear();
+    self.showHeader("YOU", "-");
     
+    self.normalPrint("× [cyan]stats[reset]");
+    self.normalPrint("× [green]items[reset]");
+    self.normalPrint("× [red]back[reset]\n");
+
   def showCombatMenu(self, combat_handler, character):
     self.clear();
     self.showHeader(f"{character.name} vs {character.enemy.name}", "×");
@@ -229,3 +266,4 @@ class UI:
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.normalPrint("× [red]flee[reset]");
     self.newLine();
+    

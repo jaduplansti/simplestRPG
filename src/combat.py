@@ -33,30 +33,23 @@ class CombatHandler:
   
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
-      self.ui.animatedPrint(f"[red]{attacker.name} passes out from exhastion.[reset]");
-      self.attacker.stats["health"] = 0;
+      self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhastion.[reset]", "fatigue");
+      attacker.stats["health"] = 0;
       return "passed out";
     elif attacker.energy <= 25:
-      self.ui.animatedPrintFile("fatigue handler", "exhausted", [attacker.name]);
+      self.ui.panelAnimatedPrintFile("fatigue handler", "exhausted", [attacker.name], "fatigue");
     elif attacker.energy <= 50:
-      self.ui.animatedPrintFile("fatigue handler", "fatigued", [attacker.name]);
+      self.ui.panelAnimatedPrintFile("fatigue handler", "fatigued", [attacker.name], "fatigue");
     elif attacker.energy <= 75:
-      self.ui.animatedPrintFile("fatigue handler", "tired", [attacker.name]);
+      self.ui.panelAnimatedPrintFile("fatigue handler", "tired", [attacker.name], "fatigue");
     else:
       return False;
     
-    self.ui.animatedPrint(f"([blue]-{self.attacker.getFatigueMultiplier()}[reset]) stat reduction.");
+    self.ui.panelPrint(f"([blue]-{self.attacker.getFatigueMultiplier()}[reset]) stat reduction.");
   
-  def handleTaunt(self, attacker, defender):
-    self.ui.animatedPrintFile("taunt", "debuff", [attacker.name, defender.name]);
-    if defender.name == "slime":
-      self.ui.animatedPrintFile("taunt success response", "debuff slime", [defender.name]);
-  
-  def handleAuto(self, auto):
-    if auto is True:
-      return choices(["attack", "block"])[0];
-    return self.ui.getInput();
-  
+  def handleInput(self):
+    pass;
+    
   def handleOption(self, option, attacker, defender):
     if self.handleFatigue(attacker) == "passed out":
       return True;
@@ -64,9 +57,10 @@ class CombatHandler:
     if option == "attack":
       self.attack_handler.handleAttack(attacker, defender);
     elif option == "block":
-      pass;
+      self.attack_handler.defense_handler.handleBlock(attacker, defender);
+      self.ui.animatedPrint("i dont know what to put here, you blocked yay!");
     elif option == "taunt":
-      self.handleTaunt(attacker, defender);
+      self.attack_handler.taunt_handler.handleTaunt(attacker, defender);
     elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25):
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
       self.ui.awaitKey();
@@ -81,18 +75,31 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
     elif self.defender.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
-      self.giveExp(self.attacker, self.defender);
-      attacker.stats["health"] = attacker.stats["max health"]
+      if randint(1, 10) == randint(1, 10):
+        self.ui.animatedPrint(f"[blue]{self.defender.name} refuses to die![reset]");
+        self.ui.animatedPrint("[yellow]HEALTH[reset] [green](+5)[reset]");
+        self.defender.stats["health"] += 5;
+        return False;
+      else:
+        self.giveExp(self.attacker, self.defender);
     else:
       return False;
+      
     self.ui.awaitKey();
+    self.attacker.stats["health"] = self.attacker.stats["max health"];
     return True;
   
+  def handleCombatLocal(self, attacker, defender): # handles multiplayer using pipes, 2 players
+    while True:
+      self.ui.showCombatMenu(attacker, defender);
+      option1 = self.ui.getInput();
+      #option2 = self.game.multiplayer_handler
+      
   def handleCombatNpc(self, auto = False):
     while True:
       self.ui.showCombatMenu(self, self.attacker);
-      option = self.handleAuto(auto);
-      enemy_option = choices(["attack", "block", "flee"], [self.defender.attack_chance, self.defender.block_chance, 0.5])[0];
+      option = self.ui.getInput();
+      enemy_option = choices(["attack", "block", "flee", "taunt"], [self.defender.attack_chance, self.defender.block_chance, 0.5, 0.5])[0];
       
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
@@ -105,10 +112,11 @@ class CombatHandler:
         break;
       
       ran = self.handleOption(enemy_option, self.defender, self.attacker);
-      self.ui.showSeperator("-");
+      self.ui.showSeperator("*");
       
       self.ui.showHealthBar(self.attacker);
       self.ui.showHealthBar(self.defender);
+      self.ui.showSeperator("*");
 
       if self.checkDeath() is True or ran is True:
         break;
