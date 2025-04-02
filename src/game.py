@@ -1,17 +1,21 @@
 from player import Player;
 from ui import UI;
 from combat import CombatHandler;
+
 from multiplayer import MultiplayerHandler;
+from menu import Menu;
+from random import choices;
 
 class Game:
   def __init__(self):
     self.player = Player("");
     self.ui = UI(self);
+    self.menu = Menu(self);
     self.multiplayer_handler = MultiplayerHandler(self);
     
   def handleMainMenu(self):
     while True:
-      self.ui.showMainMenu();
+      self.menu.showMainMenu();
       option = self.ui.getInput().lower();
       
       if option == "start":
@@ -23,15 +27,15 @@ class Game:
   
   def handleStatQueryMenu(self, character):
     while True:
-      self.ui.showStatsQueryMenu();
+      self.menu.showStatsQueryMenu();
       option = self.ui.getInput();
       
       if option == "stats":
-        self.ui.showStatsMenu(character);
+        self.menu.showStatsMenu(character);
       elif option == "evaluation":
-        self.ui.showStatsEvaluationMenu(character);
+        self.menu.showStatsEvaluationMenu(character);
       elif option == "rank":
-        self.ui.showStatsRankMenu(character);
+        self.menu.showStatsRankMenu(character);
       elif option == "back":
         return;
         
@@ -39,7 +43,7 @@ class Game:
       
   def handleHomeMenu(self):
     while True:
-      self.ui.showHomeMenu();
+      self.menu.showHomeMenu();
       option = self.ui.getInput();
     
       if option == "go outside":
@@ -48,11 +52,11 @@ class Game:
         self.handleYouMenu();
       elif option == "practice":
         combat_handler = CombatHandler(self);
-        combat_handler.initiateFightNpc(self.player, "slime");
+        combat_handler.initiateFightNpc(self.player, choices(["slime", "goblin"])[0]);
       elif option == "sleep":
         if self.player.energy >= 75:
           self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
-        else: # optimize thid
+        else: # optimize this
           self.ui.clear();
           self.ui.barPrint("[blue]sleeping[reset]", self.player.energy, 100, speed = 0.1);
           self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
@@ -62,7 +66,7 @@ class Game:
         
   def handleYouMenu(self):
     while True:
-      self.ui.showYouMenu();
+      self.menu.showYouMenu();
       option = self.ui.getInput();
     
       if option == "items":

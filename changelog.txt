@@ -81,3 +81,11 @@
 • improved combat logs
 • added a basic block system
 • tried to port to web (failed attempt no. 21)
+
+[version 2.0]
+• added a new move for basic style 
+• added dialogues to blocking
+• returned and rebalanced enemy goblin
+• refactored ui 
+• restored leveling system
+• added combo system

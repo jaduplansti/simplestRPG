@@ -1,4 +1,4 @@
-from rich import print, box;
+from rich import print
 from rich.align import Align;
 from os import system;
 
@@ -6,7 +6,6 @@ from random import choices, uniform;
 from rich.prompt import Prompt;
 from rich.text import Text;
 
-from rich.table import Table;
 from time import sleep;
 import sys;
 
@@ -21,6 +20,8 @@ from rich.progress import Progress, TextColumn, BarColumn;
 import time;
 from rich.console import Console;
 from rich.live import Live;
+
+from rich.tree import Tree;
 
 class UI:
   def __init__(self, game):
@@ -72,7 +73,8 @@ class UI:
     self.normalPrint(Panel(s));
     self.newLine();
   
-  def panelAnimatedPrint(self, text, title, type_delay=0.05):
+  def panelAnimatedPrint(self, text, title, type_speed=0.05):
+    self.disableEcho();
     current_text = ""
     formatted_text = Text.from_markup(text)
     panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0])
@@ -80,16 +82,20 @@ class UI:
       for n, ch in enumerate(formatted_text):
         panel.renderable = formatted_text[0:n];
         live.update(panel);
-        time.sleep(type_delay);
+        self.beep();
+        sleep(type_speed);
     self.newLine();
+    sleep(1);
+    self.enableEcho();
+    self.clearStdinBuffer();
     
   def animatedPrintFile(self, key, n, args, delay=1):
 	  formatted_s = self.getString(key, n).format(*args);
 	  self.animatedPrint(formatted_s, delay);
   
-  def panelAnimatedPrintFile(self, key, n, args, title, delay=1):
+  def panelAnimatedPrintFile(self, key, n, args, title, type_speed = 0.05):
 	  formatted_s = self.getString(key, n).format(*args);
-	  self.panelAnimatedPrint(formatted_s, title);
+	  self.panelAnimatedPrint(formatted_s, title, type_speed);
   
   def animatedPrint(self, s, delay=1):
     self.disableEcho();
@@ -104,6 +110,13 @@ class UI:
     sleep(delay);
     self.enableEcho();
     self.clearStdinBuffer();
+  
+  def printTreeMenu(self, title, options): 
+    tree = Tree(title);
+    for option in options:
+      tree.add(option);
+    print(tree);
+    self.newLine();
     
   def randomizeColorPrint(self, s, center = False):
     colored_string = "";
@@ -176,94 +189,4 @@ class UI:
     for _ in range(shutil.get_terminal_size().columns):
       seperator += ch;
     self.randomizeColorPrint(seperator + "\n");
-    
-  def showStatsRankMenu(self, character):
-    stats_table = Table(f"{character.name} Stats", box = box.DOUBLE);
-    stats_table.add_column("Rank");
-    for stat in character.stats:
-      stats_table.add_row(f"[yellow]{stat}[reset]", f"[blue]({character.getRankBasedOnStat(stat)})[reset]");
-    self.normalPrint(stats_table);
-    self.newLine();
-
-  def showStatsMenu(self, character):
-    stats_table = Table(f"{character.name} Stats", box = box.DOUBLE);
-    stats_table.add_column("Value");
-    for stat in character.stats:
-      stats_table.add_row(f"[yellow]{stat}[reset]", f"[{character.getColorBasedOnStat(stat)}]{character.stats[stat]}[reset]");
-    self.normalPrint(stats_table);
-    self.newLine();
-
-  def showStatsEvaluationMenu(self, character):
-    stats_table = Table(f"{character.name} Stats", box = box.DOUBLE);
-    stats_table.add_column("Evaluation");
-    for stat in character.stats:
-      stats_table.add_row(f"[yellow]{stat}[reset]", self.showStatEvaluation(stat, character.stats[stat], character.level));
-    self.normalPrint(stats_table);
-    self.newLine();
-    
-  def showStatCompareMenu(self, character1, character2):
-    stats_table = Table(f"Stat", box = box.DOUBLE);
-    stats_table.add_column("You");
-    stats_table.add_column(f"{character2.name}");
-    for stat in character1.stats:
-      stats_table.add_row(f"[yellow]{stat}[reset]", f"[{character1.getColorBasedOnStat(stat)}]{character1.stats[stat]}[reset]", f"[{character2.getColorBasedOnStat(stat)}]{character2.stats[stat]}[reset]");
-    self.normalPrint(stats_table);
-    self.newLine();
-    self.awaitKey();
-    
-  def showMainMenu(self):
-    self.clear();
-    self.normalPrint("×××××××××××××××");
-    self.normalPrint("× [bold cyan]simplestRpg[reset] ×");
-    self.normalPrint("×××××××××××××××");
-    self.normalPrint("\n• version [green]1.9[reset] •\n")
-
-    self.normalPrint("× [green]start[reset]");
-    self.normalPrint("× [red]quit[reset]\n");
-    
-  def showStatsQueryMenu(self):
-    self.clear();
-    self.normalPrint("••••••••••••••");
-    self.normalPrint("• [italic yellow]Stat Query[reset] •");
-    self.normalPrint("••••••••••••••\n");
-    
-    self.normalPrint("× [green]stats[reset]");
-    self.normalPrint("× [yellow]evaluation[reset]");
-    self.normalPrint("× [cyan]rank[reset]");
-    self.normalPrint("× [red]back[reset]\n");
-
-  def showHomeMenu(self):
-    self.clear();
-    self.normalPrint("••••••••••••••");
-    self.normalPrint("• [italic yellow]Your House[reset] •");
-    self.normalPrint("••••••••••••••\n");
-    
-    self.normalPrint("× [yellow]you[reset]");
-    self.normalPrint("× [purple]practice[reset]");
-    self.normalPrint("× [blue]sleep[reset]\n");
-  
-  def showYouMenu(self):
-    self.clear();
-    self.showHeader("YOU", "-");
-    
-    self.normalPrint("× [cyan]stats[reset]");
-    self.normalPrint("× [green]items[reset]");
-    self.normalPrint("× [red]back[reset]\n");
-
-  def showCombatMenu(self, combat_handler, character):
-    self.clear();
-    self.showHeader(f"{character.name} vs {character.enemy.name}", "×");
-    
-    self.showHealthBar(character);
-    self.showHealthBar(character.enemy);
-    self.showSeperator("+");
-    
-    self.normalPrint("× [yellow]attack[reset]");
-    self.normalPrint("× [cyan]block[reset]");
-    self.normalPrint("× [blue]taunt[reset]");
-    self.normalPrint("× [green]items[reset]");
-      
-    if character.stats["health"] <= character.stats["max health"] * 0.25:
-      self.normalPrint("× [red]flee[reset]");
-    self.newLine();
     

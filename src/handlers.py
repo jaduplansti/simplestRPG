@@ -1,6 +1,5 @@
 from random import randint, choices;
 
-#todo: probably add a seperate handleAttack for npcs
 class CriticalHandler:
   def __init__(self):
     pass;
@@ -31,8 +30,8 @@ class TauntHandler:
     if defender.name == "slime":
       self.ui.panelAnimatedPrintFile("taunt success response", "debuff slime", [defender.name], "slime");
     stat = choices(list(defender.stats))[0];
-    defender.stats[stat] = max(0, defender.stats[stat] - 5);
-    self.ui.panelPrint(f"[bold yellow]{stat.upper()}[reset] ([red]-5[reset])");
+    defender.stats[stat] = max(0, defender.stats[stat] - 0.1);
+    self.ui.panelPrint(f"[bold yellow]{stat.upper()}[reset] ([red]-0.1[reset])");
     
 class DamageHandler:
   def __init__(self, combat_handler):
@@ -75,7 +74,7 @@ class AttackHandler:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] dropped their block");
       attacker.status["blocking"] = False;
     elif defender.status["blocking"]:
-      self.ui.animatedPrint(f"[yellow]{defender.name}[reset] blocked [yellow]{attacker.name}[reset]'s attack!");
+      self.ui.panelAnimatedPrintFile("block", "successful block", [defender.name, attacker.name], "block");
       self.ui.panelPrint(f"[purple](DAMAGE BLOCKED)[reset]");
       defender.status["blocking"] = False;
     else:
@@ -85,15 +84,27 @@ class AttackHandler:
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;
-      
+    
     if attacker.attack_style == "basic":
-      preset = randint(1, 2);
+      preset = randint(1, 3);
       if preset == 1:
         dmg = self.damage_handler.calculateDamage("punch", attacker, defender);
-        self.ui.panelAnimatedPrintFile("basic style", "normal punch", [attacker.name, defender.name, dmg], attacker.name);
+        self.ui.panelAnimatedPrintFile("basic style", "normal punch", [attacker.name, defender.name, dmg], "normal punch");
         attacker.attackEnemy(dmg);
+        self.combat_handler.event_handler.handleEvent(attacker, defender, self.combat_handler.event_handler.pickEvent(["basic_normal_event", None], [0.4, 0.6]));
       elif preset == 2:
         dmg = self.damage_handler.calculateDamage("strong punch", attacker, defender);
-        self.ui.panelAnimatedPrintFile("basic style", "strong punch", [attacker.name, defender.name, dmg], attacker.name);
+        self.ui.panelAnimatedPrintFile("basic style", "strong punch", [attacker.name, defender.name, dmg], "strong punch");
         attacker.attackEnemy(dmg);
-  
+        ## add reaction event here
+      elif preset == 3:
+        for n in range(1, 3):
+          dmg = self.damage_handler.calculateDamage("strong punch", attacker, defender);
+          self.ui.panelAnimatedPrintFile("basic style", "quick combo punch", [attacker.name, defender.name, dmg], f"quick combo {n}", 0.01);
+          attacker.attackEnemy(dmg);
+    
+    elif attacker.attack_style == "debug":
+      self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damagee", "debug");
+      attacker.attackEnemy(99999999999999999);
+      self.combat_handler.event_handler.handleEvent(attacker, defender, self.combat_handler.event_handler.pickEvent(["basic_normal_event", None], [0.4, 0.6]));
+

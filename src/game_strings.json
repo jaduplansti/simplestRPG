@@ -13,6 +13,14 @@
       "[bold yellow]{0}[reset] smashed their fist into [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] poured every ounce of strength into a devastating strike, crushing [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] slammed their knuckles into [bold yellow]{1}[reset] with unstoppable force, delivering [bold red]{2}[reset] damage!"
+    ],
+    "quick combo punch": [
+      "[bold yellow]{0}[reset] quickly jabbed at [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] followed up with a swift second punch, striking [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] launched a rapid punch at [bold yellow]{1}[reset], landing cleanly for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] didn't hesitate, delivering another quick hit to [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] struck with precision, landing a clean punch on [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] wasted no time and drove another punch into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!"
     ]
   },
 
@@ -40,7 +48,7 @@
       "[yellow]{0}[reset] wipes the sweat from their eyes, trying to regain their focus.",
       "[yellow]{0}[reset] moves with effort, their energy slowly draining.",
       "[yellow]{0}[reset] tries to shake off the exhaustion, determination flickering in their eyes.",
-      "[yellow]{0}[reset] is clearly tiring, but refuses to give up."
+      "[yellow]{0}[reset] is clearly tired, but refuses to give up."
     ],
 
     "fatigued": [
@@ -106,5 +114,33 @@
       "[yellow]{0}[reset] sloshed angrily, unable to form a coherent retort!",
       "[yellow]{0}[reset] vibrated violently, its oozy form expressing pure irritation!"
     ]
+  },
+  
+  "block": {
+    "successful block": [ 
+      "[bold yellow]{0}[reset] raised their guard just in time, blocking the attack from [bold yellow]{1}[reset]!", 
+      "[bold yellow]{0}[reset] deflected the strike skillfully, preventing any damage from [bold yellow]{1}[reset]!", 
+      "[bold yellow]{0}[reset] braced themselves and absorbed the impact, nullifying [bold yellow]{1}[reset]'s attack!", 
+      "[bold yellow]{0}[reset] managed to block the incoming blow from [bold yellow]{1}[reset], taking no damage!", 
+      "[bold yellow]{0}[reset] stood firm and shielded against the strike, halting [bold yellow]{1}[reset]'s assault!" 
+    ], 
+    "blocking": [ 
+      "[bold yellow]{0}[reset] quickly raised their guard, preparing to block the attack from [bold yellow]{1}[reset]!", 
+      "[bold yellow]{0}[reset] moved into a defensive stance, anticipating the incoming blow from [bold yellow]{1}[reset]!", 
+      "[bold yellow]{0}[reset] positioned their arms to block, bracing for [bold yellow]{1}[reset]'s strike!", 
+      "[bold yellow]{0}[reset] focused their defense, attempting to intercept the attack from [bold yellow]{1}[reset]!", 
+      "[bold yellow]{0}[reset] prepared to shield themselves, reacting swiftly to [bold yellow]{1}[reset]'s assault!" 
+    ], 
+    "failed block": [ 
+      "[bold yellow]{0}[reset] misjudged the attack, failing to block as [bold yellow]{1}[reset] landed a clean hit!", 
+      "[bold yellow]{0}[reset] raised their guard too late, and [bold yellow]{1}[reset] struck directly!", 
+      "[bold yellow]{0}[reset] tried to block, but [bold yellow]{1}[reset]'s attack slipped past effortlessly!", 
+      "[bold yellow]{0}[reset] was too slow to react, taking the full force of [bold yellow]{1}[reset]'s blow!", 
+      "[bold yellow]{0}[reset] failed to block in time, leaving themselves open to [bold yellow]{1}[reset]'s attack!" 
+    ] 
+  },
+  
+  "combat dialogue": {
+    "slime" : []
   }
 }

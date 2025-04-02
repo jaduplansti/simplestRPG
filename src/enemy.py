@@ -38,9 +38,9 @@ def getEnemyByName(name):
     
   elif name == "goblin":
     goblin = Enemy("goblin");
-    goblin.level = randint(1, 5);
-    goblin.stats["health"] = 100;
-    goblin.stats["max health"] = 100;
+    goblin.level = randint(3, 5);
+    goblin.stats["health"] = 50;
+    goblin.stats["max health"] = 50;
     goblin.stats["strength"] = randint(8, 12) + goblin.getIncreasedStat();
     goblin.stats["defense"] = randint(8, 15) + goblin.getIncreasedStat();
     
