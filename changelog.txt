@@ -88,4 +88,6 @@
 • returned and rebalanced enemy goblin
 • refactored ui 
 • restored leveling system
-• added combo system
+• added combo system experimental
+• made the ui more readable
+• enemies now have a chance to go berserk

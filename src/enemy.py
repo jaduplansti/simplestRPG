@@ -11,12 +11,21 @@ class Enemy(Character):
     self.attack_chance = 0;
     self.block_chance = 0;
     
+    self.berserk = False;
+    
   def getLoot(self):
     return choices(self.loot, self.loot_chance)[0];
   
   def putLoot(self, item, chance):
     self.loot.append(item);
     self.loot_chance.append(chance);
+  
+  def goBerserk(self):
+    self.energy = 1000;
+    for stat in self.stats:
+      self.stats[stat] *= 1.5;
+    self.stats["health"] = self.stats["max health"];
+    self.berserk = True;
     
 def getEnemyByName(name):
   if name == "slime":

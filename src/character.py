@@ -24,7 +24,7 @@ class Character:
     
     self.equipment = {"head": None, "chest": None, "left arm": None, "right arm": None, "boots": None}
     
-    self.attack_style = "basic"
+    self.attack_style = "debug"
     self.inventory = {}
     self.skills = {}
     self.magic = {}

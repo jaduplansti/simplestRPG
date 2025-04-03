@@ -85,11 +85,11 @@ class UI:
         self.beep();
         sleep(type_speed);
     self.newLine();
-    sleep(1);
+    sleep(2);
     self.enableEcho();
     self.clearStdinBuffer();
     
-  def animatedPrintFile(self, key, n, args, delay=1):
+  def animatedPrintFile(self, key, n, args, delay=2):
 	  formatted_s = self.getString(key, n).format(*args);
 	  self.animatedPrint(formatted_s, delay);
   
@@ -138,26 +138,6 @@ class UI:
     self.newLine();
     return _input;
   
-  def showStatEvaluation(self, stat_name, stat_val, level):
-    if stat_name == "health" or stat_name == "max health" or stat_name == "luck":
-      return "N/A";
-    
-    bar_length = 6;
-    stat_percentage = stat_val / (level * 10);
-    filled_length = int(stat_percentage * bar_length)
-    
-    if stat_val <= (10 * level) * 0.25:
-      color = "red";
-    elif stat_val <= (10 * level) * 0.5:
-      color = "yellow";
-    elif stat_val <= (10 * level) * 1:
-      color = "green";
-    if stat_val > (10 * level) * 1:
-      color = "cyan";
-      
-    evaluation_bar = f"[{color}]" + "★" * filled_length + "☆" * (bar_length - filled_length) + "[/]"
-    return evaluation_bar;
-    
   def showHealthBar(self, character):
 	  name = character.name
 	  current_hp = character.stats["health"]

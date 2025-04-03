@@ -12,6 +12,14 @@ class Game:
     self.ui = UI(self);
     self.menu = Menu(self);
     self.multiplayer_handler = MultiplayerHandler(self);
+  
+  def handleSleep(self):
+    self.ui.clear();
+    self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] sees their bed and gets ready to sleep.");
+    self.ui.barPrint("[blue]Energy[reset]", self.player.energy, 100, speed = 0.1);
+    self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
+    self.ui.panelPrint(f"[bold blue]ENERGY[reset] ([green]+100[reset])");
+    self.player.energy = 100;
     
   def handleMainMenu(self):
     while True:
@@ -25,22 +33,6 @@ class Game:
       elif option == "quit":
         return;
   
-  def handleStatQueryMenu(self, character):
-    while True:
-      self.menu.showStatsQueryMenu();
-      option = self.ui.getInput();
-      
-      if option == "stats":
-        self.menu.showStatsMenu(character);
-      elif option == "evaluation":
-        self.menu.showStatsEvaluationMenu(character);
-      elif option == "rank":
-        self.menu.showStatsRankMenu(character);
-      elif option == "back":
-        return;
-        
-      self.ui.awaitKey();
-      
   def handleHomeMenu(self):
     while True:
       self.menu.showHomeMenu();
@@ -48,31 +40,31 @@ class Game:
     
       if option == "go outside":
         pass;
-      elif option == "you":
-        self.handleYouMenu();
+      elif option == "stats":
+        self.menu.showStatsMenu(self.player);
       elif option == "practice":
         combat_handler = CombatHandler(self);
         combat_handler.initiateFightNpc(self.player, choices(["slime", "goblin"])[0]);
+        continue;
       elif option == "sleep":
         if self.player.energy >= 75:
           self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
-        else: # optimize this
-          self.ui.clear();
-          self.ui.barPrint("[blue]sleeping[reset]", self.player.energy, 100, speed = 0.1);
-          self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
-          self.ui.panelPrint(f"[bold blue]ENERGY[reset] ([green]+100[reset])");
-          self.player.energy = 100;
-        self.ui.awaitKey();
-        
-  def handleYouMenu(self):
-    while True:
-      self.menu.showYouMenu();
-      option = self.ui.getInput();
-    
-      if option == "items":
-        pass;
-      elif option == "stats":
-        self.handleStatQueryMenu(self.player);
-      elif option == "back":
-        return;
+        else: 
+          self.handleSleep();
       self.ui.awaitKey();
+        
+  def handleCombatInitiateMenu(self, combat_handler):
+    while True:
+      self.menu.showCombatInitiateMenu();
+      option = self.ui.getInput();
+      
+      if option == "fight":
+        combat_handler.handleCombatNpc();
+        return;
+      elif option == "bail":
+        pass;
+      elif option == "talk":
+        pass;
+      
+      self.ui.awaitKey();
+        

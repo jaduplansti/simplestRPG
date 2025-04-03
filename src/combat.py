@@ -1,4 +1,4 @@
-from enemy import getEnemyByName;
+from enemy import Enemy, getEnemyByName;
 from random import randint, choices;
 from handlers import AttackHandler;
 from  combatevent import CombatEventHandler;
@@ -21,10 +21,8 @@ class CombatHandler:
     
     self.defender = enemy;
     self.defender.enemy = self.attacker;
-    self.menu.showStatCompareMenu(self.attacker, self.defender);
+    self.game.handleCombatInitiateMenu(self);
     
-    self.handleCombatNpc();
-  
   def giveExp(self, won, lost):
     exp_gain = round((lost.level * 100) / randint(1, 3));
     self.ui.animatedPrint(f"[yellow]{won.name}[reset] felt an energy surging from within, gained [italic green]{exp_gain}[reset] exp!");
@@ -55,9 +53,12 @@ class CombatHandler:
     
     self.ui.panelPrint(f"([blue]-{self.attacker.getFatigueMultiplier()}[reset]) stat reduction.");
   
-  def handleInput(self):
-    pass;
-    
+  def handleBerserkNpc(self, npc):
+    self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
+    self.ui.animatedPrint(f"[yellow]{npc.name}[reset] goes [red]Berserk[reset]!");
+    self.ui.panelPrint("[blue]ALL STATS[reset] [green](x1.5)[reset]");
+    npc.goBerserk();
+
   def handleOption(self, option, attacker, defender):
     if self.handleFatigue(attacker) == "passed out":
       return True;
@@ -77,16 +78,14 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
     
     attacker.deductEnergy();
-
+  
   def checkDeath(self):
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
     elif self.defender.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
-      if randint(1, 10) == randint(1, 10):
-        self.ui.panelPrint(f"[blue]{self.defender.name} refuses to die![reset]");
-        self.ui.panelPrint("[yellow]HEALTH[reset] [green](+5)[reset]");
-        self.defender.stats["health"] += 5;
+      if randint(1, 1) == randint(1, 1) and self.defender.berserk != True:
+        self.handleBerserkNpc(self.defender);
         return False;
       else:
         self.giveExp(self.attacker, self.defender);
@@ -123,6 +122,9 @@ class CombatHandler:
       ran = self.handleOption(enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
       
+      if isinstance(self.defender, Enemy):
+        if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
+        
       if self.checkDeath() is True or ran is True:
         break;
       
