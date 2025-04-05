@@ -15,30 +15,12 @@ class Item:
     self.weight = weight;
     self.bodypart = bodypart;
   
-  def getRarityMultiplier(self):
-    if self.rarity == "common":
-      return 1;
-    
   def use(self, game):
     if self.name == "health potion":
-      health_restored = round((game.player.stats["health"] / randint(3, 4)) * self.getRarityMultiplier());
-      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} used a health potion and recovered ({game.ui.coloredString(health_restored, "blue")} hp)");
+      health_restored = game.player.stats.get("max health") / 2;
+      game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a health potion and recovered [green]{health_restored} health[reset]!")
       game.player.healPlayer(health_restored);
     
-    elif self.name == "bread":
-      health_restored = round((game.player.stats["health"] / randint(3, 4)) * self.getRarityMultiplier());
-      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} ate bread and recovered ({game.ui.coloredString(health_restored, "blue")} hp)");
-      game.ui.animatedPrint("yummy!");
-      game.player.healPlayer(health_restored);
-    
-    elif self.name == "wooden sword":
-      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} equipped a wooden sword.");
-      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} gained +10 strength");
-      game.ui.animatedPrint(f"{game.ui.coloredString(game.player.name, "yellow")} had learned the way of the sword.");
-      game.player.equipItem(self);
-      game.player.stats["strength"] += 10;
-      game.player.attack_style = "swordsman";
-      
     game.player.usedItem(self.name);
   
   def consumeDurability(self, n):

@@ -91,3 +91,16 @@
 • added combo system experimental
 • made the ui more readable
 • enemies now have a chance to go berserk
+• added a simple tutorial
+• started to implement classes
+
+[version 2.1]
+• added fun little ascii art
+• added a basic combat tutorial
+• improved attack, taunt and blocking handling
+• added a new basic style move, slam (deals defenders stat defense + luck)
+• added 2 debug bosses, clone and exodus the god of death
+• new debug style mainly for testing (deals inf damage)
+• taunts now reduce stats by 5%
+• reimplemented items and inventory
+• improved ui and combat logs

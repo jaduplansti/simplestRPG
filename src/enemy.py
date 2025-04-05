@@ -27,7 +27,7 @@ class Enemy(Character):
     self.stats["health"] = self.stats["max health"];
     self.berserk = True;
     
-def getEnemyByName(name):
+def getEnemyByName(name, plr = None):
   if name == "slime":
     slime = Enemy("slime");
     slime.level = randint(1, 2);
@@ -71,16 +71,26 @@ def getEnemyByName(name):
     skeleton.attack_style = "basic";
     return skeleton;
   
-  elif name == "baker":
-    baker = Enemy("baker");
-    baker.level = 25;
+  elif name == "clone":
+    clone = Enemy("clone");
+    clone.level = plr.level;
     
-    baker.stats["health"] = 1000;
-    baker.stats["max health"] = 1000;
-    baker.stats["strength"] = 10 + baker.getIncreasedStat();
-    baker.stats["defense"] = 10 + baker.getIncreasedStat();
+    for stat in plr.stats:
+      clone.stats[stat] = plr.stats[stat];
+      
+    clone.attack_chance = 0.5;
+    clone.block_chance = 0.5;
+    clone.attack_style = plr.attack_style;
+    return clone;
+  
+  elif name == "deity":
+    deity = Enemy("exodus the god of death");
+    deity.level = 999999;
     
-    baker.attack_chance = 0.5;
-    baker.block_chance = 0.5;
-    baker.attack_style = "basic";
-    return baker;
+    for stat in deity.stats:
+      deity.stats[stat] = 100 * deity.level
+      
+    deity.attack_chance = 0.5;
+    deity.block_chance = 0.5;
+    deity.attack_style = "debug";
+    return deity;

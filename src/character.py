@@ -6,7 +6,7 @@ class Character:
   def __init__(self, name):
     self.name = name
     self.level = 1
-    self.exp = 0
+    self.exp = 0;
     
     self.location = "home"
     self.money = 1
@@ -24,11 +24,15 @@ class Character:
     
     self.equipment = {"head": None, "chest": None, "left arm": None, "right arm": None, "boots": None}
     
-    self.attack_style = "debug"
+    self.attack_style = "basic"
+    self._class = None;
+    
     self.inventory = {}
     self.skills = {}
     self.magic = {}
   
+    self.addItemToInventory(Item("health potion", rarity = "common"));
+
   def rerollStats(self):
     for stat in self.stats:
       if stat != "health":
@@ -54,7 +58,7 @@ class Character:
       del self.inventory[item]
     else:
       self.inventory[item]["amount"] -= 1
-      
+  
   def giveDamage(self, dmg):
     self.stats["health"] -= min(self.stats["health"], dmg)
     
@@ -79,7 +83,8 @@ class Character:
   def statLevelUp(self):
     for stat in self.stats:
       if stat == "max health":
-        self.stats[stat] += 10
+        self.stats[stat] += 10 * self.level;
+        self.stats["health"] = self.stats["max health"];
       elif stat == "luck":
         self.stats[stat] = round(self.stats[stat] + 0.01, 4)
       else:

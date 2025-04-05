@@ -1,48 +1,54 @@
 from rich.table import Table;
 from rich import print, box;
+from classes import Classes;
+
+import art;
 
 class Menu():
   def __init__(self, game):
     self.game = game;
     self.ui = game.ui;
   
-  def showStatsRankMenu(self, character):
-    stats_table = Table(f"{character.name} Stats", box = box.DOUBLE);
-    stats_table.add_column("Rank");
-    for stat in character.stats:
-      stats_table.add_row(f"[yellow]{stat}[reset]", f"[blue]({character.getRankBasedOnStat(stat)})[reset]");
-    self.ui.normalPrint(stats_table);
-    self.ui.newLine();
-
+  def showItemsMenu(self, character):
+    self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s)");
+    for name in character.inventory:
+      item = character.inventory[name];
+      self.ui.normalPrint(f"- [underline yellow]{name}[reset] [purple]({item["amount"]}x)[reset]");
+      for info in item["item"].__dict__: 
+        if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"].__dict__[info]})");
+      self.ui.newLine();
+  
   def showStatsMenu(self, character):
     self.ui.clear()
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] calls out [green](STATUS)[reset]")
-    self.ui.animatedPrint(f"[blue]Level: {character.level}[reset] | [cyan]XP: {character.exp}/{character.level * 100}[reset]")
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] has [red]{character.stats['health']} HP[reset] / [red]{character.stats['max health']} HP[reset]")
-    if character.stats['health'] < 0.3 * character.stats['max health']:
-        self.ui.animatedPrint(f"[bold red]Warning: Low health![/reset] Consider healing soon.")
-    elif character.stats['health'] < 0.6 * character.stats['max health']:
-        self.ui.animatedPrint(f"[orange]Caution: Health is getting low.[reset]")
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] has [magenta]{character.energy} Energy[reset]")
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] has [blue]{character.stats['strength']} Strength[reset]")
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] has [green]{character.stats['defense']} Defense[reset]")
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] has [purple]{character.stats['luck'] * 100}% Luck[reset]")
-  
+    self.ui.animatedPrint(f"[yellow]{character.name}[reset] focuses...")
+
+    self.ui.animatedPrint(f"[green]=== STATUS ===[reset]")
+    self.ui.animatedPrint(f"[blue]Level:[reset] [cyan]{character.level}[reset] ([magenta]{character.exp} / {character.level * 100}[reset])")
+    self.ui.animatedPrint(f"[red]Health:[reset] [green]{character.stats['health']}[reset] / [green]{character.stats['max health']}[reset] HP")
+    self.ui.animatedPrint(f"[cyan]Energy:[reset] [blue]{character.energy}[reset]")
+
+    self.ui.animatedPrint(f"[green]=== ATTRIBUTES ===[reset]")
+    self.ui.animatedPrint(f"[blue]Strength:[reset] [red]{character.stats['strength']}[reset] - [underline]Physical power, affects melee damage[reset]")
+    self.ui.animatedPrint(f"[green]Defense:[reset] [yellow]{character.stats['defense']}[reset] - [underline]Reduces damage taken[reset]")
+    self.ui.animatedPrint(f"[purple]Luck:[reset] [cyan]{character.stats['luck'] * 100:.0f}%[reset] - [underline]Affects critical hits and rare events[reset]");
+    
   def showMainMenu(self):
     self.ui.clear();
     self.ui.normalPrint("×××××××××××××××");
     self.ui.normalPrint("× [bold cyan]simplestRpg[reset] ×");
     self.ui.normalPrint("×××××××××××××××");
-    self.ui.normalPrint("\n• version [green]2.0[reset] •\n")
+    self.ui.normalPrint(art.CASTLE)
 
+    self.ui.normalPrint("\n• version [green]2.1[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showHomeMenu(self):
     self.ui.clear();
     self.ui.normalPrint("••••••••••••••");
     self.ui.normalPrint("• [italic yellow]Your House[reset] •");
-    self.ui.normalPrint("••••••••••••••\n");
+    self.ui.normalPrint("••••••••••••••");
     
+    self.ui.normalPrint(art.HOUSE + "\n");
     self.ui.normalPrint("× [green]stats[reset]");
     self.ui.normalPrint("× [purple]practice[reset]");
     self.ui.normalPrint("× [blue]sleep[reset]\n");
@@ -76,4 +82,12 @@ class Menu():
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.ui.normalPrint("× [red]flee[reset]");
     self.ui.newLine();
+    
+  def classSelectionMenu(self):
+    self.ui.animatedPrint(f"{self.game.player.name}, select your class!");
+    self.ui.animatedPrint(f"there are {len(Classes.getAvailableClass(9999))} classes in SimplestRPG.");
+  
+  def showTip(self):
+    self.ui.panelAnimatedPrintFile("tips", "tips", [], "tips");
+    
     

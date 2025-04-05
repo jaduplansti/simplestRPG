@@ -55,10 +55,7 @@ class UI:
       return choices(self.strings[key][n])[0];
     return self.strings[key][n];
     
-  def normalPrint(self, s, center = False):
-    if center is True:
-      print(Align.center(s));
-    else:
+  def normalPrint(self, s):
       print(s);
   
   def barPrint(self, s, n, n_max, speed = 0.01):
@@ -80,7 +77,7 @@ class UI:
     panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0])
     with Live(panel, console=self.console, refresh_per_second=60) as live:
       for n, ch in enumerate(formatted_text):
-        panel.renderable = formatted_text[0:n];
+        panel.renderable = formatted_text[0:n + 1];
         live.update(panel);
         self.beep();
         sleep(type_speed);
@@ -118,12 +115,12 @@ class UI:
     print(tree);
     self.newLine();
     
-  def randomizeColorPrint(self, s, center = False):
+  def randomizeColorPrint(self, s):
     colored_string = "";
     for ch in s:
       random_color = choices(["red", "blue", "yellow", "green", "cyan", "magenta"])[0];
       colored_string += f"[{random_color}]{ch}[reset]";
-    self.normalPrint(colored_string, center);
+    self.normalPrint(colored_string);
   
   def newLine(self):
     print("");
@@ -169,4 +166,8 @@ class UI:
     for _ in range(shutil.get_terminal_size().columns):
       seperator += ch;
     self.randomizeColorPrint(seperator + "\n");
-    
+  
+  def showStatus(self, msg, n):
+    with self.console.status(msg) as status:
+      sleep(n);
+      
