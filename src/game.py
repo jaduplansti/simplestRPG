@@ -69,13 +69,13 @@ class Game:
           self.handleCombatTutorial();
           tutorial = True;
         combat_handler = CombatHandler(self);
-        combat_handler.initiateFightNpc(self.player, choices(["slime", "goblin", "clone", "deity"])[0]);
+        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity"])[0]);
         continue;
       elif option == "sleep":
         self.handleSleep();
       elif option == "ascend": # for testing purposes
         self.ui.animatedPrint("this will take a few seconds, please wait as you break the limits...");
-        self.player.exp = 1000 * 1000;
+        self.player.exp = 999999 * 999999;
         self.player.tryLevelUp();
       self.ui.awaitKey();
         

@@ -104,3 +104,10 @@
 • taunts now reduce stats by 5%
 • reimplemented items and inventory
 • improved ui and combat logs
+• increased the chances of enemies going berserk
+• added swordsman style
+• buffed exodus
+• added energy potions
+• added loot system
+• made enemies more dynamic
+• readded skeleton enemy

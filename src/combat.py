@@ -27,6 +27,7 @@ class CombatHandler:
     if self.tryBerserkNpc(self.defender) is False:
       self.giveExp(self.attacker, self.defender);
       self.handleLevelUp(self.attacker);
+      self.giveLoot(self.attacker, self.defender);
       return True;
     return False;
     
@@ -41,8 +42,10 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{won.name}[reset] feels a surge of [blue]power[reset], [yellow]{won.name}[reset], leveled up!");
       self.ui.panelPrint(f"level [yellow]{old_level}[reset] -> [green]{won.level}[reset]");
       
-  def giveLoot(self, won, lost): # fix add inventory to enemy
-    won.addItemToInventory(lost.getLoot());
+  def giveLoot(self, won, lost):
+    item = lost.getLoot();
+    if item != None:
+      won.addItemToInventory(lost.getLoot());
   
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
@@ -58,10 +61,10 @@ class CombatHandler:
     else:
       return False;
     
-    self.ui.panelPrint(f"([blue]-{self.attacker.getFatigueMultiplier()}[reset]) stat reduction.");
+    self.ui.panelPrint(f"([blue]-{attacker.getFatigueMultiplier() * 100}%[reset]) stat output.");
   
   def tryBerserkNpc(self, npc):
-    if randint(1, 10) == randint(1, 10):
+    if randint(1, 8) == randint(1, 8) and npc.berserk is False:
       self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
       self.ui.animatedPrint(f"[yellow]{npc.name}[reset] goes [red]Berserk[reset]!");
       self.ui.panelPrint("[blue]ALL STATS[reset] [green](x1.5)[reset]");
@@ -74,12 +77,12 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
     elif self.defender.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
-      return self.__handleWin();
+      won = self.__handleWin();
+      if won is False: return False;
     else:
       return False;
       
     self.ui.awaitKey();
-    self.attacker.stats["health"] = self.attacker.stats["max health"];
     return True;
    
   def handleOption(self, option, attacker, defender):
@@ -98,6 +101,8 @@ class CombatHandler:
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
       self.ui.awaitKey();
       return True
+    elif option == "items":
+      self.game.handleUseItem();
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
     
@@ -107,7 +112,7 @@ class CombatHandler:
     while True:
       self.menu.showCombatMenu(self, self.attacker);
       option = self.ui.getInput();
-      enemy_option = choices(["attack", "block", "flee", "taunt"], [self.defender.attack_chance, self.defender.block_chance, 0.5, 0.5])[0];
+      enemy_option = choices(["attack", "block", "flee", "taunt"], [self.defender.attack_chance, self.defender.block_chance, self.defender.flee_chance, self.defender.taunt_chance])[0];
       
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
@@ -117,7 +122,6 @@ class CombatHandler:
       self.ui.showSeperator("-");
 
       if self.checkDeath() is True or ran is True:
-        self.ui.awaitKey();
         break;
       
       ran = self.handleOption(enemy_option, self.defender, self.attacker);
@@ -127,7 +131,6 @@ class CombatHandler:
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
       if self.checkDeath() is True or ran is True:
-        self.ui.awaitKey();
         break;
       
       self.ui.showSeperator("-");

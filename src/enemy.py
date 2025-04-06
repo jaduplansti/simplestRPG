@@ -10,9 +10,9 @@ class Enemy(Character):
     
     self.attack_chance = 0;
     self.block_chance = 0;
-    
-    self.berserk = False;
-    
+    self.flee_chance = 0;
+    self.taunt_chance = 0;
+  
   def getLoot(self):
     return choices(self.loot, self.loot_chance)[0];
   
@@ -53,16 +53,19 @@ def getEnemyByName(name, plr = None):
     goblin.stats["strength"] = randint(8, 12) + goblin.getIncreasedStat();
     goblin.stats["defense"] = randint(8, 15) + goblin.getIncreasedStat();
     
-    goblin.attack_chance = 0.8;
-    goblin.block_chance = 0.5;
+    goblin.attack_chance = 0.5;
+    goblin.block_chance = 0.1;
+    goblin.flee_chance = 0.8;
+    goblin.taunt_chance = 0.8;
+
     goblin.attack_style = "basic";
     return goblin;
     
   elif name == "skeleton":
     skeleton = Enemy("skeleton");
     skeleton.level = randint(3, 5);
-    skeleton.stats["health"] = 20;
-    skeleton.stats["max health"] = 20;
+    skeleton.stats["health"] = 150;
+    skeleton.stats["max health"] = 150;
     skeleton.stats["strength"] = randint(10, 15) + skeleton.getIncreasedStat();
     skeleton.stats["defense"] = randint(10, 15) + skeleton.getIncreasedStat();
     
@@ -90,7 +93,7 @@ def getEnemyByName(name, plr = None):
     for stat in deity.stats:
       deity.stats[stat] = 100 * deity.level
       
-    deity.attack_chance = 0.5;
-    deity.block_chance = 0.5;
+    deity.attack_chance = 1;
+    deity.block_chance = 0.1;
     deity.attack_style = "debug";
     return deity;

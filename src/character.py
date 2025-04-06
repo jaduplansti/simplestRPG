@@ -13,6 +13,7 @@ class Character:
     self.energy = 100
     
     self.status = {"blocking": False}
+    self.berserk = False;
     
     self.stats = {
       "health": 100,
@@ -30,8 +31,13 @@ class Character:
     self.inventory = {}
     self.skills = {}
     self.magic = {}
-  
-    self.addItemToInventory(Item("health potion", rarity = "common"));
+    
+    for n in range(100):
+      self.addItemToInventory(Item("health potion", rarity = "common"));
+      self.addItemToInventory(Item("energy potion", rarity = "common"));
+
+    self.addItemToInventory(Item("wooden sword", rarity = "common", durability = 100, bodypart = "right arm"));
+
 
   def rerollStats(self):
     for stat in self.stats:
@@ -59,6 +65,12 @@ class Character:
     else:
       self.inventory[item]["amount"] -= 1
   
+  def equipItem(self, item):
+    if self.isEquipped(item) != True:
+      self.equipment[item.bodypart] = item;
+      return True;
+    return False;
+    
   def giveDamage(self, dmg):
     self.stats["health"] -= min(self.stats["health"], dmg)
     
@@ -100,12 +112,10 @@ class Character:
     self.stats["health"] = min(self.stats["health"] + heal, self.stats["max health"])
   
   def isEquipped(self, item):
-    return self.equipment[item.bodypart] and self.equipment[item.bodypart].name == item.name
+    if self.equipment[item.bodypart] != None and self.equipment[item.bodypart].name == item.name: 
+      return True;
+    return False;
     
-  def equipItem(self, item):
-    if item.bodypart in self.equipment:
-      self.equipment[item.bodypart] = item
-  
   def getMaxStat(self):
     return 10 * self.level
   

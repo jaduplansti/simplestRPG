@@ -137,6 +137,9 @@ class UI:
   
   def showHealthBar(self, character):
 	  name = character.name
+	  if character.berserk is True:
+	    name += " ([bold red]BERSERK[reset])";
+	    
 	  current_hp = character.stats["health"]
 	  max_hp = character.stats["max health"]
 	  current_hp = max(0, min(current_hp, max_hp))
@@ -153,7 +156,7 @@ class UI:
 		  color = "red"
 
 	  health_bar = f"[{color}]" + "█" * filled_length + "░" * (bar_length - filled_length) + "[/]"
-	  self.normalPrint(f"{name} HP: {round(current_hp)}/{max_hp}\n({health_percentage*100:.2f}%) {health_bar}\n")
+	  self.normalPrint(f"{name} HP: [bold green]{round(current_hp)}[reset]/[bold green]{max_hp}[reset]\n([bold purple]{health_percentage*100:.2f}%[reset]) {health_bar}\n")
 	
   def showHeader(self, title, ch):
     header = "";

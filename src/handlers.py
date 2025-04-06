@@ -45,7 +45,9 @@ class DamageHandler:
       **self.createDamage("punch", 10, ["strength"]),
       **self.createDamage("strong punch", 20, ["strength"], 2),
       **self.createDamage("double punch", 10, ["strength"], 2),
-      **self.createDamage("slam", 0, ["defense", "strength"], origin = "defender"),
+      **self.createDamage("slam", 0, ["defense", "strength"]),
+      **self.createDamage("slash", 30, ["strength"], 2),
+      **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -55,14 +57,15 @@ class DamageHandler:
     return max(0, dmg - defender.stats.get("defense"));
   
   def __calculate(self, damage, attacker, defender):
-    total_damage = 0;
+    total_damage = damage.get("dmg");
     for stat in damage.get("stats"):
       if damage.get("origin") == "attacker":
         total_damage += attacker.stats.get(stat);
       else:
         total_damage += defender.stats.get(stat);
-    return (total_damage * damage.get("multiplier")) / attacker.getFatigueMultiplier();
-
+    return (total_damage * damage.get("multiplier")) * attacker.getFatigueMultiplier();
+   
+    
   def calculateDamage(self, name, attacker, defender):
     damage = self.attack_damages.get(name);
     return self.reduceDamage(self.__calculate(damage, attacker, defender), defender);
@@ -93,18 +96,22 @@ class AttackHandler:
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
-    
+  
+  def __sword_style(self, attacker, defender):
+    move = choices(["slash", "thrust"])[0];
+    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
+    attacker.attackEnemy(dmg);
+    self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
+
   def __debug_style(self, attacker, defender):
-    self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damagee", "debug");
+    self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damage", "debug");
     attacker.attackEnemy(99999999999999999);
 
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;
     
-    if attacker.attack_style == "basic":
-      self.__basic_style(attacker, defender);
-    elif attacker.attack_style == "debug":
-      self.__debug_style(attacker, defender);
-  
+    if attacker.attack_style == "basic": self.__basic_style(attacker, defender);
+    elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
+    elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
   

@@ -23,14 +23,14 @@ class Menu():
     self.ui.animatedPrint(f"[yellow]{character.name}[reset] focuses...")
 
     self.ui.animatedPrint(f"[green]=== STATUS ===[reset]")
-    self.ui.animatedPrint(f"[blue]Level:[reset] [cyan]{character.level}[reset] ([magenta]{character.exp} / {character.level * 100}[reset])")
-    self.ui.animatedPrint(f"[red]Health:[reset] [green]{character.stats['health']}[reset] / [green]{character.stats['max health']}[reset] HP")
-    self.ui.animatedPrint(f"[cyan]Energy:[reset] [blue]{character.energy}[reset]")
+    self.ui.normalPrint(f"[blue]Level:[reset] [cyan]{character.level}[reset] ([magenta]{character.exp} / {character.level * 100}[reset])\n")
+    self.ui.normalPrint(f"[red]Health:[reset] [green]{character.stats['health']}[reset] / [green]{character.stats['max health']}[reset] HP\n")
+    self.ui.normalPrint(f"[cyan]Energy:[reset] [blue]{character.energy}[reset]\n")
 
     self.ui.animatedPrint(f"[green]=== ATTRIBUTES ===[reset]")
-    self.ui.animatedPrint(f"[blue]Strength:[reset] [red]{character.stats['strength']}[reset] - [underline]Physical power, affects melee damage[reset]")
-    self.ui.animatedPrint(f"[green]Defense:[reset] [yellow]{character.stats['defense']}[reset] - [underline]Reduces damage taken[reset]")
-    self.ui.animatedPrint(f"[purple]Luck:[reset] [cyan]{character.stats['luck'] * 100:.0f}%[reset] - [underline]Affects critical hits and rare events[reset]");
+    self.ui.normalPrint(f"[blue]Strength:[reset] [red]{character.stats['strength']}[reset] - [underline]Physical power, affects melee damage[reset]\n")
+    self.ui.normalPrint(f"[green]Defense:[reset] [yellow]{character.stats['defense']}[reset] - [underline]Reduces damage taken[reset]\n")
+    self.ui.normalPrint(f"[purple]Luck:[reset] [cyan]{character.stats['luck'] * 100:.0f}%[reset] - [underline]Affects critical hits and rare events[reset]\n");
     
   def showMainMenu(self):
     self.ui.clear();
@@ -50,6 +50,7 @@ class Menu():
     
     self.ui.normalPrint(art.HOUSE + "\n");
     self.ui.normalPrint("× [green]stats[reset]");
+    self.ui.normalPrint("× [cyan]items[reset]");
     self.ui.normalPrint("× [purple]practice[reset]");
     self.ui.normalPrint("× [blue]sleep[reset]\n");
   

@@ -23,12 +23,37 @@
       "[bold yellow]{0}[reset] wasted no time and drove another punch into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!"
     ],
     
-    "slam" : [
+    "slam": [
       "[bold yellow]{0}[reset] slammed [bold yellow]{1}[reset]'s face, dealing [bold red]{2}[reset] damage!",
-      "[bold yellow]{1}[reset] was suddenly grabbed and then slammed by [bold yellow]{0}[reset], dealing [bold red]{2}[reset] damage!"
+      "[bold yellow]{1}[reset] was suddenly grabbed and then slammed by [bold yellow]{0}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] lifted [bold yellow]{1}[reset] and hurled them to the ground, causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] charged in and body-slammed [bold yellow]{1}[reset], dealing a heavy [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] grabbed [bold yellow]{1}[reset] and drove them into the floor with a thunderous slam for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] roared and smashed [bold yellow]{1}[reset] into the ground, shaking the air with [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] caught [bold yellow]{1}[reset] off guard and slammed them into a wall, dishing out [bold red]{2}[reset] damage!"
     ]
   },
-
+  
+  "sword style" : {
+    "slash": [
+      "[bold yellow]{0}[reset] slashed at [bold yellow]{1}[reset] with a swift strike, dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] swung their blade cleanly across [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] delivered a sharp cut to [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] darted forward, slashing [bold yellow]{1}[reset] and leaving a mark worth [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] carved through the air and landed a slash on [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] sliced through [bold yellow]{1}[reset]'s defense with precision, causing [bold red]{2}[reset] damage!"
+    ],
+    
+    "thrust": [
+      "[bold yellow]{0}[reset] lunged forward with their sword, piercing [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] drove the point of their blade into [bold yellow]{1}[reset], landing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] executed a precise sword thrust straight into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]'s sword shot forward like lightning, striking [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] thrust their sword with deadly aim at [bold yellow]{1}[reset], piercing them for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] slipped past [bold yellow]{1}[reset]'s guard with a clean sword thrust, dealing [bold red]{2}[reset] damage!"
+    ]
+  },
+  
   "damage handler": {
     "defense ignored": [
       "[bold yellow]{0}[reset] capitalized on [bold yellow]{1}[reset]'s weak guard!",
