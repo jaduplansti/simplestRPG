@@ -15,17 +15,20 @@ class Game:
     self.menu = Menu(self);
     self.multiplayer_handler = MultiplayerHandler(self);
   
-  def handleUseItem(self):
+  def handleUseItem(self, combat_handler = None):
     if len(self.player.inventory) <= 0:
       self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] bag is empty right now, nothing to use.");
       return;
       
     self.menu.showItemsMenu(self.player);
-    option = self.ui.getInput().lower();
+    while True:
+      option = self.ui.getInput().lower();
     
-    if self.player.itemExists(option):
-      self.player.getItem(option).use(self);
-      
+      if self.player.itemExists(option):
+        self.player.getItem(option).use(self, combat_handler);
+      elif option == "":
+        break;
+        
   def handleSleep(self):
     if self.player.energy >= 75:
       self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
@@ -42,14 +45,23 @@ class Game:
     self.ui.clear();
     self.ui.panelPrint("your name? : ");
     self.player.name = self.ui.getInput();
-
+  
+  def handleLoad(self):
+    try:
+      plr = Player.load();
+      self.ui.animatedPrint(f"[bold yellow]{plr.name}'s[reset] save was found, load data? [italic green](yes/no)[reset]");
+      if self.ui.getInput() == "yes": self.player = plr;
+      else: self.handleName();
+    except FileNotFoundError:
+      self.handleName();
+      
   def handleMainMenu(self):
-    self.handleName();
     while True:
       self.menu.showMainMenu();
       option = self.ui.getInput().lower();
       
       if option == "start":
+        self.handleLoad();
         self.handleHomeMenu();
       elif option == "quit":
         return;
@@ -69,10 +81,12 @@ class Game:
           self.handleCombatTutorial();
           tutorial = True;
         combat_handler = CombatHandler(self);
-        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity"])[0]);
+        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity", "orc"])[0]);
         continue;
       elif option == "sleep":
         self.handleSleep();
+        self.ui.showStatus("saving", 3);
+        self.player.save();
       elif option == "ascend": # for testing purposes
         self.ui.animatedPrint("this will take a few seconds, please wait as you break the limits...");
         self.player.exp = 999999 * 999999;

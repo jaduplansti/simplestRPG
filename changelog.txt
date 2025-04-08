@@ -110,4 +110,15 @@
 • added energy potions
 • added loot system
 • made enemies more dynamic
-• readded skeleton enemy
+• added skeleton enemy
+
+[version 2.2]
+• added iron reversal move for swordsman style
+• fixed energy potion bug
+• added saving and loading
+• added new move for swordsman, blade dance
+• added new enemy orc
+• added new item scroll of instant death (epic)
+• added a durability system
+• refactored item system
+• you can now view equipment in the status menu

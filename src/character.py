@@ -1,5 +1,5 @@
 from random import randint, uniform
-from item import Item
+from item import Item, removeEquipment;
 import json
 
 class Character:
@@ -32,13 +32,72 @@ class Character:
     self.skills = {}
     self.magic = {}
     
-    for n in range(100):
-      self.addItemToInventory(Item("health potion", rarity = "common"));
-      self.addItemToInventory(Item("energy potion", rarity = "common"));
+    self.addItemToInventory(Item("health potion", rarity = "common"), 100);
+    self.addItemToInventory(Item("energy potion", rarity = "common"), 100);
 
-    self.addItemToInventory(Item("wooden sword", rarity = "common", durability = 100, bodypart = "right arm"));
+    self.addItemToInventory(Item("wooden sword", rarity = "common", durability = 1000, bodypart = "right arm"));
+    self.addItemToInventory(Item("scroll of instant kill", rarity = "epic"), 100);
 
+  def to_dict(self):
+    return {
+      "name": self.name,
+      "level": self.level,
+      "exp": self.exp,
+      "location": self.location,
+      "money": self.money,
+      "energy": self.energy,
+      "status": self.status,
+      "berserk": self.berserk,
+      "stats": self.stats,
+      "equipment": {k: v.to_dict() if v else None for k, v in self.equipment.items()},
+      "attack_style": self.attack_style,
+      "_class": self._class,
+      "skills": self.skills,
+      "magic": self.magic,
+      "inventory": {
+        name: {
+          "item": item_data["item"].to_dict(),
+          "amount": item_data["amount"]
+        } for name, item_data in self.inventory.items()
+      },
+    }
 
+  @classmethod
+  def from_dict(cls, data):
+    char = cls(data["name"])
+    char.level = data["level"]
+    char.exp = data["exp"]
+    char.location = data["location"]
+    char.money = data["money"]
+    char.energy = data["energy"]
+    char.status = data["status"]
+    char.berserk = data["berserk"]
+    char.stats = data["stats"]
+    char.equipment = {
+        k: Item.from_dict(v) if v else None for k, v in data["equipment"].items()
+    }
+    char.attack_style = data["attack_style"]
+    char._class = data["_class"]
+    char.inventory = {
+      name: {
+        "item": Item.from_dict(item_data["item"]),
+        "amount": item_data["amount"]
+      } for name, item_data in data["inventory"].items()
+    }
+    char.skills = data["skills"]
+    char.magic = data["magic"]
+    return char;
+
+  def save(self, filename="character_save.json"):
+    with open(filename, "w") as f:
+      json.dump(self.to_dict(), f, indent=2)
+
+  @classmethod
+  def load(cls, filename="character_save.json"):
+    with open(filename, "r") as f:
+      data = json.load(f)
+      return cls.from_dict(data)
+    
   def rerollStats(self):
     for stat in self.stats:
       if stat != "health":
@@ -47,12 +106,13 @@ class Character:
   def itemExists(self, item):
     return item in self.inventory
       
-  def addItemToInventory(self, item):
-    if self.itemExists(item.name):
-      self.inventory[item.name]["amount"] += 1
-    else:
-      self.inventory[item.name] = {"amount": 1, "item": item}
-  
+  def addItemToInventory(self, item, n = 1):
+    for _ in range(0, n):
+      if self.itemExists(item.name):
+        self.inventory[item.name]["amount"] += 1
+      else:
+        self.inventory[item.name] = {"amount": 1, "item": item}
+    
   def getAmountOfItem(self, item):
     return self.inventory[item]["amount"]
   
@@ -70,13 +130,21 @@ class Character:
       self.equipment[item.bodypart] = item;
       return True;
     return False;
+  
+  def useEquipment(self, bodypart, n):
+    brokens = [];
+    for part in bodypart:
+      if self.equipment[part] != None and self.equipment[part].handleDurability(n) is True: 
+        brokens.append(self.equipment[part].name)
+        removeEquipment(self, part);
+    return brokens;
     
   def giveDamage(self, dmg):
     self.stats["health"] -= min(self.stats["health"], dmg)
     
   def attackEnemy(self, dmg):
-    self.enemy.giveDamage(dmg)
-  
+    self.enemy.giveDamage(dmg);
+    
   def giveExp(self, exp):
     self.exp += exp
   

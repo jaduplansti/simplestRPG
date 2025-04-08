@@ -32,14 +32,22 @@ class Menu():
     self.ui.normalPrint(f"[green]Defense:[reset] [yellow]{character.stats['defense']}[reset] - [underline]Reduces damage taken[reset]\n")
     self.ui.normalPrint(f"[purple]Luck:[reset] [cyan]{character.stats['luck'] * 100:.0f}%[reset] - [underline]Affects critical hits and rare events[reset]\n");
     
+    self.showEquipmentMenu(character);
+    
+  def showEquipmentMenu(self, character):
+    self.ui.animatedPrint("===[bold purple]Equipment[reset]===");
+    for part in character.equipment:
+      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset] -> [italic yellow]{character.equipment[part].name}[reset] ([cyan]{character.equipment[part].rarity}[reset]) ([green]{character.equipment[part].durability}[reset]%)\n");
+      else: self.ui.normalPrint(f"[purple]{part}[reset] -> [yellow]Empty[reset]\n");
+    
   def showMainMenu(self):
     self.ui.clear();
-    self.ui.normalPrint("×××××××××××××××");
-    self.ui.normalPrint("× [bold cyan]simplestRpg[reset] ×");
-    self.ui.normalPrint("×××××××××××××××");
+    self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
+    self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
+    self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
     self.ui.normalPrint(art.CASTLE)
 
-    self.ui.normalPrint("\n• version [green]2.1[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.2[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showHomeMenu(self):
@@ -49,18 +57,18 @@ class Menu():
     self.ui.normalPrint("••••••••••••••");
     
     self.ui.normalPrint(art.HOUSE + "\n");
-    self.ui.normalPrint("× [green]stats[reset]");
-    self.ui.normalPrint("× [cyan]items[reset]");
-    self.ui.normalPrint("× [purple]practice[reset]");
-    self.ui.normalPrint("× [blue]sleep[reset]\n");
+    self.ui.normalPrint("≈ [green]stats[reset]");
+    self.ui.normalPrint("≈ [cyan]items[reset]");
+    self.ui.normalPrint("≈ [purple]practice[reset]");
+    self.ui.normalPrint("≈ [blue]sleep[reset]\n");
   
   def showYouMenu(self):
     self.ui.clear();
     self.ui.showHeader("YOU", "-");
     
-    self.ui.normalPrint("× [cyan]stats[reset]");
-    self.ui.normalPrint("× [green]items[reset]");
-    self.ui.normalPrint("× [red]back[reset]\n");
+    self.ui.normalPrint("≈ [cyan]stats[reset]");
+    self.ui.normalPrint("≈ [green]items[reset]");
+    self.ui.normalPrint("≈ [red]back[reset]\n");
   
   def showCombatInitiateMenu(self):
     self.ui.clear();
@@ -69,19 +77,19 @@ class Menu():
   
   def showCombatMenu(self, combat_handler, character):
     self.ui.clear();
-    self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "×");
+    self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
     
     self.ui.showHealthBar(character);
     self.ui.showHealthBar(character.enemy);
     self.ui.showSeperator("+");
     
-    self.ui.normalPrint("× [yellow]attack[reset]");
-    self.ui.normalPrint("× [cyan]block[reset]");
-    self.ui.normalPrint("× [blue]taunt[reset]");
-    self.ui.normalPrint("× [green]items[reset]");
+    self.ui.normalPrint("≈ [yellow]attack[reset]");
+    self.ui.normalPrint("≈ [cyan]block[reset]");
+    self.ui.normalPrint("≈ [blue]taunt[reset]");
+    self.ui.normalPrint("≈ [green]items[reset]");
       
     if character.stats["health"] <= character.stats["max health"] * 0.25:
-      self.ui.normalPrint("× [red]flee[reset]");
+      self.ui.normalPrint("≈ [red]flee[reset]");
     self.ui.newLine();
     
   def classSelectionMenu(self):

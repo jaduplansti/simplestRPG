@@ -139,7 +139,9 @@ class UI:
 	  name = character.name
 	  if character.berserk is True:
 	    name += " ([bold red]BERSERK[reset])";
-	    
+	  if character.status["blocking"] is True: # temporary indicator
+	   	name += " ([bold cyan]BLOCKING[reset])";
+
 	  current_hp = character.stats["health"]
 	  max_hp = character.stats["max health"]
 	  current_hp = max(0, min(current_hp, max_hp))

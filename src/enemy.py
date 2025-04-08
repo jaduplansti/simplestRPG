@@ -26,14 +26,17 @@ class Enemy(Character):
       self.stats[stat] *= 1.5;
     self.stats["health"] = self.stats["max health"];
     self.berserk = True;
+  
+  def setHealthLevel(self):
+    self.stats["max health"] = (50 * self.level);
+    self.stats["health"] = self.stats["max health"];
     
 def getEnemyByName(name, plr = None):
   if name == "slime":
     slime = Enemy("slime");
     slime.level = randint(1, 2);
     
-    slime.stats["health"] = 20;
-    slime.stats["max health"] = 20;
+    slime.setHealthLevel();
     slime.stats["strength"] = slime.getIncreasedStat();
     slime.stats["defense"] = slime.getIncreasedStat();
     
@@ -48,8 +51,7 @@ def getEnemyByName(name, plr = None):
   elif name == "goblin":
     goblin = Enemy("goblin");
     goblin.level = randint(3, 5);
-    goblin.stats["health"] = 50;
-    goblin.stats["max health"] = 50;
+    goblin.setHealthLevel();
     goblin.stats["strength"] = randint(8, 12) + goblin.getIncreasedStat();
     goblin.stats["defense"] = randint(8, 15) + goblin.getIncreasedStat();
     
@@ -64,8 +66,7 @@ def getEnemyByName(name, plr = None):
   elif name == "skeleton":
     skeleton = Enemy("skeleton");
     skeleton.level = randint(3, 5);
-    skeleton.stats["health"] = 150;
-    skeleton.stats["max health"] = 150;
+    skeleton.setHealthLevel();
     skeleton.stats["strength"] = randint(10, 15) + skeleton.getIncreasedStat();
     skeleton.stats["defense"] = randint(10, 15) + skeleton.getIncreasedStat();
     
@@ -97,3 +98,15 @@ def getEnemyByName(name, plr = None):
     deity.block_chance = 0.1;
     deity.attack_style = "debug";
     return deity;
+    
+  elif name == "orc":
+    orc = Enemy("orc");
+    orc.level = randint(5, 8);
+    orc.setHealthLevel();
+    orc.stats["strength"] = randint(20, 25) + orc.getIncreasedStat();
+    orc.stats["defense"] = randint(20, 25) + orc.getIncreasedStat();
+    
+    orc.attack_chance = 0.9;
+    orc.block_chance = 0.1;
+    orc.attack_style = "basic";
+    return orc;

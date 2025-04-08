@@ -48,6 +48,8 @@ class DamageHandler:
       **self.createDamage("slam", 0, ["defense", "strength"]),
       **self.createDamage("slash", 30, ["strength"], 2),
       **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
+      **self.createDamage("iron reversal", 30, ["strength"], 2),
+      **self.createDamage("blade dance", 10, ["strength"], 1.5),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -68,7 +70,7 @@ class DamageHandler:
     
   def calculateDamage(self, name, attacker, defender):
     damage = self.attack_damages.get(name);
-    return self.reduceDamage(self.__calculate(damage, attacker, defender), defender);
+    return round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
     
 class AttackHandler:
   def __init__(self, combat_handler):
@@ -78,6 +80,10 @@ class AttackHandler:
     self.defense_handler = DefenseHandler(combat_handler);
     self.ui = self.combat_handler.ui;
   
+  def consumeEquipment(self, character, parts, dmg):
+    for broken in character.useEquipment(parts, dmg):
+      self.ui.animatedPrint(f"[red]{broken} was broken![reset]");
+      
   def handleBlock(self, attacker, defender):
     if attacker.status.get("blocking", False):
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] dropped their block");
@@ -96,13 +102,18 @@ class AttackHandler:
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
-  
+
   def __sword_style(self, attacker, defender):
-    move = choices(["slash", "thrust"])[0];
+    move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
+    if move == "iron reversal" : self.defense_handler.handleBlock(attacker, defender);
+    elif move == "blade dance": attacker.stats["defense"] += 1;
+    
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
-
+    
+    self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
+    
   def __debug_style(self, attacker, defender):
     self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damage", "debug");
     attacker.attackEnemy(99999999999999999);

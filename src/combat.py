@@ -21,6 +21,8 @@ class CombatHandler:
     
     self.defender = enemy;
     self.defender.enemy = self.attacker;
+    self.attacker.status["blocking"] = False; # temporary fix
+    
     self.game.handleCombatInitiateMenu(self);
   
   def __handleWin(self):
@@ -45,8 +47,9 @@ class CombatHandler:
   def giveLoot(self, won, lost):
     item = lost.getLoot();
     if item != None:
-      won.addItemToInventory(lost.getLoot());
-  
+      won.addItemToInventory(item);
+      self.ui.animatedPrint(f"[bold yellow]{won.name}[reset] acquired a [underline cyan]{item.name}[reset]!");
+      
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhastion.[reset]", "fatigue");
@@ -102,7 +105,7 @@ class CombatHandler:
       self.ui.awaitKey();
       return True
     elif option == "items":
-      self.game.handleUseItem();
+      self.game.handleUseItem(self);
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
     

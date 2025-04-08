@@ -51,6 +51,24 @@
       "[bold yellow]{0}[reset]'s sword shot forward like lightning, striking [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] thrust their sword with deadly aim at [bold yellow]{1}[reset], piercing them for [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] slipped past [bold yellow]{1}[reset]'s guard with a clean sword thrust, dealing [bold red]{2}[reset] damage!"
+    ],
+    
+  "iron reversal": [
+    "[bold yellow]{0}[reset] slashed at [bold yellow]{1}[reset] with sharp precision, then flowed seamlessly into a defensive guard, dealing [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] delivered a calculated strike to [bold yellow]{1}[reset], then raised their blade into a perfect block, landing [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset]'s sword carved through the air, hitting [bold yellow]{1}[reset] before locking into a guarded stance, dealing [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] attacked in a blur of motion, then braced for impact, leaving [bold yellow]{1}[reset] wounded for [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] flowed like water—slashing [bold yellow]{1}[reset] before turning the blade defensively, striking for [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset]'s blade danced forward with a slash, then held firm like iron, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!"
+    ],
+    
+  "blade dance" : [
+    "[bold yellow]{0}[reset] begins a swift blade dance, their movements enhancing their agility and evasion against [bold yellow]{1}[reset]'s attack! They dealt [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset]'s sword weaves intricate patterns, sharpening their reflexes and making them harder to target against [bold yellow]{1}[reset]'s blow! giving [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] flows with the rhythm of their blade dance, bolstering their defensive awareness against [bold yellow]{1}[reset]'s strike! They dealt [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] executes a fluid blade dance, increasing their ability to anticipate and avoid incoming attacks from [bold yellow]{1}[reset]! dealimg [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset]'s sword moves in a mesmerizing dance, heightening their senses and defensive capabilities against [bold yellow]{1}[reset]'s assault! dealing [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] performs a swift blade dance, their movements granting them a moment of heightened defensive focus against [bold yellow]{1}[reset]'s attack! They deal [bold red]{2}[reset] damage!"
     ]
   },
   
