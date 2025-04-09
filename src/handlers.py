@@ -18,7 +18,7 @@ class DefenseHandler:
     self.ui = self.combat_handler.ui;
   
   def handleBlock(self, attacker, defender):
-    attacker.status["blocking"] = True;
+    attacker.giveStatus("blocking", 2);
     
 class TauntHandler:
   def __init__(self, combat_handler):
@@ -26,8 +26,8 @@ class TauntHandler:
     self.ui = self.combat_handler.ui;
   
   def __handle_outcome(self, attacker, defender):
-    if defender.name == "slime":
-      self.ui.panelAnimatedPrintFile("taunt success response", "debuff slime", [defender.name], "slime");
+    if defender.name == "slime": self.ui.panelAnimatedPrintFile("taunt success response", "debuff slime", [defender.name], "slime");
+    else: self.ui.panelAnimatedPrintFile("taunt success response", "debuff", [defender.name], defender.name);
     stat = choices(list(defender.stats))[0];
     defender.stats[stat] -= max(0, defender.stats[stat] * 0.05);
 
@@ -50,6 +50,8 @@ class DamageHandler:
       **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
       **self.createDamage("iron reversal", 30, ["strength"], 2),
       **self.createDamage("blade dance", 10, ["strength"], 1.5),
+      **self.createDamage("push", 5, ["defense"], 2, "defender"),
+      **self.createDamage("poke", 10, ["strength"], 0.8),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -67,7 +69,6 @@ class DamageHandler:
         total_damage += defender.stats.get(stat);
     return (total_damage * damage.get("multiplier")) * attacker.getFatigueMultiplier();
    
-    
   def calculateDamage(self, name, attacker, defender):
     damage = self.attack_damages.get(name);
     return round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
@@ -85,15 +86,15 @@ class AttackHandler:
       self.ui.animatedPrint(f"[red]{broken} was broken![reset]");
       
   def handleBlock(self, attacker, defender):
-    if attacker.status.get("blocking", False):
+    if attacker.status["blocking"][0] is True:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] dropped their block");
-      attacker.status["blocking"] = False;
+      attacker.status["blocking"] = [False, 0];
       return True;
 
-    if defender.status.get("blocking", False):
+    if defender.status["blocking"][0] is True:
       self.ui.panelAnimatedPrintFile("block", "successful block", [defender.name, attacker.name], "block");
       self.ui.panelPrint(f"[purple](DAMAGE BLOCKED)[reset]");
-      defender.status["blocking"] = False;
+      defender.status["blocking"] = [False, 0];
       return True;
     return False;
   
@@ -106,18 +107,27 @@ class AttackHandler:
   def __sword_style(self, attacker, defender):
     move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
     if move == "iron reversal" : self.defense_handler.handleBlock(attacker, defender);
-    elif move == "blade dance": attacker.stats["defense"] += 1;
+    elif move == "blade dance": attacker.stats["defense"] += 2; # balancs this lmao
     
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
     
     self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
+    if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
     
   def __debug_style(self, attacker, defender):
-    self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damage", "debug");
+    self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damage", "delete");
     attacker.attackEnemy(99999999999999999);
-
+  
+  def __dirty_style(self, attacker, defender):
+    move = choices(["push", "poke"])[0];
+    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
+    attacker.attackEnemy(dmg);
+    self.ui.panelAnimatedPrintFile("dirty style", move, [attacker.name, defender.name, dmg], move);
+    
+    if move == "push": defender.giveStatus("stunned", 2);
+    
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;
@@ -125,4 +135,4 @@ class AttackHandler:
     if attacker.attack_style == "basic": self.__basic_style(attacker, defender);
     elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
-  
+    elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);

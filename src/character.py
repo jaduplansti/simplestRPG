@@ -1,6 +1,7 @@
 from random import randint, uniform
 from item import Item, removeEquipment;
 import json
+from skill import Skill;
 
 class Character:
   def __init__(self, name):
@@ -11,9 +12,13 @@ class Character:
     self.location = "home"
     self.money = 1
     self.energy = 100
-    
-    self.status = {"blocking": False}
     self.berserk = False;
+
+    self.status = {
+      "blocking" : [False, 0],
+      "stunned" : [False, 0],
+      "bleeding" : [False, 0],
+    }
     
     self.stats = {
       "health": 100,
@@ -36,8 +41,11 @@ class Character:
     self.addItemToInventory(Item("energy potion", rarity = "common"), 100);
 
     self.addItemToInventory(Item("wooden sword", rarity = "common", durability = 1000, bodypart = "right arm"));
-    self.addItemToInventory(Item("scroll of instant kill", rarity = "epic"), 100);
-
+    self.addItemToInventory(Item("scroll of instant death", rarity = "epic"), 100);
+    self.addItemToInventory(Item("scroll of repair", rarity = "rare"), 100);
+    
+    self.addSkill(Skill("crimson edge", 10));
+    
   def to_dict(self):
     return {
       "name": self.name,
@@ -54,6 +62,7 @@ class Character:
       "_class": self._class,
       "skills": self.skills,
       "magic": self.magic,
+      "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
         name: {
           "item": item_data["item"].to_dict(),
@@ -74,7 +83,10 @@ class Character:
     char.berserk = data["berserk"]
     char.stats = data["stats"]
     char.equipment = {
-        k: Item.from_dict(v) if v else None for k, v in data["equipment"].items()
+      k: Item.from_dict(v) if v else None for k, v in data["equipment"].items()
+    }
+    char.skills = {
+       k: Skill.from_dict(v) if v else None for k, v in data["skills"].items()
     }
     char.attack_style = data["attack_style"]
     char._class = data["_class"]
@@ -84,7 +96,6 @@ class Character:
         "amount": item_data["amount"]
       } for name, item_data in data["inventory"].items()
     }
-    char.skills = data["skills"]
     char.magic = data["magic"]
     return char;
 
@@ -112,7 +123,7 @@ class Character:
         self.inventory[item.name]["amount"] += 1
       else:
         self.inventory[item.name] = {"amount": 1, "item": item}
-    
+  
   def getAmountOfItem(self, item):
     return self.inventory[item]["amount"]
   
@@ -200,48 +211,28 @@ class Character:
       return "green"
     return "cyan"
   
-  def getRankBasedOnStat(self, stat):
-    ratio = self.stats[stat] / self.getMaxStat()
-    
-    if ratio <= 0.05: return "E"
-    elif ratio <= 0.15: return "F"
-    elif ratio <= 0.3: return "D"
-    elif ratio <= 0.45: return "C"
-    elif ratio <= 0.6: return "B"
-    elif ratio <= 0.75: return "A"
-    elif ratio <= 0.9: return "S"
-    elif ratio <= 1.0: return "S+"
-    elif ratio <= 1.15: return "SS"
-    elif ratio <= 1.3: return "SS+"
-    elif ratio <= 1.5: return "SSS"
-    elif ratio <= 1.75: return "SSS+"
-    return "???"
-  
   def getFatigueMultiplier(self):
     if self.energy <= 25:
-      return 0.25
+      return 0.25;
     elif self.energy <= 50:
-      return 0.5
+      return 0.5;
     elif self.energy <= 75:
-      return 0.8
-    return 1
+      return 0.8;
+    return 1;
       
   def deductEnergy(self):
-    self.energy = max(0, round(self.energy - 5 / self.getFatigueMultiplier()))
+    self.energy = max(0, round(self.energy - 5 / self.getFatigueMultiplier()));
+
+  def giveStatus(self, status, n):
+    try:
+      self.status[status][0] = True;
+      self.status[status][1] += n;
+    except KeyError:
+      pass;
   
-  def loadData(self, path):
-    with open(path, "r") as file:
-      data = json.load(file)
-      self.name = data["name"]
-      self.energy = data["energy"]
-      self.stats = data["stats"]
+  def addSkill(self, skill):
+    self.skills.update({skill.name : skill});
   
-  def loadDataFromJson(self, s):
-    data = json.loads(s)
-    self.name = data["name"]
-    self.energy = data["energy"]
-    self.stats = data["stats"]
-    return self
-    
-  def getData(self):
-    return json.dumps(self.__dict__)
+  def skillExists(self, skill):
+    return skill in self.skills;
+      

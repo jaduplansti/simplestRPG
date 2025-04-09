@@ -61,6 +61,7 @@ def getEnemyByName(name, plr = None):
     goblin.taunt_chance = 0.8;
 
     goblin.attack_style = "basic";
+    goblin.putLoot(Item("health potion", rarity = "common"), 0.1);
     return goblin;
     
   elif name == "skeleton":
@@ -110,3 +111,19 @@ def getEnemyByName(name, plr = None):
     orc.block_chance = 0.1;
     orc.attack_style = "basic";
     return orc;
+    
+  elif name == "bandit":
+    bandit = Enemy("bandit");
+    bandit.level = randint(10, 13);
+    bandit.setHealthLevel();
+    bandit.stats["strength"] = randint(14, 18) + bandit.getIncreasedStat();
+    bandit.stats["defense"] = randint(8, 13) + bandit.getIncreasedStat();
+
+    bandit.attack_chance = 0.3;
+    bandit.block_chance = 0.1;
+    bandit.flee_chance = 0.5;
+    bandit.taunt_chance = 0.5;
+
+    bandit.attack_style = "dirty";
+    #bandit.putLoot(Item("bandit hide", rarity="uncommon"), 0.1)
+    return bandit;

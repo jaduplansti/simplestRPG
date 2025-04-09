@@ -66,30 +66,32 @@
     "[bold yellow]{0}[reset] begins a swift blade dance, their movements enhancing their agility and evasion against [bold yellow]{1}[reset]'s attack! They dealt [bold red]{2}[reset] damage!",
     "[bold yellow]{0}[reset]'s sword weaves intricate patterns, sharpening their reflexes and making them harder to target against [bold yellow]{1}[reset]'s blow! giving [bold red]{2}[reset] damage!",
     "[bold yellow]{0}[reset] flows with the rhythm of their blade dance, bolstering their defensive awareness against [bold yellow]{1}[reset]'s strike! They dealt [bold red]{2}[reset] damage!",
-    "[bold yellow]{0}[reset] executes a fluid blade dance, increasing their ability to anticipate and avoid incoming attacks from [bold yellow]{1}[reset]! dealimg [bold red]{2}[reset] damage!",
+    "[bold yellow]{0}[reset] executes a fluid blade dance, increasing their ability to anticipate and avoid incoming attacks from [bold yellow]{1}[reset]! dealing [bold red]{2}[reset] damage!",
     "[bold yellow]{0}[reset]'s sword moves in a mesmerizing dance, heightening their senses and defensive capabilities against [bold yellow]{1}[reset]'s assault! dealing [bold red]{2}[reset] damage!",
     "[bold yellow]{0}[reset] performs a swift blade dance, their movements granting them a moment of heightened defensive focus against [bold yellow]{1}[reset]'s attack! They deal [bold red]{2}[reset] damage!"
     ]
   },
   
-  "damage handler": {
-    "defense ignored": [
-      "[bold yellow]{0}[reset] capitalized on [bold yellow]{1}[reset]'s weak guard!",
-      "[bold yellow]{1}[reset] left themselves vulnerable, and [bold yellow]{0}[reset] wasted no time!",
-      "[bold yellow]{0}[reset] bypassed the defenses of [bold yellow]{1}[reset] with a cunning strike!",
-      "[bold yellow]{1}[reset] failed to react, leaving a clear opening for [bold yellow]{0}[reset]!",
-      "[bold yellow]{0}[reset] exploited the moment, delivering a punishing blow to [bold yellow]{1}[reset]!"
+  "dirty style": {
+    "push": [
+      "[bold yellow]{0}[reset] lunges forward, shoving [bold yellow]{1}[reset] with surprising force, disrupting their stance and dealing [bold red]{2}[reset] damage!",
+      "With a powerful shove, [bold yellow]{0}[reset] sends [bold yellow]{1}[reset] stumbling backward, creating distance and inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] uses their momentum to push into [bold yellow]{1}[reset], knocking them off balance and dealing a solid [bold red]{2}[reset] damage!",
+      "Focusing their strength, [bold yellow]{0}[reset] pushes [bold yellow]{1}[reset] with a sudden burst of energy, causing them to reel and take [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] charges, their shoulder connecting with [bold yellow]{1}[reset], a forceful push that disrupts their attack and deals [bold red]{2}[reset] damage!",
+      "Seizing an opportunity, [bold yellow]{0}[reset] shoves [bold yellow]{1}[reset] with a calculated push, breaking their concentration and dealing [bold red]{2}[reset] damage!"
     ],
     
-    "no damage": [
-      "[bold yellow]{0}[reset] struck hard, but [bold yellow]{1}[reset] barely felt it!",
-      "[bold yellow]{1}[reset] smirked as [bold yellow]{0}[reset]'s punch glanced harmlessly away!",
-      "[bold yellow]{0}[reset] threw a mighty punch, but it was completely ineffective against [bold yellow]{1}[reset]!",
-      "[bold yellow]{1}[reset] shrugged off the attack like it was nothing!",
-      "[bold yellow]{0}[reset]'s strike was met with a solid defense, causing no harm to [bold yellow]{1}[reset]!"
+    "poke": [
+      "[bold yellow]{0}[reset] swiftly jabs at [bold yellow]{1}[reset], a quick poke that finds a weak point and deals [bold red]{2}[reset] damage!",
+      "With a precise poke, [bold yellow]{0}[reset] targets an opening in [bold yellow]{1}[reset]'s defense, inflicting a sharp [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]'s attack is a lightning-fast poke, catching [bold yellow]{1}[reset] off guard and dealing a stinging [bold red]{2}[reset] damage!",
+      "A sharp poke from [bold yellow]{0}[reset]'s fingers pierces [bold yellow]{1}[reset]'s defenses, resulting in [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] executes a quick and subtle poke, finding a vulnerable spot on [bold yellow]{1}[reset] and dealing [bold red]{2}[reset] damage!",
+      "Utilizing a swift poking motion, [bold yellow]{0}[reset] lands a precise hit on [bold yellow]{1}[reset], dealing a surprising [bold red]{2}[reset] damage!"
     ]
   },
-
+  
   "fatigue handler": {
     "tired": [
       "[yellow]{0}[reset] breathes deeply, fighting against the mounting fatigue.",
@@ -161,6 +163,13 @@
       "[yellow]{0}[reset] quivered with indignation, though it could do little to respond!",
       "[yellow]{0}[reset] sloshed angrily, unable to form a coherent retort!",
       "[yellow]{0}[reset] vibrated violently, its oozy form expressing pure irritation!"
+    ],
+    
+    "debuff": [
+      "[yellow]{0}[reset] flinched, but a flicker of malice sparked in its gaze.",
+      "[yellow]{0}[reset] let out a soundless cry, the air around it warping faintly.",
+      "[yellow]{0}[reset] stirred with quiet fury, its form trembling with restrained power.",
+      "[yellow]{0}[reset] exhaled something between a hiss and a growl, tension thick in the air."
     ]
   },
   

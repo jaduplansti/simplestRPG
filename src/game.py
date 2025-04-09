@@ -28,7 +28,15 @@ class Game:
         self.player.getItem(option).use(self, combat_handler);
       elif option == "":
         break;
-        
+  
+  def handleUseSkill(self, skill = None, combat_handler = None, attacker = None, defender = None):
+    if skill is None:
+      self.menu.showSkillsMenu(attacker);
+      skill = self.ui.getInput();
+    
+    if attacker.skillExists(skill) is True:
+      attacker.skills[skill].use(combat_handler, attacker, defender);
+  
   def handleSleep(self):
     if self.player.energy >= 75:
       self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
@@ -81,7 +89,7 @@ class Game:
           self.handleCombatTutorial();
           tutorial = True;
         combat_handler = CombatHandler(self);
-        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity", "orc"])[0]);
+        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity", "orc", "bandit"])[0]);
         continue;
       elif option == "sleep":
         self.handleSleep();

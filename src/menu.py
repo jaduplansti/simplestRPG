@@ -18,6 +18,15 @@ class Menu():
         if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"].__dict__[info]})");
       self.ui.newLine();
   
+  def showSkillsMenu(self, character):
+    self.ui.animatedPrint(f"[magenta]==SKILLS==[reset]");
+    for skill_name in character.skills:
+      skill = character.skills[skill_name];
+      self.ui.normalPrint(f"- [bold yellow]{skill_name}[reset]");
+      for info in skill.__dict__: 
+        if info != "name": self.ui.normalPrint(f"  - [bold green]{info.capitalize()}[reset] ({skill.__dict__[info]})");
+      self.ui.newLine();
+  
   def showStatsMenu(self, character):
     self.ui.clear()
     self.ui.animatedPrint(f"[yellow]{character.name}[reset] focuses...")
@@ -47,7 +56,7 @@ class Menu():
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
     self.ui.normalPrint(art.CASTLE)
 
-    self.ui.normalPrint("\n• version [green]2.2[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.3[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showHomeMenu(self):
@@ -87,7 +96,8 @@ class Menu():
     self.ui.normalPrint("≈ [cyan]block[reset]");
     self.ui.normalPrint("≈ [blue]taunt[reset]");
     self.ui.normalPrint("≈ [green]items[reset]");
-      
+    self.ui.normalPrint("≈ [magenta]skills[reset]");
+
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.ui.normalPrint("≈ [red]flee[reset]");
     self.ui.newLine();

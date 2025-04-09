@@ -1,7 +1,7 @@
 from enemy import Enemy, getEnemyByName;
 from random import randint, choices;
 from handlers import AttackHandler;
-from  combatevent import CombatEventHandler;
+from combatevent import CombatEventHandler;
 
 class CombatHandler:
   def __init__(self, game):
@@ -21,7 +21,7 @@ class CombatHandler:
     
     self.defender = enemy;
     self.defender.enemy = self.attacker;
-    self.attacker.status["blocking"] = False; # temporary fix
+    self.attacker.status["blocking"] = [False, 0]; # temporary fix
     
     self.game.handleCombatInitiateMenu(self);
   
@@ -66,8 +66,27 @@ class CombatHandler:
     
     self.ui.panelPrint(f"([blue]-{attacker.getFatigueMultiplier() * 100}%[reset]) stat output.");
   
+  def handleStatus(self, attacker): # i should give this its seperate class
+    pass_turn = False;
+    if attacker.status["stunned"][0] is True: # this one is pretty unfair, trust me i died to that bandit
+      self.ui.animatedPrint(f"[red]{attacker.name} is stunned and cant move[reset]!");
+      attacker.status["stunned"][1] -= 1;
+      if randint(1, 3) == randint(1, 3): self.ui.animatedPrint(f"[red]{attacker.name} resisted the stun[reset]!"); # temporary quick nerf
+      else: pass_turn = True;
+    if attacker.status["bleeding"][0] is True:
+      dmg = round(attacker.enemy.stats["health"] * 0.1);
+      self.ui.animatedPrint(f"[red]{attacker.name} is bleeding, receiving {dmg} damage[reset]!");
+      attacker.attackEnemy(dmg);
+      attacker.status["bleeding"][1] -= 1;
+      
+    for status in attacker.status:
+      if attacker.status[status][1] <= 0 and attacker.status[status][0] != False:
+        self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] is no longer [red]{status}[reset]!");
+        attacker.status[status][0] = False;
+    return pass_turn;
+    
   def tryBerserkNpc(self, npc):
-    if randint(1, 8) == randint(1, 8) and npc.berserk is False:
+    if randint(1, 7) == randint(1, 7) and npc.berserk is False:
       self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
       self.ui.animatedPrint(f"[yellow]{npc.name}[reset] goes [red]Berserk[reset]!");
       self.ui.panelPrint("[blue]ALL STATS[reset] [green](x1.5)[reset]");
@@ -106,12 +125,15 @@ class CombatHandler:
       return True
     elif option == "items":
       self.game.handleUseItem(self);
+    elif option == "skills":
+      self.game.handleUseSkill(None, self, attacker, defender);
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
     
     attacker.deductEnergy();
   
   def handleCombatNpc(self, auto = False):
+    ran = None; # temporary
     while True:
       self.menu.showCombatMenu(self, self.attacker);
       option = self.ui.getInput();
@@ -121,20 +143,17 @@ class CombatHandler:
       self.ui.showHeader("Combat Logs", "=");
       self.ui.showSeperator("-");
       
-      ran = self.handleOption(option, self.attacker, self.defender);
+      if self.handleStatus(self.attacker) != True: ran = self.handleOption(option, self.attacker, self.defender);
       self.ui.showSeperator("-");
 
-      if self.checkDeath() is True or ran is True:
-        break;
+      if self.checkDeath() is True or ran is True: break;
       
-      ran = self.handleOption(enemy_option, self.defender, self.attacker);
+      if self.handleStatus(self.defender) != True: ran = self.handleOption(enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
       
       if isinstance(self.defender, Enemy):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
-      if self.checkDeath() is True or ran is True:
-        break;
-      
+      if self.checkDeath() is True or ran is True: break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
