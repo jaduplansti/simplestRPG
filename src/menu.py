@@ -56,7 +56,7 @@ class Menu():
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
     self.ui.normalPrint(art.CASTLE)
 
-    self.ui.normalPrint("\n• version [green]2.3[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.4[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showHomeMenu(self):

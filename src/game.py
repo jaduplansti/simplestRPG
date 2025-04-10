@@ -35,8 +35,9 @@ class Game:
       skill = self.ui.getInput();
     
     if attacker.skillExists(skill) is True:
-      attacker.skills[skill].use(combat_handler, attacker, defender);
-  
+      if attacker.energy >= attacker.skills[skill].energy: attacker.skills[skill].use(combat_handler, attacker, defender);
+      else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
+      
   def handleSleep(self):
     if self.player.energy >= 75:
       self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);

@@ -133,3 +133,6 @@
 • stunned has been nerfed, you have a 1/3 chance to resist
 • swordsman style has been buffed with each attack having a chance to inflict bleeding damage
 • added basic skill system
+
+[version 2.4]
+• added skill energies

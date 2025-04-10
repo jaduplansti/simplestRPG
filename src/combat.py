@@ -74,9 +74,9 @@ class CombatHandler:
       if randint(1, 3) == randint(1, 3): self.ui.animatedPrint(f"[red]{attacker.name} resisted the stun[reset]!"); # temporary quick nerf
       else: pass_turn = True;
     if attacker.status["bleeding"][0] is True:
-      dmg = round(attacker.enemy.stats["health"] * 0.1);
+      dmg = round(attacker.stats["health"] * 0.1);
       self.ui.animatedPrint(f"[red]{attacker.name} is bleeding, receiving {dmg} damage[reset]!");
-      attacker.attackEnemy(dmg);
+      attacker.enemy.attackEnemy(dmg);
       attacker.status["bleeding"][1] -= 1;
       
     for status in attacker.status:

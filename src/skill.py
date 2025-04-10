@@ -5,10 +5,14 @@ class Skill:
     self.name = name;
     self.energy = energy;
     self.level = level;
+  
+  def deductEnergy(self, character, n):
+    character.energy = max(0, character.energy - n);
     
   def use(self, combat_handler = None, attacker = None, defender = None):
     SKILLS[self.name](self, combat_handler, attacker, defender);
- 
+    self.deductEnergy(attacker, self.energy);
+    
   def to_dict(self):
     return {
       "name": self.name,
@@ -24,7 +28,7 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
   if skill.name == "crimson edge": # this is just a placeholder
     defender.giveStatus("stunned", 100);
     defender.giveStatus("bleeding", 100);
-
+  
 SKILLS = {
   "crimson edge" : action_normal_damage,
 };
