@@ -136,3 +136,14 @@
 
 [version 2.4]
 • added skill energies
+• buffed blade dance
+• fixed slime loot bug
+• fixed breaking a wooden sword makes your stat go negative
+• breaking a sword will cause you to lose 10% of your stat
+• slightly refactored game class
+• made enemies a bit more dynamic
+• refactored enemies, removed previous enemies only slime and goblin are left
+• rebalanced energy system
+• added critical hits
+• improved combat menu
+• fixed more bugs

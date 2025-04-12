@@ -8,10 +8,10 @@ class Enemy(Character):
     self.loot = [None];
     self.loot_chance = [0.5];
     
-    self.attack_chance = 0;
-    self.block_chance = 0;
-    self.flee_chance = 0;
-    self.taunt_chance = 0;
+    self.attack_chance = 0.1;
+    self.block_chance = 0.1;
+    self.flee_chance = 0.1;
+    self.taunt_chance = 0.1;
   
   def getLoot(self):
     return choices(self.loot, self.loot_chance)[0];
@@ -27,103 +27,59 @@ class Enemy(Character):
     self.stats["health"] = self.stats["max health"];
     self.berserk = True;
   
-  def setHealthLevel(self):
-    self.stats["max health"] = (50 * self.level);
-    self.stats["health"] = self.stats["max health"];
+  def statLevelUp(self):
+    for stat in self.stats:
+      if stat == "max health":
+        self.stats[stat] += 20;
+        self.stats["health"] = self.stats["max health"];
+      elif stat == "luck": self.stats[stat] += 0.001;
+      else: self.stats[stat] += 1;
+        
+  def getAction(self):
+    if self.status["blocking"][0] is True:
+      return "taunt";
+    elif self.stats["health"] <= self.stats["max health"] * 0.25:
+      return choices(["flee", "block"], [self.flee_chance, self.block_chance])[0];
+    else: return choices(["attack", "block"], [self.attack_chance, self.block_chance])[0];
+  
+def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list):
+  enemy = Enemy(name);
+  enemy.level = level;
+  
+  for stat in stats:
+    enemy.stats[stat] = stats[stat];
+ 
+  for _ in range(enemy.level + 1):
+    enemy.statLevelUp();
+  
+  enemy.attack_chance = action_chances[0];
+  enemy.block_chance = action_chances[1];
+  enemy.flee_chance = action_chances[2];
+  enemy.taunt_chance = action_chances[3];
+  
+  enemy.attack_style = attack_style;
+  for loot in loots:
+    enemy.putLoot(loot[0], loot[1]);
+  return enemy;
+  
     
 def getEnemyByName(name, plr = None):
   if name == "slime":
-    slime = Enemy("slime");
-    slime.level = randint(1, 2);
-    
-    slime.setHealthLevel();
-    slime.stats["strength"] = slime.getIncreasedStat();
-    slime.stats["defense"] = slime.getIncreasedStat();
-    
-    slime.attack_chance = 0.5;
-    slime.block_chance = 0;
-    slime.attack_style = "basic";
-
-    slime.putLoot(Item("wooden sword", rarity = "common",  bodypart = "left arm"), 0.8);
-    slime.putLoot(Item("health potion", rarity = "common"), 0.1);
-    return slime;
-    
+    return createEnemy(
+      "slime", randint(1, 2), {"strength" : 1}, "basic", [0.5, 0.5, 0.01, 0.01],
+      [
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm"), 0.8]
+      ]
+    );
   elif name == "goblin":
-    goblin = Enemy("goblin");
-    goblin.level = randint(3, 5);
-    goblin.setHealthLevel();
-    goblin.stats["strength"] = randint(8, 12) + goblin.getIncreasedStat();
-    goblin.stats["defense"] = randint(8, 15) + goblin.getIncreasedStat();
+    return createEnemy(
+      "goblin", randint(3, 5), {"strength" : 5, "defense" : 3}, "basic", [0.7, 0.1, 0.5, 0.01],
+      [
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm"), 0.8],
+        [Item("health potion", rarity = "common"), 0.8],
+        [Item("health potion", rarity = "uncommon"), 0.5],
+      ]
+    );
     
-    goblin.attack_chance = 0.5;
-    goblin.block_chance = 0.1;
-    goblin.flee_chance = 0.8;
-    goblin.taunt_chance = 0.8;
-
-    goblin.attack_style = "basic";
-    goblin.putLoot(Item("health potion", rarity = "common"), 0.1);
-    return goblin;
-    
-  elif name == "skeleton":
-    skeleton = Enemy("skeleton");
-    skeleton.level = randint(3, 5);
-    skeleton.setHealthLevel();
-    skeleton.stats["strength"] = randint(10, 15) + skeleton.getIncreasedStat();
-    skeleton.stats["defense"] = randint(10, 15) + skeleton.getIncreasedStat();
-    
-    skeleton.attack_chance = 0.9;
-    skeleton.block_chance = 0.1;
-    skeleton.attack_style = "basic";
-    return skeleton;
   
-  elif name == "clone":
-    clone = Enemy("clone");
-    clone.level = plr.level;
     
-    for stat in plr.stats:
-      clone.stats[stat] = plr.stats[stat];
-      
-    clone.attack_chance = 0.5;
-    clone.block_chance = 0.5;
-    clone.attack_style = plr.attack_style;
-    return clone;
-  
-  elif name == "deity":
-    deity = Enemy("exodus the god of death");
-    deity.level = 999999;
-    
-    for stat in deity.stats:
-      deity.stats[stat] = 100 * deity.level
-      
-    deity.attack_chance = 1;
-    deity.block_chance = 0.1;
-    deity.attack_style = "debug";
-    return deity;
-    
-  elif name == "orc":
-    orc = Enemy("orc");
-    orc.level = randint(5, 8);
-    orc.setHealthLevel();
-    orc.stats["strength"] = randint(20, 25) + orc.getIncreasedStat();
-    orc.stats["defense"] = randint(20, 25) + orc.getIncreasedStat();
-    
-    orc.attack_chance = 0.9;
-    orc.block_chance = 0.1;
-    orc.attack_style = "basic";
-    return orc;
-    
-  elif name == "bandit":
-    bandit = Enemy("bandit");
-    bandit.level = randint(10, 13);
-    bandit.setHealthLevel();
-    bandit.stats["strength"] = randint(14, 18) + bandit.getIncreasedStat();
-    bandit.stats["defense"] = randint(8, 13) + bandit.getIncreasedStat();
-
-    bandit.attack_chance = 0.3;
-    bandit.block_chance = 0.1;
-    bandit.flee_chance = 0.5;
-    bandit.taunt_chance = 0.5;
-
-    bandit.attack_style = "dirty";
-    #bandit.putLoot(Item("bandit hide", rarity="uncommon"), 0.1)
-    return bandit;

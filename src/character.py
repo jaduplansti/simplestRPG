@@ -25,7 +25,7 @@ class Character:
       "max health": 100,
       "strength": randint(5, 10),
       "defense": randint(5, 10),
-      "luck": round(uniform(0.1, 0.4), 4),
+      "luck": 0.3,
     }
     
     self.equipment = {"head": None, "chest": None, "left arm": None, "right arm": None, "boots": None}
@@ -36,13 +36,6 @@ class Character:
     self.inventory = {}
     self.skills = {}
     self.magic = {}
-    
-    self.addItemToInventory(Item("health potion", rarity = "common"), 100);
-    self.addItemToInventory(Item("energy potion", rarity = "common"), 100);
-
-    self.addItemToInventory(Item("wooden sword", rarity = "common", durability = 1000, bodypart = "right arm"));
-    self.addItemToInventory(Item("scroll of instant death", rarity = "epic"), 100);
-    self.addItemToInventory(Item("scroll of repair", rarity = "rare"), 100);
     
     self.addSkill(Skill("crimson edge", 10));
     
@@ -174,10 +167,10 @@ class Character:
   def statLevelUp(self):
     for stat in self.stats:
       if stat == "max health":
-        self.stats[stat] += 10 * self.level;
+        self.stats[stat] += 50;
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck":
-        self.stats[stat] = round(self.stats[stat] + 0.01, 4)
+        self.stats[stat] = round(self.stats[stat] + 0.0001, 4)
       else:
         self.stats[stat] += 2
         
@@ -221,7 +214,7 @@ class Character:
     return 1;
       
   def deductEnergy(self):
-    self.energy = max(0, round(self.energy - 5 / self.getFatigueMultiplier()));
+    self.energy = max(0, self.energy - 5);
 
   def giveStatus(self, status, n):
     try:

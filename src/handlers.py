@@ -1,4 +1,4 @@
-from random import randint, choices;
+from random import randint, choices, uniform;
 
 class CriticalHandler:
   def __init__(self):
@@ -49,7 +49,7 @@ class DamageHandler:
       **self.createDamage("slash", 30, ["strength"], 2),
       **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
       **self.createDamage("iron reversal", 30, ["strength"], 2),
-      **self.createDamage("blade dance", 10, ["strength"], 1.5),
+      **self.createDamage("blade dance", 20, ["strength"], 1.5),
       **self.createDamage("push", 5, ["defense"], 2, "defender"),
       **self.createDamage("poke", 10, ["strength"], 0.8),
     }
@@ -60,6 +60,13 @@ class DamageHandler:
   def reduceDamage(self, dmg, defender):
     return max(0, dmg - defender.stats.get("defense"));
   
+  def attemptCritical(self, dmg, attacker):
+    if choices(["crit", None], [attacker.stats["luck"], 0.5])[0] == "crit":
+      multiplier = round(uniform(1.1, attacker.stats["luck"] * 10), 1);
+      self.ui.panelPrint(f"[bold red]CRITICAL HIT![reset] [green]({multiplier}x)[reset]");
+      return dmg * multiplier;
+    return dmg;
+     
   def __calculate(self, damage, attacker, defender):
     total_damage = damage.get("dmg");
     for stat in damage.get("stats"):
@@ -67,11 +74,13 @@ class DamageHandler:
         total_damage += attacker.stats.get(stat);
       else:
         total_damage += defender.stats.get(stat);
-    return (total_damage * damage.get("multiplier")) * attacker.getFatigueMultiplier();
+    return self.attemptCritical(total_damage * damage.get("multiplier"), attacker) * attacker.getFatigueMultiplier();
    
   def calculateDamage(self, name, attacker, defender):
     damage = self.attack_damages.get(name);
-    return round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
+    total_damage = round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
+    if total_damage >= defender.stats["max health"]: self.ui.panelPrint("[bold green]BRILLIANT![reset]"); # might remove this in the future
+    return total_damage;
     
 class AttackHandler:
   def __init__(self, combat_handler):

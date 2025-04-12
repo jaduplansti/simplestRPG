@@ -70,7 +70,7 @@ class UI:
     self.normalPrint(Panel(s));
     self.newLine();
   
-  def panelAnimatedPrint(self, text, title, type_speed=0.05):
+  def panelAnimatedPrint(self, text, title):
     self.disableEcho();
     current_text = ""
     formatted_text = Text.from_markup(text)
@@ -80,31 +80,31 @@ class UI:
         panel.renderable = formatted_text[0:n + 1];
         live.update(panel);
         self.beep();
-        sleep(type_speed);
+        sleep(self.game.settings["type speed"]);
     self.newLine();
-    sleep(2);
+    sleep(self.game.settings["delay speed"]);
     self.enableEcho();
     self.clearStdinBuffer();
     
-  def animatedPrintFile(self, key, n, args, delay=2):
+  def animatedPrintFile(self, key, n, args):
 	  formatted_s = self.getString(key, n).format(*args);
-	  self.animatedPrint(formatted_s, delay);
+	  self.animatedPrint(formatted_s);
   
-  def panelAnimatedPrintFile(self, key, n, args, title, type_speed = 0.05):
+  def panelAnimatedPrintFile(self, key, n, args, title):
 	  formatted_s = self.getString(key, n).format(*args);
-	  self.panelAnimatedPrint(formatted_s, title, type_speed);
+	  self.panelAnimatedPrint(formatted_s, title);
   
-  def animatedPrint(self, s, delay=1):
+  def animatedPrint(self, s):
     self.disableEcho();
     parsed_s = Text.from_markup(s)
     print("~ ", end = "");
     for ch in parsed_s:
       print(ch, end='', flush=True)
       self.beep();
-      sleep(uniform(0.01, 0.06));
+      sleep(self.game.settings["type speed"]);
     self.newLine();
     self.newLine();
-    sleep(delay);
+    sleep(self.game.settings["delay speed"]);
     self.enableEcho();
     self.clearStdinBuffer();
   
@@ -134,32 +134,36 @@ class UI:
     _input = Prompt.ask();
     self.newLine();
     return _input;
-  
-  def showHealthBar(self, character):
-	  name = character.name
-	  if character.berserk is True:
-	    name += " ([bold red]BERSERK[reset])";
-	  for status in character.status:
-	    if character.status[status][0] is True: name += f" ([bold cyan]{status} {character.status[status][1]}x[reset])";
     
-	  current_hp = character.stats["health"]
-	  max_hp = character.stats["max health"]
-	  current_hp = max(0, min(current_hp, max_hp))
+  def showBar(self, n, total, bar_length, color):
+    n = max(0, min(n, total))
+    filled_length = int(n / total * bar_length) if total > 0 else 0
+    return f"[{color}]" + "◼" * filled_length + "◻" * (bar_length - filled_length) + "[reset]"
+    
+  def showCombatBar(self, character):
+    color = "";
+    statuses = "";
+    
+    if character.stats["health"] / character.stats["max health"] > 0.6:
+      color = "green";
+    elif character.stats["health"] / character.stats["max health"] > 0.3:
+      color = "yellow";
+    else: color = "red";
+    
+    health_bar = self.showBar(character.stats["health"], character.stats["max health"], 6, color);
+    energy_bar = self.showBar(character.energy, 100, 6, "blue");
 
-	  health_percentage = current_hp / max_hp
-	  bar_length = 6
-	  filled_length = int(health_percentage * bar_length)
-
-	  if health_percentage > 0.6:
-		  color = "green"
-	  elif health_percentage > 0.3:
-		  color = "yellow"
-	  else:
-		  color = "red"
-
-	  health_bar = f"[{color}]" + "█" * filled_length + "░" * (bar_length - filled_length) + "[/]"
-	  self.normalPrint(f"{name} HP: [bold green]{round(current_hp)}[reset]/[bold green]{max_hp}[reset]\n([bold purple]{health_percentage*100:.2f}%[reset]) {health_bar}\n")
-	
+    for status in character.status:
+      if character.status[status][0] is True:
+        symbol = "";
+        if status in ["blocking"]: symbol = "⬆";
+        else: symbol = "⬇";
+        statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1]}x[reset] {symbol})");
+     
+    self.normalPrint(f"{character.name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
+    self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.energy / 100)*100:.2f}%[reset]) {energy_bar}\n")
+    if statuses != "": self.normalPrint(f"{statuses}\n");
+    
   def showHeader(self, title, ch):
     header = "";
     for _ in range(len(title)):
@@ -175,4 +179,4 @@ class UI:
   def showStatus(self, msg, n):
     with self.console.status(msg) as status:
       sleep(n);
-      
+  

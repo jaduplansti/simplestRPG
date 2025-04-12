@@ -6,7 +6,8 @@ from multiplayer import MultiplayerHandler;
 from menu import Menu;
 from random import choices;
 
-tutorial = True;
+from os import _exit;
+#todo refactor game class, improve ui class
 
 class Game:
   def __init__(self):
@@ -14,7 +15,20 @@ class Game:
     self.ui = UI(self);
     self.menu = Menu(self);
     self.multiplayer_handler = MultiplayerHandler(self);
-  
+    
+    self.settings = { 
+      "type speed" : 0.01,
+      "delay speed" : 0.5,
+    }
+   
+  def handleMenu(self, options : dict, showFun = None):
+    while True:
+      if showFun != None: showFun();
+      option = self.ui.getInput();
+      if option in options.keys():
+        options[option]();
+      self.ui.awaitKey();
+      
   def handleUseItem(self, combat_handler = None):
     if len(self.player.inventory) <= 0:
       self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] bag is empty right now, nothing to use.");
@@ -23,7 +37,6 @@ class Game:
     self.menu.showItemsMenu(self.player);
     while True:
       option = self.ui.getInput().lower();
-    
       if self.player.itemExists(option):
         self.player.getItem(option).use(self, combat_handler);
       elif option == "":
@@ -39,6 +52,8 @@ class Game:
       else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
       
   def handleSleep(self):
+    self.ui.showStatus("saving", 2);
+    self.player.save();
     if self.player.energy >= 75:
       self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
       return;
@@ -59,49 +74,33 @@ class Game:
     try:
       plr = Player.load();
       self.ui.animatedPrint(f"[bold yellow]{plr.name}'s[reset] save was found, load data? [italic green](yes/no)[reset]");
-      if self.ui.getInput() == "yes": self.player = plr;
+      if self.ui.getInput() == "yes": 
+        self.ui.showStatus("loading", 2);
+        self.player = plr;
       else: self.handleName();
     except FileNotFoundError:
       self.handleName();
       
   def handleMainMenu(self):
-    while True:
-      self.menu.showMainMenu();
-      option = self.ui.getInput().lower();
-      
-      if option == "start":
-        self.handleLoad();
-        self.handleHomeMenu();
-      elif option == "quit":
-        return;
+    self.handleMenu({"start" : self.handleHomeMenu, "exit" : _exit}, self.menu.showMainMenu);
   
   def handleHomeMenu(self):
-    while True:
-      self.menu.showHomeMenu();
-      option = self.ui.getInput();
+    self.handleLoad();
+    self.handleMenu(
+      {
+       "items" : self.handleUseItem, 
+       "stats" : lambda: self.menu.showStatsMenu(self.player),
+       "practice" : self.initiateFight,
+       "sleep" : self.handleSleep,
+       "settings" : self.handleSettings,
+      }, 
+      self.menu.showHomeMenu
+    );
+  
+  def initiateFight(self):
+    combat_handler = CombatHandler(self);
+    combat_handler.initiateFightNpc(self.player, choices(["slime", "goblin"])[0]);
     
-      if option == "items":
-        self.handleUseItem();
-      elif option == "stats":
-        self.menu.showStatsMenu(self.player);
-      elif option == "practice":
-        global tutorial;
-        if tutorial is False:
-          self.handleCombatTutorial();
-          tutorial = True;
-        combat_handler = CombatHandler(self);
-        combat_handler.initiateFightNpc(self.player, choices(["slime", "skeleton", "goblin", "clone", "deity", "orc", "bandit"])[0]);
-        continue;
-      elif option == "sleep":
-        self.handleSleep();
-        self.ui.showStatus("saving", 3);
-        self.player.save();
-      elif option == "ascend": # for testing purposes
-        self.ui.animatedPrint("this will take a few seconds, please wait as you break the limits...");
-        self.player.exp = 999999 * 999999;
-        self.player.tryLevelUp();
-      self.ui.awaitKey();
-        
   def handleCombatInitiateMenu(self, combat_handler):
     while True:
       self.menu.showCombatInitiateMenu();
@@ -116,37 +115,21 @@ class Game:
       
       self.ui.awaitKey();
       
-  def handleCombatTutorial(self):
-    self.ui.clear();
-    self.ui.animatedPrint(f"[green]{self.player.name}[reset] in [underline]simplestRPG[reset] there are 4 main actions.");
-    self.ui.animatedPrint("these are [yellow]attack[reset], [blue]block[reset], [purple]taunt[reset], [red]flee[reset].");
-    self.ui.animatedPrint("[yellow]attack[reset] deals damage to enemies and may vary depending on the player class and attack style.");
+  def handleSettings(self):
+    self.menu.showSettingsMenu();
+    option = self.ui.getInput();
     
-    self.ui.animatedPrint("attacks are automatically reduced by enemy defense, however if the opponents defense is too high.");
-    self.ui.panelAnimatedPrintFile("damage handler", "no damage", ["joe", "kevin"], "reduced dmg");
-    self.ui.animatedPrint("attacks may also ignore enemy defense.");
-    self.ui.panelAnimatedPrintFile("damage handler", "defense ignored", ["joe", "kevin"], "no dmg");
+    if option == "type speed" or option == "ts":
+      self.ui.normalPrint("set type speed ⤵\n");
+      try:
+        self.settings["type speed"] = int(self.ui.getInput());
+      except ValueError:
+        self.ui.normalPrint("type speed must be integers ⤴\n");
     
-    self.ui.awaitKey();
-    self.ui.clear();
-    self.ui.animatedPrint("[blue]block[reset] completely nullifies the damage incoming, which only applies to physical attacks.");
-    self.ui.animatedPrint("blocking is useful especially for strategies.");
+    elif option == "delay speed" or option == "ds":
+      self.ui.normalPrint("set delay speed ⤵\n");
+      try:
+        self.settings["delay speed"] = int(self.ui.getInput());
+      except ValueError:
+        self.ui.normalPrint("delay speed must be integers ⤴\n");
     
-    self.ui.panelAnimatedPrintFile("block", "blocking", ["joe", "kevin"], "blocking");
-    self.ui.panelAnimatedPrintFile("block", "blocking", ["joe", "kevin"], "blocking");
-    self.ui.panelAnimatedPrintFile("basic style", "strong punch", ["kevin", "joe", 0], "blocked");
-    self.ui.animatedPrint("as you can see the damage has been zeroed.");
-   
-    self.ui.awaitKey();
-    self.ui.clear();
-    self.ui.animatedPrint("[purple]taunt[reset] is a strategic move to reduce opponents stats.");
-    self.ui.animatedPrint("taunting will get buffed soon.");
-    
-    self.ui.panelAnimatedPrintFile("taunt", "debuff", ["joe", "kevin"], "taunt");
-    self.ui.awaitKey();
-    self.ui.clear();
-    self.ui.animatedPrint("[red]flee[reset] is a viable option, npcs tend to spam this move especially when their below 25% health.");
-    
-    self.ui.awaitKey();
-    self.ui.clear();
-

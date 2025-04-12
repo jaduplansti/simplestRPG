@@ -78,6 +78,8 @@ class CombatHandler:
       self.ui.animatedPrint(f"[red]{attacker.name} is bleeding, receiving {dmg} damage[reset]!");
       attacker.enemy.attackEnemy(dmg);
       attacker.status["bleeding"][1] -= 1;
+    if attacker.status["blocking"][0] is True:
+      attacker.status["blocking"][1] -= 1;
       
     for status in attacker.status:
       if attacker.status[status][1] <= 0 and attacker.status[status][0] != False:
@@ -104,7 +106,6 @@ class CombatHandler:
     else:
       return False;
       
-    self.ui.awaitKey();
     return True;
    
   def handleOption(self, option, attacker, defender):
@@ -112,9 +113,9 @@ class CombatHandler:
     if self.handleFatigue(attacker) == "passed out":
       return True;
       
-    if option == "attack":
+    if option in ["attack", "atk"]:
       self.attack_handler.handleAttack(attacker, defender);
-    elif option == "block":
+    elif option in ["block", "blk"]:
       self.attack_handler.defense_handler.handleBlock(attacker, defender);
       self.ui.panelAnimatedPrintFile("block", "blocking", [attacker.name, defender.name], "block");
     elif option == "taunt":
@@ -137,7 +138,6 @@ class CombatHandler:
     while True:
       self.menu.showCombatMenu(self, self.attacker);
       option = self.ui.getInput();
-      enemy_option = choices(["attack", "block", "flee", "taunt"], [self.defender.attack_chance, self.defender.block_chance, self.defender.flee_chance, self.defender.taunt_chance])[0];
       
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
@@ -148,6 +148,7 @@ class CombatHandler:
 
       if self.checkDeath() is True or ran is True: break;
       
+      enemy_option = self.defender.getAction();
       if self.handleStatus(self.defender) != True: ran = self.handleOption(enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
       

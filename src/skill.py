@@ -28,7 +28,9 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
   if skill.name == "crimson edge": # this is just a placeholder
     defender.giveStatus("stunned", 100);
     defender.giveStatus("bleeding", 100);
-  
+  elif skill.name == "parry": # todo
+    attacker.giveStatus("parrying", 2);
+    
 SKILLS = {
   "crimson edge" : action_normal_damage,
 };

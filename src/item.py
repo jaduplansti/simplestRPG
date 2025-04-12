@@ -46,7 +46,7 @@ def removeEquipment(plr, part):
   item = plr.equipment[part];
   if "sword" in item.name:
     plr.attack_style = "basic";
-    plr.stats["strength"] = plr.stats["strength"] - (3 * plr.level);
+    plr.stats["strength"] -= plr.stats["strength"] * 0.1;
   plr.equipment[part] = None;
   
 # def createItem(name, durability = 1, rank = "E", rarity = "common", weight = 0.1, stat_bonus = None, bodypart = None):
@@ -91,7 +91,7 @@ def use_scroll(item, game, combat_handler):
       
 def use_sword(item, game, combat_handler):
   if game.player.equipItem(item) != True:
-    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] has already equipped a [bold cyan]wooden sword[reset]!");
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
     return;
         
   if item.name == "wooden sword":

@@ -69,8 +69,9 @@ class Menu():
     self.ui.normalPrint("≈ [green]stats[reset]");
     self.ui.normalPrint("≈ [cyan]items[reset]");
     self.ui.normalPrint("≈ [purple]practice[reset]");
-    self.ui.normalPrint("≈ [blue]sleep[reset]\n");
-  
+    self.ui.normalPrint("≈ [blue]sleep[reset]");
+    self.ui.normalPrint("≈ [green]settings[reset]\n");
+
   def showYouMenu(self):
     self.ui.clear();
     self.ui.showHeader("YOU", "-");
@@ -88,8 +89,8 @@ class Menu():
     self.ui.clear();
     self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
     
-    self.ui.showHealthBar(character);
-    self.ui.showHealthBar(character.enemy);
+    self.ui.showCombatBar(character);
+    self.ui.showCombatBar(character.enemy);
     self.ui.showSeperator("+");
     
     self.ui.normalPrint("≈ [yellow]attack[reset]");
@@ -108,5 +109,11 @@ class Menu():
   
   def showTip(self):
     self.ui.panelAnimatedPrintFile("tips", "tips", [], "tips");
-    
-    
+  
+  def showSettingsMenu(self):
+    self.ui.clear();
+    self.ui.showHeader("Settings", ".");
+    self.ui.normalPrint(f"• [yellow]type speed[reset] : {self.game.settings["type speed"]}");
+    self.ui.normalPrint(f"• [cyan]delay speed[reset] : {self.game.settings["delay speed"]}");
+    self.ui.newLine();
+
