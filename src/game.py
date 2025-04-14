@@ -52,19 +52,18 @@ class Game:
       else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
       
   def handleSleep(self):
-    self.ui.showStatus("saving", 2);
-    self.player.save();
-    if self.player.energy >= 75:
-      self.ui.animatedPrintFile("sleep", "cant sleep", [self.player.name]);
-      return;
-      
     self.ui.clear();
     self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] sees their bed and gets ready to sleep.");
     self.ui.barPrint("[blue]Energy[reset]", self.player.energy, 100, speed = 0.1);
     self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
-    self.ui.panelPrint(f"[bold blue]ENERGY[reset] ([green]+100[reset])");
+    self.ui.panelPrint(f"[bold blue]ENERGY[reset] & [bold green]HEALTH[reset] RESTORED");
+
     self.player.energy = 100;
-  
+    self.player.stats["health"] = self.player.stats["max health"];
+    
+    self.ui.showStatus("saving", 2);
+    self.player.save();
+    
   def handleName(self):
     self.ui.clear();
     self.ui.panelPrint("your name? : ");

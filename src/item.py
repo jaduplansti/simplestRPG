@@ -1,4 +1,4 @@
-from random import randint;
+from random import randint, choices;
 
 class Item:
   def __init__(self, 
@@ -61,6 +61,12 @@ def removeEquipment(plr, part):
 # 
 
 def use_potion(item, game, combat_handler):
+  event = choices(["expired", None], [0.1, 0.9])[0];
+  
+  if event == "expired":
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a health potion but it was expired?");
+    return;
+    
   if item.name == "health potion":
     health_restored = game.player.stats.get("max health") / 2;
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a health potion and recovered [green]{health_restored} health[reset]!")

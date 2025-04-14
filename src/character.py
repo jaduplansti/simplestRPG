@@ -1,7 +1,8 @@
 from random import randint, uniform
 from item import Item, removeEquipment;
-import json
 from skill import Skill;
+from copy import deepcopy;
+import json;
 
 class Character:
   def __init__(self, name):
@@ -38,6 +39,7 @@ class Character:
     self.magic = {}
     
     self.addSkill(Skill("crimson edge", 10));
+    self.addItemToInventory(Item("health potion"), 100);
     
   def to_dict(self):
     return {
@@ -131,7 +133,7 @@ class Character:
   
   def equipItem(self, item):
     if self.isEquipped(item) != True:
-      self.equipment[item.bodypart] = item;
+      self.equipment[item.bodypart] = deepcopy(item);
       return True;
     return False;
   

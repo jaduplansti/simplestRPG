@@ -147,3 +147,6 @@
 • added critical hits
 • improved combat menu
 • fixed more bugs
+• potions have a 10℅ chance to be expired upon use
+• sleeping now restores max health
+• you can now sleep regardless of your energy

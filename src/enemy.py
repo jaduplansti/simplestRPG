@@ -21,7 +21,7 @@ class Enemy(Character):
     self.loot_chance.append(chance);
   
   def goBerserk(self):
-    self.energy = 1000;
+    self.energy = 100;
     for stat in self.stats:
       self.stats[stat] *= 1.5;
     self.stats["health"] = self.stats["max health"];
@@ -37,9 +37,9 @@ class Enemy(Character):
         
   def getAction(self):
     if self.status["blocking"][0] is True:
-      return "taunt";
+      return choices(["taunt", None])[0];
     elif self.stats["health"] <= self.stats["max health"] * 0.25:
-      return choices(["flee", "block"], [self.flee_chance, self.block_chance])[0];
+      return choices(["flee", "block", None], [self.flee_chance, self.block_chance, 0.5])[0];
     else: return choices(["attack", "block"], [self.attack_chance, self.block_chance])[0];
   
 def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list):
@@ -66,16 +66,16 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
 def getEnemyByName(name, plr = None):
   if name == "slime":
     return createEnemy(
-      "slime", randint(1, 2), {"strength" : 1}, "basic", [0.5, 0.5, 0.01, 0.01],
+      "slime", randint(1, 2), {"strength" : 1}, "basic", [0.7, 0.2, 0.01, 0.01],
       [
-        [Item("wooden sword", rarity = "common",  bodypart = "right arm"), 0.8]
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8]
       ]
     );
   elif name == "goblin":
     return createEnemy(
       "goblin", randint(3, 5), {"strength" : 5, "defense" : 3}, "basic", [0.7, 0.1, 0.5, 0.01],
       [
-        [Item("wooden sword", rarity = "common",  bodypart = "right arm"), 0.8],
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8],
         [Item("health potion", rarity = "common"), 0.8],
         [Item("health potion", rarity = "uncommon"), 0.5],
       ]

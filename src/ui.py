@@ -143,7 +143,11 @@ class UI:
   def showCombatBar(self, character):
     color = "";
     statuses = "";
+    name = character.name;
     
+    if character.berserk is True:
+      name += " ([bold red]berserk[reset])";
+      
     if character.stats["health"] / character.stats["max health"] > 0.6:
       color = "green";
     elif character.stats["health"] / character.stats["max health"] > 0.3:
@@ -159,8 +163,8 @@ class UI:
         if status in ["blocking"]: symbol = "⬆";
         else: symbol = "⬇";
         statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1]}x[reset] {symbol})");
-     
-    self.normalPrint(f"{character.name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
+    
+    self.normalPrint(f"{name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
     self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.energy / 100)*100:.2f}%[reset]) {energy_bar}\n")
     if statuses != "": self.normalPrint(f"{statuses}\n");
     
