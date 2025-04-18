@@ -27,7 +27,7 @@
       "[bold yellow]{0}[reset] slammed [bold yellow]{1}[reset]'s face, dealing [bold red]{2}[reset] damage!",
       "[bold yellow]{1}[reset] was suddenly grabbed and then slammed by [bold yellow]{0}[reset], dealing [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] lifted [bold yellow]{1}[reset] and hurled them to the ground, causing [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset] charged in and body-slammed [bold yellow]{1}[reset], dealing a heavy [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] charged in and body slammed [bold yellow]{1}[reset], dealing a heavy [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] grabbed [bold yellow]{1}[reset] and drove them into the floor with a thunderous slam for [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] roared and smashed [bold yellow]{1}[reset] into the ground, shaking the air with [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] caught [bold yellow]{1}[reset] off guard and slammed them into a wall, dishing out [bold red]{2}[reset] damage!"
@@ -85,7 +85,7 @@
     "poke": [
       "[bold yellow]{0}[reset] swiftly jabs at [bold yellow]{1}[reset], a quick poke that finds a weak point and deals [bold red]{2}[reset] damage!",
       "With a precise poke, [bold yellow]{0}[reset] targets an opening in [bold yellow]{1}[reset]'s defense, inflicting a sharp [bold red]{2}[reset] damage!",
-      "[bold yellow]{0}[reset]'s attack is a lightning-fast poke, catching [bold yellow]{1}[reset] off guard and dealing a stinging [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]'s attack is a lightning fast poke, catching [bold yellow]{1}[reset] off guard and dealing a stinging [bold red]{2}[reset] damage!",
       "A sharp poke from [bold yellow]{0}[reset]'s fingers pierces [bold yellow]{1}[reset]'s defenses, resulting in [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] executes a quick and subtle poke, finding a vulnerable spot on [bold yellow]{1}[reset] and dealing [bold red]{2}[reset] damage!",
       "Utilizing a swift poking motion, [bold yellow]{0}[reset] lands a precise hit on [bold yellow]{1}[reset], dealing a surprising [bold red]{2}[reset] damage!"
@@ -147,7 +147,7 @@
       "[yellow]{0}[reset] stretches, the night's rest rejuvenating their spirit.", 
       "[yellow]{0}[reset] slept soundly, the warmth of the morning sun greeting them.", 
       "[yellow]{0}[reset] yawns and smiles, the peaceful night bringing clarity to their mind.", 
-      "[yellow]{0}[reset] rises well-rested, strength renewed.", 
+      "[yellow]{0}[reset] rises well rested, strength renewed.", 
       "[yellow]{0}[reset] wakes up feeling energized, their body fully restored.", 
       "[yellow]{0}[reset] rubs their eyes and smiles, grateful for a restful sleep.", 
       "[yellow]{0}[reset] breathes deeply, savoring the refreshing feeling of a good night's rest.", 
@@ -197,9 +197,34 @@
     ] 
   },
   
-  "tips" : {
-    "tips" : [
-      "ey"
+  "tips": {
+    "tips": [
+      "Did you know there's a [cyan]10%[reset] chance for potions to be [underline]expired[reset]?",
+      "[green]Swordsman style[reset] can inflict [red]bleeding[reset]!",
+      "[yellow]Blade Dance[reset] is bound to get nerfed!",
+      "Sleeping now fully restores your [green]health[reset] don't forget to rest!",
+      "If your sword [red]breaks[reset], you lose [yellow]10%[reset] of your stats!",
+      "Potions are useful but they [cyan]might expire[reset], so use them wisely!",
+      "You can [green]cut trees[reset] in the [bold]Forest[reset] to gather [yellow]wood[reset].",
+      "[blue]Energy potions[reset] can keep you going just watch out for expired ones!",
+      "Passing out from fatigue is real keep your [magenta]energy[reset] up!",
+      "Bleeding can chip away at enemies even after your attack ends.",
+      "[cyan]Blocking[reset] completely nullifies damage regardless of the level gap.",
+      "Watch your sword's [red]durability[reset] a broken weapon weakens you!",
+      "Enemies may [red]resist[reset] status effects like [yellow]stun[reset]!",
+      "Your [yellow]attack style[reset] changes how your moves behave experiment to find your playstyle!",
+      "The [blue]dirty style[reset] is unpredictable use it to surprise your enemies.",
+      "Some enemies will [bold red]taunt[reset] you respond or suffer stat loss!",
+      "Taunts can lower enemy stats by [yellow]5%[reset] use them wisely.",
+      "You can [green]pass out[reset] from low energy—keep an eye on your fatigue levels!",
+      "Low fatigue affects your combat fight fresh for the best chance at victory.",
+      "Blocking is good, but some moves can [red]break through[reset] it!",
+      "Enemies behave dynamically they can defend, taunt, or go berserk at any time!",
+      "Combat logs give you hints read them carefully to learn enemy patterns.",
+      "Try equipping a sword to unlock the [blue]Swordsman[reset] style!",
+      "Use a [purple]Scroll of Repair[reset] to fix broken equipment!",
+      "The [red]Scroll of Instant Death[reset] can end a fight in one move if you find one.",
+      "Some moves deal bonus damage based on [green]luck[reset] stack it high!"
     ]
   }
 }

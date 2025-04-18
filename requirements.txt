@@ -1,1 +1,3 @@
 rich
+readchar
+timedinput

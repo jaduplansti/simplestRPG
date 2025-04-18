@@ -1,6 +1,5 @@
 from rich.table import Table;
 from rich import print, box;
-from classes import Classes;
 
 import art;
 
@@ -44,7 +43,7 @@ class Menu():
     self.showEquipmentMenu(character);
     
   def showEquipmentMenu(self, character):
-    self.ui.animatedPrint("===[bold purple]Equipment[reset]===");
+    self.ui.animatedPrint("[bold purple]=== EQUIPMENT ===[reset]");
     for part in character.equipment:
       if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset] -> [italic yellow]{character.equipment[part].name}[reset] ([cyan]{character.equipment[part].rarity}[reset]) ([green]{character.equipment[part].durability}[reset]%)\n");
       else: self.ui.normalPrint(f"[purple]{part}[reset] -> [yellow]Empty[reset]\n");
@@ -54,37 +53,16 @@ class Menu():
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
-    self.ui.normalPrint(art.CASTLE)
 
-    self.ui.normalPrint("\n• version [green]2.4[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
-  def showHomeMenu(self):
-    self.ui.clear();
-    self.ui.normalPrint("••••••••••••••");
-    self.ui.normalPrint("• [italic yellow]Your House[reset] •");
-    self.ui.normalPrint("••••••••••••••");
-    
-    self.ui.normalPrint(art.HOUSE + "\n");
-    self.ui.normalPrint("≈ [green]stats[reset]");
-    self.ui.normalPrint("≈ [cyan]items[reset]");
-    self.ui.normalPrint("≈ [purple]practice[reset]");
-    self.ui.normalPrint("≈ [blue]sleep[reset]");
-    self.ui.normalPrint("≈ [green]settings[reset]\n");
-
-  def showYouMenu(self):
-    self.ui.clear();
-    self.ui.showHeader("YOU", "-");
-    
-    self.ui.normalPrint("≈ [cyan]stats[reset]");
-    self.ui.normalPrint("≈ [green]items[reset]");
-    self.ui.normalPrint("≈ [red]back[reset]\n");
-  
   def showCombatInitiateMenu(self):
     self.ui.clear();
     self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] encounters a [cyan]{self.game.player.enemy.name}[cyan]!");
     self.ui.printTreeMenu("[green](options)[reset]\n", ["[red]fight[reset]", "[red]bail[reset]", "[purple]talk[reset]"]);
-  
+    self.showTip();
+    
   def showCombatMenu(self, combat_handler, character):
     self.ui.clear();
     self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
@@ -103,10 +81,6 @@ class Menu():
       self.ui.normalPrint("≈ [red]flee[reset]");
     self.ui.newLine();
     
-  def classSelectionMenu(self):
-    self.ui.animatedPrint(f"{self.game.player.name}, select your class!");
-    self.ui.animatedPrint(f"there are {len(Classes.getAvailableClass(9999))} classes in SimplestRPG.");
-  
   def showTip(self):
     self.ui.panelAnimatedPrintFile("tips", "tips", [], "tips");
   
@@ -115,5 +89,7 @@ class Menu():
     self.ui.showHeader("Settings", ".");
     self.ui.normalPrint(f"• [yellow]type speed[reset] : {self.game.settings["type speed"]}");
     self.ui.normalPrint(f"• [cyan]delay speed[reset] : {self.game.settings["delay speed"]}");
+    self.ui.normalPrint(f"• [purple]audio[reset] : {self.game.audio_handler.enabled}");
     self.ui.newLine();
+    
 

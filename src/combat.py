@@ -3,6 +3,8 @@ from random import randint, choices;
 from handlers import AttackHandler;
 from combatevent import CombatEventHandler;
 
+from time import time;
+
 class CombatHandler:
   def __init__(self, game):
     self.game = game;
@@ -13,6 +15,8 @@ class CombatHandler:
     self.event_handler = CombatEventHandler(self);
     self.attacker = None;
     self.defender = None;
+    
+    self.enemy_option = ""; # temporary solution
     
   def initiateFightNpc(self, character, name):
     enemy = getEnemyByName(name, character);
@@ -66,27 +70,6 @@ class CombatHandler:
     
     self.ui.panelPrint(f"([blue]-{attacker.getFatigueMultiplier() * 100}%[reset]) stat output.");
   
-  def handleStatus(self, attacker): # i should give this its seperate class
-    pass_turn = False;
-    if attacker.status["stunned"][0] is True: # this one is pretty unfair, trust me i died to that bandit
-      self.ui.animatedPrint(f"[red]{attacker.name} is stunned and cant move[reset]!");
-      attacker.status["stunned"][1] -= 1;
-      if randint(1, 3) == randint(1, 3): self.ui.animatedPrint(f"[red]{attacker.name} resisted the stun[reset]!"); # temporary quick nerf
-      else: pass_turn = True;
-    if attacker.status["bleeding"][0] is True:
-      dmg = round(attacker.stats["health"] * 0.1);
-      self.ui.animatedPrint(f"[red]{attacker.name} is bleeding, receiving {dmg} damage[reset]!");
-      attacker.enemy.attackEnemy(dmg);
-      attacker.status["bleeding"][1] -= 1;
-    if attacker.status["blocking"][0] is True:
-      attacker.status["blocking"][1] -= 1;
-      
-    for status in attacker.status:
-      if attacker.status[status][1] <= 0 and attacker.status[status][0] != False:
-        self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] is no longer [red]{status}[reset]!");
-        attacker.status[status][0] = False;
-    return pass_turn;
-    
   def tryBerserkNpc(self, npc):
     if randint(1, 7) == randint(1, 7) and npc.berserk is False:
       self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
@@ -107,23 +90,23 @@ class CombatHandler:
       return False;
       
     return True;
-   
+    
   def handleOption(self, option, attacker, defender):
-    self.ui.showStatus("processing move", 1);
+    self.ui.showStatus("processing move", 1, "clock");
     if self.handleFatigue(attacker) == "passed out":
-      return True;
+      return "passed out";
       
     if option in ["attack", "atk"]:
-      self.attack_handler.handleAttack(attacker, defender);
+      if self.attack_handler.handleAttack(attacker, defender) in ["parried"]: return "parry";
     elif option in ["block", "blk"]:
-      self.attack_handler.defense_handler.handleBlock(attacker, defender);
+      self.attack_handler.defense_handler.giveBlock(attacker, defender);
       self.ui.panelAnimatedPrintFile("block", "blocking", [attacker.name, defender.name], "block");
     elif option == "taunt":
       self.attack_handler.taunt_handler.handleTaunt(attacker, defender);
     elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25):
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
       self.ui.awaitKey();
-      return True
+      return "flee";
     elif option == "items":
       self.game.handleUseItem(self);
     elif option == "skills":
@@ -142,14 +125,18 @@ class CombatHandler:
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
       self.ui.showSeperator("-");
+      self.attack_handler.status_handler.handleStatus(self.attacker, self.defender);
       
-      if self.handleStatus(self.attacker) != True: ran = self.handleOption(option, self.attacker, self.defender);
+      if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(option, self.attacker, self.defender);
       self.ui.showSeperator("-");
-
-      if self.checkDeath() is True or ran is True: break;
       
-      enemy_option = self.defender.getAction();
-      if self.handleStatus(self.defender) != True: ran = self.handleOption(enemy_option, self.defender, self.attacker);
+      if self.checkDeath() is True or ran is True:
+        break;
+      
+      self.enemy_option = self.defender.getAction();
+      self.attack_handler.status_handler.handleStatus(self.defender, self.attacker);
+      
+      if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
       
       if isinstance(self.defender, Enemy):

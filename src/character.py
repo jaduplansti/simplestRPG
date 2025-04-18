@@ -9,8 +9,9 @@ class Character:
     self.name = name
     self.level = 1
     self.exp = 0;
+    self.position = 0;
     
-    self.location = "home"
+    self.location = "";
     self.money = 1
     self.energy = 100
     self.berserk = False;
@@ -19,6 +20,7 @@ class Character:
       "blocking" : [False, 0],
       "stunned" : [False, 0],
       "bleeding" : [False, 0],
+      "parrying" : [False, 0],
     }
     
     self.stats = {
@@ -46,6 +48,7 @@ class Character:
       "name": self.name,
       "level": self.level,
       "exp": self.exp,
+      "position": self.position,
       "location": self.location,
       "money": self.money,
       "energy": self.energy,
@@ -71,6 +74,7 @@ class Character:
     char = cls(data["name"])
     char.level = data["level"]
     char.exp = data["exp"]
+    char.position = data["position"]
     char.location = data["location"]
     char.money = data["money"]
     char.energy = data["energy"]

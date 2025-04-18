@@ -26,11 +26,16 @@ class Skill:
     
 def action_normal_damage(skill, combat_handler, attacker, defender): # generic skill attack
   if skill.name == "crimson edge": # this is just a placeholder
-    defender.giveStatus("stunned", 100);
-    defender.giveStatus("bleeding", 100);
-  elif skill.name == "parry": # todo
+    combat_handler.ui.panelPrint(f"{attacker.name} unleashed a crimson edge!");
+    for n in range(1, 100):
+      combat_handler.ui.panelPrint(f"[bold red]DEALT 10 DAMAGE! {n}x[reset]");
+      attacker.attackEnemy(10);
+      
+def action_normal_defense(skill, combat_handler, attacker, defender):
+  if skill.name == "parry":
     attacker.giveStatus("parrying", 2);
     
 SKILLS = {
   "crimson edge" : action_normal_damage,
+  "parry" : action_normal_defense,
 };

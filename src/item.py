@@ -20,7 +20,7 @@ class Item:
       ITEMS[self.name](self, game, combat_handler);
       game.player.usedItem(self.name);
     except KeyError:
-      pass;
+      game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
   
   def consumeDurability(self, n):
     self.durability = max(self.durability - n, 0);

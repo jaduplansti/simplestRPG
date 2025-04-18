@@ -22,8 +22,23 @@ from rich.console import Console;
 from rich.live import Live;
 
 from rich.tree import Tree;
+from readchar import readkey;
+
+from timedinput import timedinput;
 
 class UI:
+  """
+  This class handles User Interface, mainly serving as a wrapper for rich.
+  
+  Attributes:
+  game, an instance of the Game class.
+  console, an instance of the rich.console.Console class.
+  strings, a dictionary holding the strings in game_strings.json.
+  
+  Usage:
+  ui = UI(Game())
+  """
+  
   def __init__(self, game):
     self.game = game;
     self.console = Console();
@@ -31,34 +46,68 @@ class UI:
     self.loadStrings();
   
   def beep(self):
+    """prints the beep escape character, i should rewrite this."""
     system("echo -n -e \a");
     
   def clear(self):
+    """clear duh"""
     system("clear");
   
   def disableEcho(self):
+    """a way to disable input echo, highly not compatible with other platforms."""
     system("stty -echo");
   
   def enableEcho(self):
+    """see disableEcho()."""
     system("stty echo");
   
   def clearStdinBuffer(self):
+    """clears the input buffer, often paired with disableEcho(), idek if this works."""
     while select.select([sys.stdin], [], [], 0.1)[0]:
       sys.stdin.read(1);
   
   def loadStrings(self):
+    """loads game_strings.json into self.strings, note: rewrite this."""
     with open(str(Path.home()) + "/simplestRPG/src/game_strings.json", "r") as file:
       self.strings = json.load(file);
   
   def getString(self, key, n):
+    """
+    used to get a certain string in self.strings
+    
+    Parameters:
+    key, a string containing the first key,
+    n, a string containing the second key,
+    
+    Returns:
+    this method may return a list of strings or a singular string.
+    
+    Usage:
+    ui.getString("sword style", "iron reversal")
+    """
+    
     if isinstance(self.strings[key][n], list):
       return choices(self.strings[key][n])[0];
     return self.strings[key][n];
     
   def normalPrint(self, s):
-      print(s);
+    """ print. """
+    print(s);
   
   def barPrint(self, s, n, n_max, speed = 0.01):
+    """
+    prints a rich progress bar.
+    
+    parameters:
+    s, a string holding a name e.g health, energy, username.
+    n, an integer holding the current value.
+    n_max, the limit of n.
+    speed, i forgot wth.
+    
+    Usage:
+    ui.barPrint("health", 50, 100)
+    """
+    
     self.disableEcho();
     with Progress(TextColumn(f"({s}): "), BarColumn()) as progress:
       for _ in progress.track(range(n, n_max)):
@@ -67,10 +116,22 @@ class UI:
     self.enableEcho();
     
   def panelPrint(self, s):
+    """prints a panel."""
     self.normalPrint(Panel(s));
     self.newLine();
   
   def panelAnimatedPrint(self, text, title):
+    """
+    typewriter effect inside a panel.
+    
+    Parameters:
+    text, a string to be printed,
+    title, a title.
+    
+    Usage:
+    ui.panelAnimatedPrint("help me!", "error")
+    """
+    
     self.disableEcho();
     current_text = ""
     formatted_text = Text.from_markup(text)
@@ -125,16 +186,26 @@ class UI:
   def newLine(self):
     print("");
   
+  def getKey(self):
+    return readkey();
+    
   def awaitKey(self):
-    self.normalPrint("(press enter to continue)\n");
-    self.getInput();
+    self.normalPrint("(type anything to continue)\n");
+    self.getInput(); # yeah
     self.newLine();
     
   def getInput(self):
     _input = Prompt.ask();
     self.newLine();
     return _input;
-    
+  
+  def getInputWithTimeout(self, msg, n):
+    self.normalPrint(msg + "\n");
+    try:
+      return timedinput(f": ", timeout = n);
+    except:
+      return "";
+      
   def showBar(self, n, total, bar_length, color):
     n = max(0, min(n, total))
     filled_length = int(n / total * bar_length) if total > 0 else 0
@@ -180,7 +251,7 @@ class UI:
       seperator += ch;
     self.randomizeColorPrint(seperator + "\n");
   
-  def showStatus(self, msg, n):
-    with self.console.status(msg) as status:
+  def showStatus(self, msg, n, spinner = "dots"):
+    with self.console.status(msg, spinner = spinner) as status:
       sleep(n);
   

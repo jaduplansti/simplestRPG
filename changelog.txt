@@ -150,3 +150,11 @@
 • potions have a 10℅ chance to be expired upon use
 • sleeping now restores max health
 • you can now sleep regardless of your energy
+
+[version 2.5]
+• added simple audio (termux only)
+• added simple exploration
+• added home and forest
+• you can now cut trees to get wood in forest
+• added parrying system
+• added damage rating system, IMPRESSIVE, GREAT, FANTASTIC, BRILLIANT and TRANSCENDENT
