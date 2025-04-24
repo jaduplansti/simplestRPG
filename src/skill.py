@@ -26,6 +26,9 @@ class Skill:
     return cls(**data);
     
 def action_normal_damage(skill, combat_handler, attacker, defender): # generic skill attack
+  if combat_handler.attack_handler.handleBlock(attacker, defender) is True:
+      return;  
+      
   if skill.name == "crimson edge": # this is just a placeholder
     combat_handler.ui.panelPrint(f"{attacker.name} unleashed a crimson edge!");
     for n in range(1, 100):

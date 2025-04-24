@@ -45,6 +45,10 @@ class UI:
     self.strings = {};
     self.loadStrings();
   
+  def validScreenSize(self):
+    if self.console.width in range(20, 40): return True;
+    else: return False;
+    
   def beep(self):
     """prints the beep escape character, i should rewrite this."""
     system("echo -n -e \a");
@@ -193,11 +197,11 @@ class UI:
     
   def awaitKey(self):
     self.normalPrint("(type anything to continue)\n");
-    self.getInput(); # yeah
+    input();
     self.newLine();
     
   def getInput(self):
-    _input = Prompt.ask();
+    _input = Prompt.ask(f"[yellow](enter command)[reset] ⤵\n\n");
     self.newLine();
     return _input;
   

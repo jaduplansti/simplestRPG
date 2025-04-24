@@ -8,6 +8,11 @@ class Menu():
     self.game = game;
     self.ui = game.ui;
   
+  def showPlayerMenu(self):
+    self.ui.console.print(f"[yellow]{self.game.player.name}[reset] ([green]level {self.game.player.level}[reset])\n", justify = "center");
+    self.ui.normalPrint(f"× ([cyan]{len(self.game.player.inventory)} items[reset]) ([purple]{len(self.game.player.skills)} skills[reset])\n");
+    self.ui.normalPrint("× [underline bold magenta]check status for more details.[reset]\n");
+    
   def showItemsMenu(self, character):
     self.ui.animatedPrint(f"([magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s))");
     for name in character.inventory:

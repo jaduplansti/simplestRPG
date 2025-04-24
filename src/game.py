@@ -10,6 +10,9 @@ from os import _exit;
 from exploration import Exploration, AREAS;
 from audio import AudioPlayer;
 
+from time import sleep;
+from subprocess import run;
+
 class Game:
   """ 
   This class handles the interaction between other classes.
@@ -73,6 +76,14 @@ class Game:
       elif option == "quit": self.handleQuit();
       elif option in options.keys(): options[option]();
       self.ui.awaitKey();
+  
+  def handleConfiguration(self):
+    while self.ui.validScreenSize() is False:
+      self.ui.clear();
+      self.ui.normalPrint(f"[yellow]zoom in your terminal around 20-40 (current width {self.ui.console.width})[reset]\n");
+      self.ui.normalPrint(f"[green]you can zoom in by (pinching in) or (ctrl +)[reset]\n");
+      sleep(2);
+    
   
   def handleQuit(self):
     """Handles quitting, stops audio player and enables echoing."""
@@ -222,4 +233,9 @@ class Game:
       
       if enable == "true": self.audio_handler.enabled = True;
       elif enable == "false": self.audio_handler.enabled = False;
-
+    
+  def doUpdate(self): # test
+    run(["git", "fetch"], check = True);
+    result = run(["git status"], check = True, text = True);
+    if "behind" in result:
+      run(["git", "pull"]);

@@ -167,3 +167,8 @@
 [version 2.5.2]
 • fixed a bug where audio still plays upon exit / interrupt.
 • fixed a bug where the game disables echo upon exit.
+
+[version 2.5.3]
+• added screen configuration
+• improved ui
+• skills can now be blocked
