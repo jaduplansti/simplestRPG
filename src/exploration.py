@@ -5,6 +5,7 @@ from combat import CombatHandler;
 
 from home import Home;
 from forest import Forest;
+from shop import Shop;
 
 def createArea(name, handler, _next = [], prev = [], enemies = None, position = 0):
   return {name : {
@@ -16,8 +17,9 @@ def createArea(name, handler, _next = [], prev = [], enemies = None, position = 
   }};
 
 AREAS = {
-  **createArea("home", Home, _next = ["forest"], position = 0),
+  **createArea("home", Home, _next = ["forest", "shop"], position = 0),
   **createArea("forest", Forest, prev = ["home"], position = 10),
+  **createArea("shop", Shop, prev = ["home"], position = 5),
 };
 
 class Exploration:
@@ -39,8 +41,8 @@ class Exploration:
     while True:
       self.ui.clear();
       try:
-        for loc in area["next"]: self.ui.normalPrint(f"- {loc} ({AREAS[loc]['position']} fyres) ⬆\n");
-        for loc in area["prev"]: self.ui.normalPrint(f"- {loc} ({AREAS[loc]['position']} fyres) ⬇\n");
+        for loc in area["next"]: self.ui.normalPrint(f"- [yellow underline]{loc}[reset] ({AREAS[loc]['position']} fyres) ⬆\n");
+        for loc in area["prev"]: self.ui.normalPrint(f"- [yellow underline]{loc}[reset] ({AREAS[loc]['position']} fyres) ⬇\n");
 
         destination_name = self.ui.getInput();
         return [AREAS[destination_name], destination_name];

@@ -1,6 +1,17 @@
 from random import randint, choices;
 
 class Item:
+  """
+  an Item class.
+  
+  Parameters:
+  name, a string holding the name for the item, very important
+  durability, a integer which can go beyond 100, i should fix that
+  rank, a string that could be E to SSS+
+  weight, a floating point, not really used.
+  bodypart, a string that could be a bodypart in Character.equipment, see character.py.
+  """
+  
   def __init__(self, 
   name, 
   durability = 1, 

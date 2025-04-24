@@ -12,6 +12,7 @@ class Home(SubMenu):
     self.ui.normalPrint("• [italic yellow]Your Home[reset] •");
     self.ui.normalPrint("•••••••••••••\n");
     
+    self.ui.normalPrint(f"(page {self.page})\n");
     if self.page == 1:
       self.ui.normalPrint("≈ [green]stats[reset]");
       self.ui.normalPrint("≈ [cyan]items[reset]");

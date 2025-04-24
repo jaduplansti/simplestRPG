@@ -11,7 +11,7 @@ class Character:
     self.exp = 0;
     self.position = 0;
     
-    self.location = "";
+    self.location = "home";
     self.money = 1
     self.energy = 100
     self.berserk = False;

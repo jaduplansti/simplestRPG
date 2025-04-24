@@ -214,7 +214,7 @@ class UI:
   def showCombatBar(self, character):
     color = "";
     statuses = "";
-    name = character.name;
+    name = character.name + f" [green]|lv {character.level}|[reset]";
     
     if character.berserk is True:
       name += " ([bold red]berserk[reset])";

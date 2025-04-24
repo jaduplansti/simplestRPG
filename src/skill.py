@@ -1,4 +1,5 @@
 from random import randint;
+from item import Item;
 
 class Skill:
   def __init__(self, name, energy, level = 0):
@@ -34,8 +35,16 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
 def action_normal_defense(skill, combat_handler, attacker, defender):
   if skill.name == "parry":
     attacker.giveStatus("parrying", 2);
-    
+
+def action_normal_item(skill, combat_handler, attacker, defender):
+  if skill.name == "mind sword":
+    if attacker.equipItem(Item("imaginary sword", rarity = "undefined", bodypart = "right arm")) != False:
+      combat_handler.ui.panelNormalPrint(f"{attacker.name} focused, drawing his a fictional sword with his hand!");
+      combat_handler.ui.panelNormalPrint(f"{attacker.name} used mind sword succesfully!");
+      attacker.attack_style = "imaginary blade";
+      
 SKILLS = {
   "crimson edge" : action_normal_damage,
+  "mind sword" : action_normal_item,
   "parry" : action_normal_defense,
 };

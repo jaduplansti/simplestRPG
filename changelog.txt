@@ -158,3 +158,8 @@
 • you can now cut trees to get wood in forest
 • added parrying system
 • added damage rating system, IMPRESSIVE, GREAT, FANTASTIC, BRILLIANT and TRANSCENDENT
+
+[version 2.5.1]
+• fixed issues with blocking and parrying
+• fixed an issue where creating a character throws an error
+• added a shop

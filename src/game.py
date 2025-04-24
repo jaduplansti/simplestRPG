@@ -86,10 +86,11 @@ class Game:
       return;
       
     self.menu.showItemsMenu(self.player);
+    
     while True:
       option = self.ui.getInput().lower();
       if self.player.itemExists(option): self.player.getItem(option).use(self, combat_handler);
-      elif option == "": break;
+      elif option == "close": break;
   
   def handleUseSkill(self, skill = None, combat_handler = None, attacker = None, defender = None):
     """
@@ -155,7 +156,7 @@ class Game:
     
   def handleMainMenu(self):
     """This is self explanatory"""
-    
+    self.audio_handler.play("main_menu.mp3")
     self.handleMenu({"start" : self.handleStart, "exit" : _exit}, self.menu.showMainMenu);
   
   def initiateFight(self):

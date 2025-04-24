@@ -9,14 +9,15 @@ class Menu():
     self.ui = game.ui;
   
   def showItemsMenu(self, character):
-    self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s)");
+    self.ui.animatedPrint(f"([magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s))");
     for name in character.inventory:
       item = character.inventory[name];
       self.ui.normalPrint(f"- [underline yellow]{name}[reset] [purple]({item["amount"]}x)[reset]");
       for info in item["item"].__dict__: 
         if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"].__dict__[info]})");
       self.ui.newLine();
-  
+    self.ui.normalPrint("[bold yellow]you can close the bag by typing 'close'[reset]\n");
+      
   def showSkillsMenu(self, character):
     self.ui.animatedPrint(f"[magenta]==SKILLS==[reset]");
     for skill_name in character.skills:
@@ -54,7 +55,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5.1[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):

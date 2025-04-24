@@ -103,7 +103,7 @@ class CombatHandler:
       self.ui.panelAnimatedPrintFile("block", "blocking", [attacker.name, defender.name], "block");
     elif option == "taunt":
       self.attack_handler.taunt_handler.handleTaunt(attacker, defender);
-    elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25):
+    elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25): # put in handlers
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
       self.ui.awaitKey();
       return "flee";
@@ -130,7 +130,7 @@ class CombatHandler:
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(option, self.attacker, self.defender);
       self.ui.showSeperator("-");
       
-      if self.checkDeath() is True or ran is True:
+      if self.checkDeath() is True or ran is "flee":
         break;
       
       self.enemy_option = self.defender.getAction();
