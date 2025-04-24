@@ -172,3 +172,4 @@
 • added screen configuration
 • improved ui
 • skills can now be blocked
+• game now auto updates
