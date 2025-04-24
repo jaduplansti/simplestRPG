@@ -11,6 +11,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
+# Standalone Executable
+```
+bash setup.sh
+```
+
 # Platforms 
 - [x] Windows (probably)
 - [x] Linux (yes)
