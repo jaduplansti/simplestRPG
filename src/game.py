@@ -235,7 +235,11 @@ class Game:
       elif enable == "false": self.audio_handler.enabled = False;
     
   def doUpdate(self): # test
+    self.ui.console.log("checking for updates!");
     run(["git", "fetch"], check = True);
     result = run(["git", "status"], check = True, text = True, capture_output = True);
     if "behind" in result.stdout:
+      self.ui.console.log("found latest version!");
       run(["git", "pull"]);
+      self.ui.console.log("update complete!");
+      self.handleQuit();
