@@ -1,9 +1,12 @@
 from game import Game;
 
 def main():
-  game = Game();
-  game.handleMainMenu();
-  
+  try:
+    game = Game();
+    game.handleMainMenu();
+  except KeyboardInterrupt:
+    game.handleQuit();
+    
 if __name__ == "__main__":
   main();
   

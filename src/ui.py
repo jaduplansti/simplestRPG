@@ -55,11 +55,13 @@ class UI:
   
   def disableEcho(self):
     """a way to disable input echo, highly not compatible with other platforms."""
-    system("stty -echo");
+    if self.game.audio_handler.isTermux() is True: # temporary solution, hey it works!
+      system("stty -echo");
   
   def enableEcho(self):
     """see disableEcho()."""
-    system("stty echo");
+    if self.game.audio_handler.isTermux() is True:
+      system("stty echo");
   
   def clearStdinBuffer(self):
     """clears the input buffer, often paired with disableEcho(), idek if this works."""

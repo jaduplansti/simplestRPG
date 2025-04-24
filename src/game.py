@@ -70,9 +70,16 @@ class Game:
       if showFun != None: showFun();
       option = self.ui.getInput();
       if option == "help": self.menu.showTip();
+      elif option == "quit": self.handleQuit();
       elif option in options.keys(): options[option]();
       self.ui.awaitKey();
-      
+  
+  def handleQuit(self):
+    """Handles quitting, stops audio player and enables echoing."""
+    self.audio_handler.stop();
+    self.ui.enableEcho();
+    _exit(0);
+    
   def handleUseItem(self, combat_handler = None):
     """
     Handles item usage by displaying the inventory and getting input.
@@ -91,7 +98,7 @@ class Game:
       option = self.ui.getInput().lower();
       if self.player.itemExists(option): self.player.getItem(option).use(self, combat_handler);
       elif option == "close": break;
-  
+      
   def handleUseSkill(self, skill = None, combat_handler = None, attacker = None, defender = None):
     """
     Handles skill usage by displaying skills and getting input.
@@ -157,7 +164,7 @@ class Game:
   def handleMainMenu(self):
     """This is self explanatory"""
     self.audio_handler.play("main_menu.mp3")
-    self.handleMenu({"start" : self.handleStart, "exit" : _exit}, self.menu.showMainMenu);
+    self.handleMenu({"start" : self.handleStart, "quit" : self.handleQuit}, self.menu.showMainMenu);
   
   def initiateFight(self):
     """Initiates a fight using CombatHandler, see combat.py."""
@@ -173,7 +180,7 @@ class Game:
     combat_handler, an instance of the CombatHandler class.
     
     Returns:
-    boolean, this is to leav the initiation menu.
+    boolean, this is to leave the initiation menu.
     """
     
     while True:
