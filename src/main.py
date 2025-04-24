@@ -3,6 +3,7 @@ from game import Game;
 def main():
   try:
     game = Game();
+    game.audio_handler.enabled = False; # bug fix
     game.handleMainMenu();
   except KeyboardInterrupt:
     game.handleQuit();
