@@ -29,12 +29,15 @@ class Shop(SubMenu):
       else: self.ui.normalPrint("not enough coins\n");
     except KeyError:
       self.ui.normalPrint("item does not exist!\n");
-      
+  
+  def handleSell(self):
+    self.ui.normalPrint("NOT ADDED!");
+    
   def handleShop(self):
     self.game.handleMenu(
       {
         "buy" : self.handleBuy, 
-        "sell" : None,
+        "sell" : self.handleSell,
         "exit" : self.game.exploration_handler.explore,
       }, 
       self.showShopMenu,

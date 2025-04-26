@@ -74,7 +74,7 @@ class UI:
   
   def loadStrings(self):
     """loads game_strings.json into self.strings, note: rewrite this."""
-    with open(str(Path.home()) + "/simplestRPG/src/game_strings.json", "r") as file:
+    with open("game_strings.json", "r") as file:
       self.strings = json.load(file);
   
   def getString(self, key, n):
@@ -121,9 +121,9 @@ class UI:
     self.newLine();
     self.enableEcho();
     
-  def panelPrint(self, s):
+  def panelPrint(self, s, alignment = None, title = ""):
     """prints a panel."""
-    self.normalPrint(Panel(s));
+    self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title));
     self.newLine();
   
   def panelAnimatedPrint(self, text, title):

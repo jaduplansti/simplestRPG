@@ -1,2 +1,3 @@
 src/__pycache__/
-src/character_save.json
+src/saves
+src/test.py

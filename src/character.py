@@ -98,13 +98,13 @@ class Character:
     char.magic = data["magic"]
     return char;
 
-  def save(self, filename="character_save.json"):
-    with open(filename, "w") as f:
+  def save(self):
+    with open(f"saves/{self.name}.save", "w") as f:
       json.dump(self.to_dict(), f, indent=2)
 
   @classmethod
-  def load(cls, filename="character_save.json"):
-    with open(filename, "r") as f:
+  def load(cls, name):
+    with open(f"saves/{name}.save", "r") as f:
       data = json.load(f)
       return cls.from_dict(data)
     

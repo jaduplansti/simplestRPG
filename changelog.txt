@@ -173,3 +173,6 @@
 • improved ui
 • skills can now be blocked
 • game now auto updates
+
+[version 2.5.4]
+• improved saving and loading, (you can now save a bunch of character files)

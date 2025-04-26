@@ -1,0 +1,63 @@
+{
+  "name": "joe",
+  "level": 3,
+  "exp": 33,
+  "position": 0,
+  "location": "home",
+  "money": 1,
+  "energy": 100,
+  "status": {
+    "blocking": [
+      false,
+      0
+    ],
+    "stunned": [
+      false,
+      0
+    ],
+    "bleeding": [
+      false,
+      0
+    ],
+    "parrying": [
+      false,
+      0
+    ]
+  },
+  "berserk": false,
+  "stats": {
+    "health": 200,
+    "max health": 200,
+    "strength": 14,
+    "defense": 9,
+    "luck": 0.3002
+  },
+  "equipment": {
+    "head": null,
+    "chest": null,
+    "left arm": null,
+    "right arm": null,
+    "boots": null
+  },
+  "attack_style": "basic",
+  "_class": null,
+  "skills": {
+    "crimson edge": {
+      "name": "crimson edge",
+      "energy": 10,
+      "level": 0
+    }
+  },
+  "magic": {},
+  "inventory": {
+    "health potion": {
+      "item": {
+        "name": "health potion",
+        "rarity": "common",
+        "durability": 1,
+        "bodypart": null
+      },
+      "amount": 99
+    }
+  }
+}

@@ -60,7 +60,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5.3[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5.4[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -98,4 +98,4 @@ class Menu():
     self.ui.normalPrint(f"• [purple]audio[reset] : {self.game.audio_handler.enabled}");
     self.ui.newLine();
     
-
+    

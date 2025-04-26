@@ -7,6 +7,9 @@ class Home(SubMenu):
     
   def showHouseMenu(self):
     self.ui.clear();
+    self.ui.showSeperator("-");
+    self.game.menu.showPlayerMenu();
+    self.ui.showSeperator("-");
     
     self.ui.normalPrint("•••••••••••••");
     self.ui.normalPrint("• [italic yellow]Your Home[reset] •");
@@ -23,9 +26,6 @@ class Home(SubMenu):
       self.ui.normalPrint("≈ [blue]sleep[reset]");
       self.ui.normalPrint("≈ [green]settings[reset]");
       self.ui.normalPrint("≈ [yellow]back[reset]\n");
-    
-    self.ui.showSeperator("-")
-    self.game.menu.showPlayerMenu();
     
   def handleHome(self):
     self.game.handleMenu(

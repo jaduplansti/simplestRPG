@@ -6,7 +6,7 @@ from multiplayer import MultiplayerHandler;
 from menu import Menu;
 from random import choices;
 
-from os import _exit;
+import os;
 from exploration import Exploration, AREAS;
 from audio import AudioPlayer;
 
@@ -89,7 +89,7 @@ class Game:
     """Handles quitting, stops audio player and enables echoing."""
     self.audio_handler.stop();
     self.ui.enableEcho();
-    _exit(0);
+    os._exit(0);
     
   def handleUseItem(self, combat_handler = None):
     """
@@ -141,8 +141,7 @@ class Game:
     self.player.energy = 100;
     self.player.stats["health"] = self.player.stats["max health"];
     
-    self.ui.showStatus("saving", 2, "line");
-    self.player.save();
+    self.handleSave();
     
   def handleName(self):
     """Gets character name"""
@@ -151,19 +150,7 @@ class Game:
     self.ui.panelPrint("your name? : ");
     self.player.name = self.ui.getInput();
   
-  def handleLoad(self):
-    """Tries to load character data, otherwise call handleName."""
-    
-    try:
-      self.ui.showHeader("LOAD DATA", "-");
-      plr = Player.load();
-      self.ui.animatedPrint(f"[bold yellow]{plr.name}'s[reset] save was found, load data? [italic green](yes/no)[reset]");
-      if self.ui.getInput() == "yes": 
-        self.ui.showStatus("loading", 2, "line");
-        self.player = plr;
-      else: self.handleName();
-    except FileNotFoundError:
-      self.handleName();
+  
   
   def handleStart(self):
     """Initializes the game."""
@@ -234,12 +221,58 @@ class Game:
       if enable == "true": self.audio_handler.enabled = True;
       elif enable == "false": self.audio_handler.enabled = False;
     
-  def doUpdate(self): # test
+  def doUpdate(self): # refactor
     self.ui.console.log("checking for updates!");
-    run(["git", "fetch"], check = True);
-    result = run(["git", "status"], check = True, text = True, capture_output = True);
-    if "behind" in result.stdout:
-      self.ui.console.log("found latest version!");
-      run(["git", "pull"]);
-      self.ui.console.log("update complete!");
-      self.handleQuit();
+    try:
+      run(["git", "fetch"], check = True);
+      result = run(["git", "status"], check = True, text = True, capture_output = True);
+      if "behind" in result.stdout:
+        self.ui.console.log("found latest version!");
+        run(["git", "pull"]);
+        self.ui.console.log("update complete!");
+        self.handleQuit();
+    except FileNotFoundError:
+      self.ui.console.log("git is not installed!");
+      return;
+    except:
+      return;
+      
+  def handleLoad(self):
+    self.ui.clear();
+    self.ui.showHeader("Save Slots", "#");
+    
+    if os.path.exists("saves") != True:
+      self.handleName();
+      return;
+    
+    player_data = {};
+    for save in os.listdir("saves"):
+      self.ui.showStatus("fetching", 1.5);
+      plr = Player(None).load(save.replace(".save", ""));
+      player_data.update({plr.name : plr});
+      self.ui.panelPrint(f"level {plr.level} ({plr.exp}/{plr.level * 100})", title = plr.name, alignment = "center");
+    
+    self.ui.animatedPrint("[underline green]pick a character to load, leave it blank to ignore![reset]")
+    option = self.ui.getInput();
+    
+    if option == "":
+      self.handleName();
+      return;
+   
+    try:
+      self.ui.showStatus("loading", 2);
+      self.player = player_data[option]
+    except KeyError:
+      self.handleLoad();
+        
+  def handleSave(self):
+    if os.path.exists("saves") != True:
+      os.mkdir("saves");
+    
+    if os.path.isfile(f"saves/{self.player.name}.save"):
+      self.ui.animatedPrint(f"[yellow]save for {self.player.name} already exists!, overwrite? (yes/no)[reset]");
+      if self.ui.getInput().lower() != "yes":
+        return;
+    
+    self.ui.showStatus("saving", 2);
+    self.player.save();
