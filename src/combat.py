@@ -130,7 +130,7 @@ class CombatHandler:
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(option, self.attacker, self.defender);
       self.ui.showSeperator("-");
       
-      if self.checkDeath() is True or ran is "flee":
+      if self.checkDeath() is True or ran == "flee":
         break;
       
       self.enemy_option = self.defender.getAction();
