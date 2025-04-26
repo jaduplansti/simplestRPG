@@ -49,10 +49,6 @@ class UI:
     if self.console.width in range(20, 40): return True;
     else: return False;
     
-  def beep(self):
-    """prints the beep escape character, i should rewrite this."""
-    system("echo -n -e \a");
-    
   def clear(self):
     """clear duh"""
     system("clear");
@@ -146,7 +142,6 @@ class UI:
       for n, ch in enumerate(formatted_text):
         panel.renderable = formatted_text[0:n + 1];
         live.update(panel);
-        self.beep();
         sleep(self.game.settings["type speed"]);
     self.newLine();
     sleep(self.game.settings["delay speed"]);
@@ -167,7 +162,6 @@ class UI:
     print("~ ", end = "");
     for ch in parsed_s:
       print(ch, end='', flush=True)
-      self.beep();
       sleep(self.game.settings["type speed"]);
     self.newLine();
     self.newLine();

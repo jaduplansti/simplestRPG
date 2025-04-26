@@ -7,7 +7,12 @@ class Forest:
     self.ui = game.ui;
   
   def cutTree(self):
-    if self.game.player.equipment["right arm"].name != "chopping axe":
+    character_right_arm = self.game.player.equipment["right arm"];
+    if character_right_arm is None:
+      self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] cant cut tree's with his bare hands.");
+      return;
+      
+    if character_right_arm.name != "chopping axe": # temporary fix lol
       self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] cant cut tree's without equipping a [green italic]chopping axe[reset]!");
       return;
     

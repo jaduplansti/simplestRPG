@@ -5,7 +5,7 @@ class Shop(SubMenu):
   def __init__(self, game):
     super().__init__(game);
     self.items = {
-      "health potion" : [Item("health potion"), 1, ],
+      "health potion" : [Item("health potion"), 20, 1],
     };
     
   def showShopMenu(self):
