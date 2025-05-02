@@ -191,7 +191,7 @@ class UI:
     
   def awaitKey(self):
     self.normalPrint("(type anything to continue)\n");
-    input();
+    input("> ");
     self.newLine();
     
   def getInput(self):

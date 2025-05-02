@@ -1,7 +1,6 @@
 from enemy import Enemy, getEnemyByName;
 from random import randint, choices;
 from handlers import AttackHandler;
-from combatevent import CombatEventHandler;
 
 from time import time;
 
@@ -12,7 +11,6 @@ class CombatHandler:
     self.menu = self.game.menu;
     self.attack_handler = AttackHandler(self);
     
-    self.event_handler = CombatEventHandler(self);
     self.attacker = None;
     self.defender = None;
     
@@ -74,11 +72,11 @@ class CombatHandler:
     if randint(1, 7) == randint(1, 7) and npc.berserk is False:
       self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
       self.ui.animatedPrint(f"[yellow]{npc.name}[reset] goes [red]Berserk[reset]!");
-      self.ui.panelPrint("[blue]ALL STATS[reset] [green](x1.5)[reset]");
+      self.ui.panelPrint("[blue]ALL STATS[reset] [green](1.5x)[reset]");
       npc.goBerserk();
       return True;
     return False;
-    
+  
   def checkDeath(self):
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
@@ -120,7 +118,7 @@ class CombatHandler:
     ran = None; # temporary
     while True:
       self.menu.showCombatMenu(self, self.attacker);
-      option = self.ui.getInput();
+      option = self.ui.getInputWithTimeout("[green](enter action)[reset] ⤵", 5);
       
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");

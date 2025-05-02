@@ -14,7 +14,7 @@ class Menu():
     self.ui.normalPrint("× [underline bold magenta]check status for more details.[reset]\n");
     
   def showItemsMenu(self, character):
-    self.ui.animatedPrint(f"([magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s))");
+    self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s)");
     for name in character.inventory:
       item = character.inventory[name];
       self.ui.normalPrint(f"- [underline yellow]{name}[reset] [purple]({item["amount"]}x)[reset]");
@@ -60,7 +60,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5.4[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5.5[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):

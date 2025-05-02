@@ -47,6 +47,9 @@ class Game:
       "delay speed" : 0.5,
     }
     
+    self.giveQuest("goblin slayer");
+    self.player.trackQuest();
+    
   def getArea(self, name):
     """
     Gets an area from the self.areas
@@ -83,8 +86,7 @@ class Game:
       self.ui.normalPrint(f"[yellow]zoom in your terminal around 20-40 (current width {self.ui.console.width})[reset]\n");
       self.ui.normalPrint(f"[green]you can zoom in by (pinching in) or (ctrl +)[reset]\n");
       sleep(2);
-    
-  
+   
   def handleQuit(self):
     """Handles quitting, stops audio player and enables echoing."""
     self.audio_handler.stop();
@@ -102,13 +104,26 @@ class Game:
     if len(self.player.inventory) <= 0:
       self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] bag is empty right now, nothing to use.");
       return;
-      
-    self.menu.showItemsMenu(self.player);
-    
+   
     while True:
-      option = self.ui.getInput().lower();
-      if self.player.itemExists(option): self.player.getItem(option).use(self, combat_handler);
-      elif option == "close": break;
+      self.ui.clear();   
+      self.menu.showItemsMenu(self.player);
+      option = self.ui.getInput().lower().split(",");
+      count = 1;
+      
+      try:
+        if len(option) > 1: count = int(option[1]);
+      except ValueError:
+        self.ui.normalPrint("[red bold]the amount must be an integer e.g wooden sword, 2[reset]\n");
+      
+      for _ in range(0, count):
+        if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, combat_handler);
+        elif option[0] == "close": return;
+        else: 
+          self.ui.normalPrint(f"[red underline]{self.player.name} does not have {option[0]}[reset]\n");
+          self.ui.awaitKey();
+          break;
+      self.ui.awaitKey();
       
   def handleUseSkill(self, skill = None, combat_handler = None, attacker = None, defender = None):
     """
@@ -149,8 +164,6 @@ class Game:
     self.ui.clear();
     self.ui.panelPrint("your name? : ");
     self.player.name = self.ui.getInput();
-  
-  
   
   def handleStart(self):
     """Initializes the game."""
@@ -247,7 +260,7 @@ class Game:
     
     player_data = {};
     for save in os.listdir("saves"):
-      self.ui.showStatus("fetching", 1.5);
+      self.ui.showStatus("fetching", 0.5);
       plr = Player(None).load(save.replace(".save", ""));
       player_data.update({plr.name : plr});
       self.ui.panelPrint(f"level {plr.level} ({plr.exp}/{plr.level * 100})", title = plr.name, alignment = "center");
@@ -276,3 +289,8 @@ class Game:
     
     self.ui.showStatus("saving", 2);
     self.player.save();
+    
+  def giveQuest(self, name):
+    self.player.giveQuest(name)
+    self.ui.animatedPrint(f"{name} quest recieved!");
+  

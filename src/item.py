@@ -75,7 +75,7 @@ def use_potion(item, game, combat_handler):
   event = choices(["expired", None], [0.1, 0.9])[0];
   
   if event == "expired":
-    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a health potion but it was expired?");
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a {item.name} but it was expired?");
     return;
     
   if item.name == "health potion":
@@ -87,7 +87,13 @@ def use_potion(item, game, combat_handler):
     energy_restored = round(game.player.energy / 2);
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a energy potion and recovered [green]{energy_restored} energy[reset]!")
     game.player.energy = min(game.player.energy + energy_restored, 100);
+  
+  elif item.name == "strength potion":
+    strength_increased = round(2 + game.player.stats["luck"]);
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a strength potion and gained [green]{strength_increased} strength[reset]!");
+    game.player.stats["strength"] += strength_increased;
     
+  
 def use_scroll(item, game, combat_handler):
   if item.name == "scroll of instant death" and combat_handler != None:
     combat_handler.defender.stats["health"] = 0;
@@ -119,10 +125,32 @@ def use_sword(item, game, combat_handler):
     game.player.attack_style = "swordsman";
     game.player.stats["strength"] += strength_increased;
 
+def use_chest(item, game, combat_handler):
+  if item.name == "starter chest":
+    possible_loot = [Item("wooden sword"), Item("scroll of repair"), Item("energy potion"), Item("health potion"), Item("strength potion")];
+    
+    amount_loot = randint(0, len(possible_loot));
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] opened up a [bold green]starter chest[reset]!");
+    
+    if amount_loot == 0:
+      game.ui.animatedPrint(f"[red bold]the starter chest was empty[reset]!");
+      return;
+      
+    recieved = choices(possible_loot[0:amount_loot], k = amount_loot);
+    recieved_str = "";
+    
+    for item in recieved:
+      amount_item = randint(1, 1 + round(game.player.stats["luck"]));
+      recieved_str += (f"- [yellow]{item.name}[reset] ({item.rarity}) {amount_item} x\n");
+      game.player.addItemToInventory(item, amount_item);
+    game.ui.panelPrint(recieved_str.rstrip("\n"), title = "starter chest");
+  
 ITEMS = {
   "wooden sword": use_sword,
   "health potion" : use_potion,
   "energy potion" : use_potion,
   "scroll of instant death" : use_scroll,
   "scroll of repair" : use_scroll,
+  "starter chest" : use_chest,
+  "strength potion" : use_potion,
 };

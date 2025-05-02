@@ -28,7 +28,7 @@ class Exploration:
     self.ui = self.game.ui;
 
   def getRandomEvent(self):
-    return choices(["fight", None], [0.01, 0.99])[0];
+    return choices(["fight", None], [0.05, 0.99])[0];
 
   def handleEvent(self, event):
     if event == "fight":

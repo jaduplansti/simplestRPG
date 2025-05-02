@@ -43,5 +43,4 @@ class Home(SubMenu):
     );
     
   def enter(self):
-    self.ui.animatedPrint("a damn house");
     self.handleHome();

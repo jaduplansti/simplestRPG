@@ -176,3 +176,10 @@
 
 [version 2.5.4]
 • improved saving and loading, (you can now save a bunch of character files)
+• fixed issue #1 
+
+[version 2.5.5]
+• added a time limit during choosing an action during combat.
+• added starter chest
+• added strength potion
+• you can now specify how much of an item to use
