@@ -29,8 +29,7 @@ class Shop(SubMenu):
     return 1;
     
   def handleBuy(self):
-    self.ui.clear():;
-    
+    self.ui.clear();
     for item in self.items:
       self.ui.normalPrint(f"- [yellow]{item}[reset] ({self.items[item][2]} gold)");
     self.ui.newLine();
