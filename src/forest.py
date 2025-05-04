@@ -41,7 +41,6 @@ class Forest:
     self.ui.normalPrint("≈ [green]leave[reset]\n");
 
   def handleForest(self):
-    self.game.audio_handler.play("forest.mp3");
     self.game.handleMenu(
     {
       "cut tree" : self.cutTree,

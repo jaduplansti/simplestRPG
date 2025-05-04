@@ -183,3 +183,14 @@
 • added starter chest
 • added strength potion
 • you can now specify how much of an item to use
+
+[version 2.5.6]
+• refactored core components
+• removed art.py, multiplayer.py and audio.py
+• added quests
+• improved skills
+• fixed flee bug
+• improved ui
+• improved saving
+• improved shop and its menu
+• adjusted time limit to 15 seconds

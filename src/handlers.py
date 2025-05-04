@@ -224,7 +224,7 @@ class AttackHandler:
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("imaginary blade style", move, [attacker.name, defender.name, dmg], move);
-    
+ 
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;

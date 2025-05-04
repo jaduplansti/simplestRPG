@@ -1,4 +1,5 @@
 from random import randint, choices;
+from copy import deepcopy;
 
 class Item:
   """
@@ -28,7 +29,7 @@ class Item:
   
   def use(self, game, combat_handler = None):
     try:
-      ITEMS[self.name](self, game, combat_handler);
+      ITEMS[self.name]["action"](self, game, combat_handler);
       game.player.usedItem(self.name);
     except KeyError:
       game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
@@ -71,6 +72,12 @@ def removeEquipment(plr, part):
 #     );
 # 
 
+def getItem(name):  
+  try:
+    return deepcopy(ITEMS[name]["item"]);
+  except KeyError:
+    return None;
+    
 def use_potion(item, game, combat_handler):
   event = choices(["expired", None], [0.1, 0.9])[0];
   
@@ -124,10 +131,11 @@ def use_sword(item, game, combat_handler):
     game.ui.animatedPrint(f"Strength [green]+{strength_increased}[reset]!");
     game.player.attack_style = "swordsman";
     game.player.stats["strength"] += strength_increased;
-
+    game.givePlayerSkill("parry");
+    
 def use_chest(item, game, combat_handler):
   if item.name == "starter chest":
-    possible_loot = [Item("wooden sword"), Item("scroll of repair"), Item("energy potion"), Item("health potion"), Item("strength potion")];
+    possible_loot = [getItem("wooden sword"), getItem("energy potion"), getItem("health potion"), getItem("scroll of repair"), getItem("strength potion")];
     
     amount_loot = randint(0, len(possible_loot));
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] opened up a [bold green]starter chest[reset]!");
@@ -146,11 +154,32 @@ def use_chest(item, game, combat_handler):
     game.ui.panelPrint(recieved_str.rstrip("\n"), title = "starter chest");
   
 ITEMS = {
-  "wooden sword": use_sword,
-  "health potion" : use_potion,
-  "energy potion" : use_potion,
-  "scroll of instant death" : use_scroll,
-  "scroll of repair" : use_scroll,
-  "starter chest" : use_chest,
-  "strength potion" : use_potion,
-};
+  "wooden sword": {
+    "item": Item(name="wooden sword", durability = 1000, rank="E", weight=2.0, bodypart="right arm"),
+    "action": use_sword
+  },
+  "health potion": {
+    "item": Item(name="health potion", rank="E", weight=0.5),
+    "action": use_potion
+  },
+  "energy potion": {
+    "item": Item(name="energy potion", rank="E", weight=0.5),
+    "action": use_potion
+  },
+  "scroll of instant death": {
+    "item": Item(name="scroll of instant death", rank="B", rarity="rare", weight=0.2),
+    "action": use_scroll
+  },
+  "scroll of repair": {
+    "item": Item(name="scroll of repair", rank="D", rarity="uncommon", weight=0.2),
+    "action": use_scroll
+  },
+  "starter chest": {
+    "item": Item(name="starter chest", durability=1, rank="D", rarity="common", weight=5.0),
+    "action": use_chest
+  },
+  "strength potion": {
+    "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.6),
+    "action": use_potion
+  }
+}

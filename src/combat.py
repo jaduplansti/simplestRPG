@@ -13,7 +13,6 @@ class CombatHandler:
     
     self.attacker = None;
     self.defender = None;
-    
     self.enemy_option = ""; # temporary solution
     
   def initiateFightNpc(self, character, name):
@@ -78,6 +77,7 @@ class CombatHandler:
     return False;
   
   def checkDeath(self):
+    self.game.player.trackQuest(self.game, self);
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
     elif self.defender.stats["health"] <= 0:
@@ -104,7 +104,6 @@ class CombatHandler:
     elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25): # put in handlers
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
       self.ui.awaitKey();
-      return "flee";
     elif option == "items":
       self.game.handleUseItem(self);
     elif option == "skills":
@@ -115,10 +114,9 @@ class CombatHandler:
     attacker.deductEnergy();
   
   def handleCombatNpc(self, auto = False):
-    ran = None; # temporary
     while True:
       self.menu.showCombatMenu(self, self.attacker);
-      option = self.ui.getInputWithTimeout("[green](enter action)[reset] ⤵", 5);
+      option = self.ui.getInputWithTimeout("[green](enter action)[reset] ⤵", 15);
       
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
@@ -128,7 +126,7 @@ class CombatHandler:
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(option, self.attacker, self.defender);
       self.ui.showSeperator("-");
       
-      if self.checkDeath() is True or ran == "flee":
+      if self.checkDeath() is True or option == "flee":
         break;
       
       self.enemy_option = self.defender.getAction();
@@ -140,6 +138,6 @@ class CombatHandler:
       if isinstance(self.defender, Enemy):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
-      if self.checkDeath() is True or ran is True: break;
+      if self.checkDeath() is True or option == "flee": break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();

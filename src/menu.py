@@ -1,8 +1,6 @@
 from rich.table import Table;
 from rich import print, box;
 
-import art;
-
 class Menu():
   def __init__(self, game):
     self.game = game;
@@ -27,15 +25,11 @@ class Menu():
     self.ui.animatedPrint(f"[magenta]==SKILLS==[reset]");
     for skill_name in character.skills:
       skill = character.skills[skill_name];
-      self.ui.normalPrint(f"- [bold yellow]{skill_name}[reset]");
-      for info in skill.__dict__: 
-        if info != "name": self.ui.normalPrint(f"  - [bold green]{info.capitalize()}[reset] ({skill.__dict__[info]})");
-      self.ui.newLine();
+      self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center");
+
   
   def showStatsMenu(self, character):
     self.ui.clear()
-    self.ui.animatedPrint(f"[yellow]{character.name}[reset] focuses...")
-
     self.ui.animatedPrint(f"[green]=== STATUS ===[reset]")
     self.ui.normalPrint(f"[blue]Level:[reset] [cyan]{character.level}[reset] ([magenta]{character.exp} / {character.level * 100}[reset])\n")
     self.ui.normalPrint(f"[red]Health:[reset] [green]{character.stats['health']}[reset] / [green]{character.stats['max health']}[reset] HP\n")
@@ -60,7 +54,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5.5[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5.6[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -73,8 +67,6 @@ class Menu():
     self.ui.clear();
     self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
     
-    self.ui.showCombatBar(character);
-    self.ui.showCombatBar(character.enemy);
     self.ui.showSeperator("+");
     
     self.ui.normalPrint("≈ [yellow]attack[reset]");
@@ -86,6 +78,10 @@ class Menu():
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.ui.normalPrint("≈ [red]flee[reset]");
     self.ui.newLine();
+    
+    self.ui.showSeperator("-");
+    self.ui.showCombatBar(character);
+    self.ui.showCombatBar(character.enemy);
     
   def showTip(self):
     self.ui.panelAnimatedPrintFile("tips", "tips", [], "tips");

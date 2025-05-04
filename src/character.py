@@ -1,6 +1,6 @@
 from random import randint, uniform
-from item import Item, removeEquipment;
-from skill import Skill;
+from item import Item, removeEquipment, getItem;
+from skill import Skill, getSkill;
 from copy import deepcopy;
 import json;
 
@@ -40,12 +40,13 @@ class Character:
     self.skills = {}
     self.magic = {}
     
-    self.addSkill(Skill("crimson edge", 10));
-    self.addItemToInventory(Item("health potion"), 100);
+    self.addSkill(getSkill("crimson edge"));
+    self.addItemToInventory(getItem("health potion"), 100);
+    self.addItemToInventory(getItem("starter chest"), 5);
     
   def to_dict(self):
     return {
-      "name": self.name,
+     "name": self.name,
       "level": self.level,
       "exp": self.exp,
       "position": self.position,

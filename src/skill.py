@@ -1,17 +1,19 @@
 from random import randint;
-from item import Item;
+from copy import deepcopy;
 
 class Skill:
-  def __init__(self, name, energy, level = 0):
+  def __init__(self, name, desc, energy, rank, level = 0):
     self.name = name;
     self.energy = energy;
+    self.rank = rank
     self.level = level;
-  
+    self.desc = desc;
+    
   def deductEnergy(self, character, n):
     character.energy = max(0, character.energy - n);
     
   def use(self, combat_handler = None, attacker = None, defender = None):
-    SKILLS[self.name](self, combat_handler, attacker, defender);
+    SKILLS[self.name]["action"](self, combat_handler, attacker, defender);
     self.deductEnergy(attacker, self.energy);
     
   def to_dict(self):
@@ -19,6 +21,8 @@ class Skill:
       "name": self.name,
       "energy": self.energy,
       "level": self.level,
+      "desc" : self.desc,
+      "rank" : self.rank,
       };
 
   @classmethod
@@ -45,9 +49,21 @@ def action_normal_item(skill, combat_handler, attacker, defender):
       combat_handler.ui.panelNormalPrint(f"{attacker.name} focused, drawing his a fictional sword with his hand!");
       combat_handler.ui.panelNormalPrint(f"{attacker.name} used mind sword succesfully!");
       attacker.attack_style = "imaginary blade";
-      
+
+def getSkill(name):  
+  try:
+    return deepcopy(SKILLS[name]["skill"]);
+  except KeyError:
+    return None;
+    
 SKILLS = {
-  "crimson edge" : action_normal_damage,
-  "mind sword" : action_normal_item,
-  "parry" : action_normal_defense,
+  "crimson edge" : {
+     "skill" : Skill("crimson edge", "a hundred slashes dealing 10 damage each", 50, "D"), 
+     "action" : action_normal_damage
+    },
+  "parry" : {
+    "skill" : Skill("parry", "inflicts a parrying status", 5, "E"), 
+    "action" : action_normal_defense
+  },
 };
+

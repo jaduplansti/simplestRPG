@@ -2,16 +2,16 @@ from player import Player;
 from ui import UI;
 from combat import CombatHandler;
 
-from multiplayer import MultiplayerHandler;
 from menu import Menu;
 from random import choices;
-
 import os;
-from exploration import Exploration, AREAS;
-from audio import AudioPlayer;
 
+from exploration import Exploration, AREAS;
 from time import sleep;
 from subprocess import run;
+
+from item import getItem;
+from skill import getSkill;
 
 class Game:
   """ 
@@ -36,9 +36,7 @@ class Game:
     self.player = Player("");
     self.ui = UI(self);
     self.menu = Menu(self);
-    self.multiplayer_handler = MultiplayerHandler(self);
     self.exploration_handler = Exploration(self);
-    self.audio_handler = AudioPlayer(self);
     
     self.areas = {};
     
@@ -46,9 +44,6 @@ class Game:
       "type speed" : 0.01,
       "delay speed" : 0.5,
     }
-    
-    self.giveQuest("goblin slayer");
-    self.player.trackQuest();
     
   def getArea(self, name):
     """
@@ -89,7 +84,6 @@ class Game:
    
   def handleQuit(self):
     """Handles quitting, stops audio player and enables echoing."""
-    self.audio_handler.stop();
     self.ui.enableEcho();
     os._exit(0);
     
@@ -118,7 +112,8 @@ class Game:
       
       for _ in range(0, count):
         if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, combat_handler);
-        elif option[0] == "close": return;
+        elif option[0] == "close": 
+          return;
         else: 
           self.ui.normalPrint(f"[red underline]{self.player.name} does not have {option[0]}[reset]\n");
           self.ui.awaitKey();
@@ -167,21 +162,20 @@ class Game:
   
   def handleStart(self):
     """Initializes the game."""
-    
+ 
     self.ui.clear();
     self.handleLoad();
     AREAS[self.player.location]["handler"](self).enter();
     
   def handleMainMenu(self):
     """This is self explanatory"""
-    self.audio_handler.play("main_menu.mp3")
     self.handleMenu({"start" : self.handleStart, "quit" : self.handleQuit}, self.menu.showMainMenu);
   
   def initiateFight(self):
     """Initiates a fight using CombatHandler, see combat.py."""
     
     combat_handler = CombatHandler(self);
-    combat_handler.initiateFightNpc(self.player, choices(["slime", "goblin"])[0]);
+    combat_handler.initiateFightNpc(self.player, choices(["goblin"])[0]);
     
   def handleCombatInitiateMenu(self, combat_handler):
     """
@@ -233,12 +227,15 @@ class Game:
       
       if enable == "true": self.audio_handler.enabled = True;
       elif enable == "false": self.audio_handler.enabled = False;
+  
+  def doUpdate(self):
+    """Handles updates using git fetch"""
     
-  def doUpdate(self): # refactor
     self.ui.console.log("checking for updates!");
     try:
       run(["git", "fetch"], check = True);
       result = run(["git", "status"], check = True, text = True, capture_output = True);
+        
       if "behind" in result.stdout:
         self.ui.console.log("found latest version!");
         run(["git", "pull"]);
@@ -247,10 +244,12 @@ class Game:
     except FileNotFoundError:
       self.ui.console.log("git is not installed!");
       return;
-    except:
+    except Exception:
       return;
       
   def handleLoad(self):
+    """Handles load files in /saves"""
+    
     self.ui.clear();
     self.ui.showHeader("Save Slots", "#");
     
@@ -268,7 +267,8 @@ class Game:
     self.ui.animatedPrint("[underline green]pick a character to load, leave it blank to ignore![reset]")
     option = self.ui.getInput();
     
-    if option == "":
+    if option not in player_data:
+      self.ui.animatedPrint(f"character {option} does not exist!");
       self.handleName();
       return;
    
@@ -279,6 +279,8 @@ class Game:
       self.handleLoad();
         
   def handleSave(self):
+    """saves the current game.player to /saves/{name}.save"""
+    
     if os.path.exists("saves") != True:
       os.mkdir("saves");
     
@@ -289,8 +291,29 @@ class Game:
     
     self.ui.showStatus("saving", 2);
     self.player.save();
-    
+   
   def giveQuest(self, name):
-    self.player.giveQuest(name)
-    self.ui.animatedPrint(f"{name} quest recieved!");
+    if self.player.giveQuest(name) != -1:
+      self.ui.normalPrint(f"Quest {name} accepted!");
+      
+  def givePlayerExp(self, exp):
+    self.player.exp += exp;
   
+  def handlePlayerLevelUp(self):
+    old_level = self.player.level;
+    if self.player.tryLevelUp() is True:
+      self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] feels a surge of [blue]power[reset], [yellow]{self.player.name}[reset], leveled up!");
+      self.ui.panelPrint(f"level [yellow]{old_level}[reset] -> [green]{self.player.level}[reset]");
+  
+  def isTermux(self):
+    return "PREFIX" in os.environ and "/data/data/com.termux/files/usr" in os.environ["PREFIX"];
+ 
+  def givePlayerItem(self, name, amount = 1):
+   item = getItem(name);
+   self.player.addItemToInventory(item, amount);
+   self.ui.animatedPrint(f"Acquired [bold yellow]{item.name}[reset] ([green]{item.rarity})[reset] {amount}x");
+ 
+  def givePlayerSkill(self, name):
+   skill = getSkill(name);
+   self.player.addSkill(skill);
+   self.ui.panelPrint(f"[bold yellow]{skill.name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center", "Learned");

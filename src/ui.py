@@ -25,6 +25,7 @@ from rich.tree import Tree;
 from readchar import readkey;
 
 from timedinput import timedinput;
+from threading import Thread
 
 class UI:
   """
@@ -55,12 +56,12 @@ class UI:
   
   def disableEcho(self):
     """a way to disable input echo, highly not compatible with other platforms."""
-    if self.game.audio_handler.isTermux() is True: # temporary solution, hey it works!
+    if self.game.isTermux() is True: # temporary solution, hey it works!
       system("stty -echo");
   
   def enableEcho(self):
     """see disableEcho()."""
-    if self.game.audio_handler.isTermux() is True:
+    if self.game.isTermux() is True:
       system("stty echo");
   
   def clearStdinBuffer(self):
@@ -254,4 +255,8 @@ class UI:
   def showStatus(self, msg, n, spinner = "dots"):
     with self.console.status(msg, spinner = spinner) as status:
       sleep(n);
+  
+  def showQuest(self, name):
+    quest = self.game.player.quests[name]["obj"];
+    self.panelPrint(quest.desc, "center", quest.name);
   

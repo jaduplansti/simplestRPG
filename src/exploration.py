@@ -69,7 +69,6 @@ class Exploration:
     destination, destination_name = self.handleGetNext(area);
     self.handleExplore(self.game.player, destination);
     
-    self.game.audio_handler.stop();
     self.ui.normalPrint(f"[bold cyan]you have arrived at {destination_name}[reset]\n");
     self.game.player.location = destination_name;
     self.ui.awaitKey();
