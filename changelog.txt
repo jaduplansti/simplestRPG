@@ -196,3 +196,5 @@
 • adjusted time limit to 15 seconds
 
 [version 2.5.7]
+• fixed loading bug
+• fixed bugs

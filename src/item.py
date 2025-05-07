@@ -181,5 +181,5 @@ ITEMS = {
   "strength potion": {
     "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.6),
     "action": use_potion
-  }
+  },
 }

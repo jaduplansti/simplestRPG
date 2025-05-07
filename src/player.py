@@ -18,8 +18,7 @@ class Player(Character):
   
   @classmethod
   def from_dict(cls, data):
-    super().from_dict(data);
-    char = cls(data["name"])
+    char = super().from_dict(data);
     char.quests = {
       name: {
           "obj": Quest.from_dict(quest_data["obj"]),

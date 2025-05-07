@@ -15,7 +15,7 @@ class Character:
     self.money = 1
     self.energy = 100
     self.berserk = False;
-
+    
     self.status = {
       "blocking" : [False, 0],
       "stunned" : [False, 0],

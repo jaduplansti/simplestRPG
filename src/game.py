@@ -256,7 +256,7 @@ class Game:
     if os.path.exists("saves") != True:
       self.handleName();
       return;
-    
+      
     player_data = {};
     for save in os.listdir("saves"):
       self.ui.showStatus("fetching", 0.5);

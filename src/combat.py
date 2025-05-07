@@ -53,7 +53,7 @@ class CombatHandler:
       
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
-      self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhastion.[reset]", "fatigue");
+      self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhaustion.[reset]", "fatigue");
       attacker.stats["health"] = 0;
       return "passed out";
     elif attacker.energy <= 25:
@@ -138,6 +138,6 @@ class CombatHandler:
       if isinstance(self.defender, Enemy):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
-      if self.checkDeath() is True or option == "flee": break;
+      if self.checkDeath() is True or self.enemy_option == "flee": break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
