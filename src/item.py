@@ -19,14 +19,17 @@ class Item:
   rank = "E", 
   rarity = "common", 
   weight = 0.1,
-  bodypart = None):
+  bodypart = None,
+  current_durabilty = 1):
     
     self.name = name;
     self.durability = durability;
+    self.rank = rank;
     self.rarity = rarity;
     self.weight = weight;
     self.bodypart = bodypart;
-  
+    self.current_durabilty = 1;
+    
   def use(self, game, combat_handler = None):
     try:
       ITEMS[self.name]["action"](self, game, combat_handler);
@@ -34,9 +37,13 @@ class Item:
     except KeyError:
       game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
   
-  def consumeDurability(self, n):
-    self.durability = max(self.durability - n, 0);
+  def getDurability(self):
+    return (self.current_durabilty / self.durability) * 100;
     
+  def consumeDurability(self, n):
+    sub = (n - self.rarityToVal());
+    self.current_durability = max(self.durability - sub, 0);
+  
   def handleDurability(self, n):
     self.consumeDurability(n);
     if self.durability <= 0:
@@ -49,11 +56,15 @@ class Item:
       "durability": self.durability,
       "bodypart": self.bodypart,
       };
-
+  
+  def rarityToVal(self):
+    for n, val in enumerate(["common", "uncommon"]):
+      if self.rarity == val: return (n + 1) * 10;
+  
   @classmethod
   def from_dict(cls, data):
     return cls(**data);
-
+  
 def removeEquipment(plr, part):
   item = plr.equipment[part];
   if "sword" in item.name:

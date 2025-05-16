@@ -31,7 +31,7 @@ class Home(SubMenu):
     self.game.handleMenu(
       {
         "items" : self.game.handleUseItem, 
-        "stats" : lambda: self.game.menu.showStatsMenu(self.game.player),
+        "stats" : self.game.handleStatsMenu,
         "practice" : self.game.initiateFight,
         "sleep" : self.game.handleSleep,
         "settings" : self.game.handleSettings,

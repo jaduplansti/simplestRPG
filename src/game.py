@@ -75,13 +75,6 @@ class Game:
       elif option in options.keys(): options[option]();
       self.ui.awaitKey();
   
-  def handleConfiguration(self):
-    while self.ui.validScreenSize() is False:
-      self.ui.clear();
-      self.ui.normalPrint(f"[yellow]zoom in your terminal around 20-40 (current width {self.ui.console.width})[reset]\n");
-      self.ui.normalPrint(f"[green]you can zoom in by (pinching in) or (ctrl +)[reset]\n");
-      sleep(2);
-   
   def handleQuit(self):
     """Handles quitting, stops audio player and enables echoing."""
     self.ui.enableEcho();
@@ -317,3 +310,32 @@ class Game:
    skill = getSkill(name);
    self.player.addSkill(skill);
    self.ui.panelPrint(f"[bold yellow]{skill.name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center", "Learned");
+  
+  def handleStatsMenu(self):
+    while True:
+      self.ui.clear()
+      self.menu.showStatsMenu(self.player)
+
+      if self.player.points > 0:
+        self.ui.normalPrint("[yellow]hint[reset]: type strength, 2 to allocate points to strength\n") 
+        option = self.ui.getInput().split(",")
+
+        try:
+          if len(option) != 2:
+            raise ValueError("Invalid input format. Use: stat, amount")
+
+          stat = option[0].strip()
+          amount = int(option[1].strip())
+
+          if stat not in self.player.stats:
+            raise KeyError(f"'{stat}' is not a valid stat")
+
+          if amount <= 0 or amount > self.player.points:
+            raise ValueError("Invalid amount")
+            
+          self.player.stats[stat] += amount
+          self.player.points -= amount
+          
+        except Exception as e: self.ui.panelPrint(str(e), "center", "system", "red")
+        self.ui.awaitKey()
+      else: break;

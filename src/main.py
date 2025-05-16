@@ -4,7 +4,6 @@ def main():
   try:
     game = Game();
     #game.doUpdate();
-    game.handleConfiguration();
     game.handleMainMenu();
   except KeyboardInterrupt:
     game.handleQuit();

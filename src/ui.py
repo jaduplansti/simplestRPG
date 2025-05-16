@@ -46,10 +46,6 @@ class UI:
     self.strings = {};
     self.loadStrings();
   
-  def validScreenSize(self):
-    if self.console.width in range(20, 40): return True;
-    else: return False;
-    
   def clear(self):
     """clear duh"""
     system("clear");
@@ -118,9 +114,9 @@ class UI:
     self.newLine();
     self.enableEcho();
     
-  def panelPrint(self, s, alignment = None, title = ""):
+  def panelPrint(self, s, alignment = None, title = "", color = "white"):
     """prints a panel."""
-    self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title));
+    self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color));
     self.newLine();
   
   def panelAnimatedPrint(self, text, title):

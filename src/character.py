@@ -16,6 +16,8 @@ class Character:
     self.energy = 100
     self.berserk = False;
     
+    self.points = 5;
+    self.title = "unawakened";
     self.status = {
       "blocking" : [False, 0],
       "stunned" : [False, 0],
@@ -60,6 +62,8 @@ class Character:
       "attack_style": self.attack_style,
       "_class": self._class,
       "skills": self.skills,
+      "points": self.points,
+      "title": self.title,
       "magic": self.magic,
       "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
@@ -82,6 +86,8 @@ class Character:
     char.status = data["status"]
     char.berserk = data["berserk"]
     char.stats = data["stats"]
+    char.points = data["points"]
+    char.title = data["title"]
     char.equipment = {
       k: Item.from_dict(v) if v else None for k, v in data["equipment"].items()
     }

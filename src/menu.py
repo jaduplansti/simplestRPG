@@ -26,27 +26,31 @@ class Menu():
     for skill_name in character.skills:
       skill = character.skills[skill_name];
       self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center");
-
-  
+      
   def showStatsMenu(self, character):
-    self.ui.clear()
-    self.ui.animatedPrint(f"[green]=== STATUS ===[reset]")
-    self.ui.normalPrint(f"[blue]Level:[reset] [cyan]{character.level}[reset] ([magenta]{character.exp} / {character.level * 100}[reset])\n")
-    self.ui.normalPrint(f"[red]Health:[reset] [green]{character.stats['health']}[reset] / [green]{character.stats['max health']}[reset] HP\n")
-    self.ui.normalPrint(f"[cyan]Energy:[reset] [blue]{character.energy}[reset]\n")
-
-    self.ui.animatedPrint(f"[green]=== ATTRIBUTES ===[reset]")
-    self.ui.normalPrint(f"[blue]Strength:[reset] [red]{character.stats['strength']}[reset] - [underline]Physical power, affects melee damage[reset]\n")
-    self.ui.normalPrint(f"[green]Defense:[reset] [yellow]{character.stats['defense']}[reset] - [underline]Reduces damage taken[reset]\n")
-    self.ui.normalPrint(f"[purple]Luck:[reset] [cyan]{character.stats['luck'] * 100:.0f}%[reset] - [underline]Affects critical hits and rare events[reset]\n");
+    info = f"[green]name[reset]: [bold yellow]{character.name}[reset]\n[blue]level[reset]: {character.level} ({character.exp}/{100 * character.level})\n";
+    info += f"[yellow]title[reset]: {character.title}\n";
+    info += f"[red]health[reset]: {character.stats["health"]}/{character.stats["max health"]}\n";
+    info += f"[blue]energy[reset]: {character.energy}\n";
+    info += f"[bold]points[reset]: [green]{character.points}[reset]\n\n"
     
-    self.showEquipmentMenu(character);
-    
+    info += f"[green]stats[reset]:\n"
+    for stat in character.stats:
+      info += f"  [yellow]{stat}[reset]: {character.stats[stat]}\n";
+   
+    info += "\n[cyan]skills[reset]:\n";
+    for skill in character.skills:
+      info += f"  [yellow]{skill}[reset] ({character.skills[skill].rank})\n";
+      
+    info.rstrip("\n");
+    self.ui.panelPrint(info, title = "status", color = "cyan");
+   
   def showEquipmentMenu(self, character):
     self.ui.animatedPrint("[bold purple]=== EQUIPMENT ===[reset]");
+    
     for part in character.equipment:
-      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset] -> [italic yellow]{character.equipment[part].name}[reset] ([cyan]{character.equipment[part].rarity}[reset]) ([green]{character.equipment[part].durability}[reset]%)\n");
-      else: self.ui.normalPrint(f"[purple]{part}[reset] -> [yellow]Empty[reset]\n");
+      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset]:[italic yellow]{character.equipment[part].getDurability()}[reset] ([green]{character.equipment[part].rarity}[reset]) ([green]{character.equipment[part].durability}[reset]%)\n");
+      else: self.ui.normalPrint(f"[bold magenta]{part}[reset]: [red]Empty[reset]\n");
     
   def showMainMenu(self):
     self.ui.clear();
@@ -54,7 +58,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5.7[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.5.8[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):

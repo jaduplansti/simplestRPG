@@ -198,3 +198,9 @@
 [version 2.5.7]
 • fixed loading bug
 • fixed bugs
+
+[version 2.5.8]
+• improved status ui
+• fixed equipment ui 
+• fixed equipment durability
+• you can now allocate points, each level grants 2 points

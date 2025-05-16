@@ -103,7 +103,6 @@ class CombatHandler:
       self.attack_handler.taunt_handler.handleTaunt(attacker, defender);
     elif option == "flee" and attacker.stats["health"] <= (attacker.stats["max health"] * 0.25): # put in handlers
       self.ui.animatedPrint(f"[red]{attacker.name}[reset] ran away!");
-      self.ui.awaitKey();
     elif option == "items":
       self.game.handleUseItem(self);
     elif option == "skills":
