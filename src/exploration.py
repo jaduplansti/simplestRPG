@@ -7,6 +7,8 @@ from home import Home;
 from forest import Forest;
 from shop import Shop;
 
+from dungeon import Dungeon;
+
 def createArea(name, handler, _next = [], prev = [], enemies = None, position = 0):
   return {name : {
     "handler" : handler,
@@ -18,8 +20,9 @@ def createArea(name, handler, _next = [], prev = [], enemies = None, position = 
 
 AREAS = {
   **createArea("home", Home, _next = ["forest", "shop"], position = 0),
-  **createArea("forest", Forest, prev = ["home"], position = 10),
+  **createArea("forest", Forest, prev = ["home"], _next = ["dungeon"], position = 10),
   **createArea("shop", Shop, prev = ["home"], position = 5),
+  **createArea("dungeon", Dungeon, prev = ["forest"], position = 25),
 };
 
 class Exploration:

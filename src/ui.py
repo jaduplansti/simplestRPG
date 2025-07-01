@@ -67,7 +67,7 @@ class UI:
   
   def loadStrings(self):
     """loads game_strings.json into self.strings, note: rewrite this."""
-    with open("game_strings.json", "r") as file:
+    with open(sys.path[0] + "/game_strings.json", "r") as file:
       self.strings = json.load(file);
   
   def getString(self, key, n):
@@ -166,6 +166,9 @@ class UI:
     self.enableEcho();
     self.clearStdinBuffer();
   
+  def printDialogue(self, name, s):
+    self.animatedPrint(f"{name}: {s}");
+    
   def printTreeMenu(self, title, options): 
     tree = Tree(title);
     for option in options:
@@ -230,7 +233,7 @@ class UI:
         symbol = "";
         if status in ["blocking"]: symbol = "⬆";
         else: symbol = "⬇";
-        statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1]}x[reset] {symbol})");
+        statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1] - 1}x[reset] {symbol})");
     
     self.normalPrint(f"{name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
     self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.energy / 100)*100:.2f}%[reset]) {energy_bar}\n")

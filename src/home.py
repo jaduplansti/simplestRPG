@@ -4,7 +4,7 @@ class Home(SubMenu):
   def __init__(self, game):
     super().__init__(game);
     self.max_page = 2;
-
+    
   def showHouseMenu(self):
     self.ui.clear();
     self.ui.showSeperator("-");

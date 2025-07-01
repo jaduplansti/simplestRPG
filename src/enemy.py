@@ -80,6 +80,6 @@ def getEnemyByName(name, plr = None):
         [Item("health potion", rarity = "uncommon"), 0.5],
       ]
     );
-    
+ 
   
     

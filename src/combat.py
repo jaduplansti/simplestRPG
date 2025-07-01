@@ -42,6 +42,9 @@ class CombatHandler:
   def handleLevelUp(self, won):
     old_level = won.level;
     if won.tryLevelUp() is True:
+      if won.level in range(2, 4): self.game.giveQuest("slime slayer");
+      elif won.level in range(4, 8): self.game.giveQuest("goblin slayer");
+ 
       self.ui.animatedPrint(f"[yellow]{won.name}[reset] feels a surge of [blue]power[reset], [yellow]{won.name}[reset], leveled up!");
       self.ui.panelPrint(f"level [yellow]{old_level}[reset] -> [green]{won.level}[reset]");
       
@@ -56,11 +59,11 @@ class CombatHandler:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhaustion.[reset]", "fatigue");
       attacker.stats["health"] = 0;
       return "passed out";
-    elif attacker.energy <= 25:
+    elif attacker.energy <= 25 and not isinstance(attacker, Enemy):
       self.ui.panelAnimatedPrintFile("fatigue handler", "exhausted", [attacker.name], "fatigue");
-    elif attacker.energy <= 50:
+    elif attacker.energy <= 50 and not isinstance(attacker, Enemy):
       self.ui.panelAnimatedPrintFile("fatigue handler", "fatigued", [attacker.name], "fatigue");
-    elif attacker.energy <= 75:
+    elif attacker.energy <= 75 and not isinstance(attacker, Enemy):
       self.ui.panelAnimatedPrintFile("fatigue handler", "tired", [attacker.name], "fatigue");
     else:
       return False;
@@ -91,6 +94,7 @@ class CombatHandler:
     
   def handleOption(self, option, attacker, defender):
     self.ui.showStatus("processing move", 1, "clock");
+    
     if self.handleFatigue(attacker) == "passed out":
       return "passed out";
       

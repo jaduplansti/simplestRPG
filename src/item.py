@@ -15,20 +15,21 @@ class Item:
   
   def __init__(self, 
   name, 
+  max_durability = 1,
   durability = 1, 
   rank = "E", 
   rarity = "common", 
   weight = 0.1,
   bodypart = None,
-  current_durabilty = 1):
+  ):
     
     self.name = name;
+    self.max_durability = max_durability
     self.durability = durability;
     self.rank = rank;
     self.rarity = rarity;
     self.weight = weight;
     self.bodypart = bodypart;
-    self.current_durabilty = 1;
     
   def use(self, game, combat_handler = None):
     try:
@@ -38,12 +39,11 @@ class Item:
       game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
   
   def getDurability(self):
-    return (self.current_durabilty / self.durability) * 100;
+    return (self.durability / self.max_durability) * 100
     
   def consumeDurability(self, n):
-    sub = (n - self.rarityToVal());
-    self.current_durability = max(self.durability - sub, 0);
-  
+    self.durability = max(self.durability - n, 0);
+    
   def handleDurability(self, n):
     self.consumeDurability(n);
     if self.durability <= 0:
@@ -53,6 +53,7 @@ class Item:
     return {
       "name": self.name,
       "rarity": self.rarity,
+      "max_durability" : self.max_durability,
       "durability": self.durability,
       "bodypart": self.bodypart,
       };
@@ -111,7 +112,6 @@ def use_potion(item, game, combat_handler):
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a strength potion and gained [green]{strength_increased} strength[reset]!");
     game.player.stats["strength"] += strength_increased;
     
-  
 def use_scroll(item, game, combat_handler):
   if item.name == "scroll of instant death" and combat_handler != None:
     combat_handler.defender.stats["health"] = 0;
@@ -124,8 +124,8 @@ def use_scroll(item, game, combat_handler):
     part = game.ui.getInput();
     try:
       if game.player.equipment[part] != None:
-        game.player.equipment[part].durability += 1000; # temporary
-        game.ui.animatedPrint(f"[purple]{game.player.equipment[part].name}[reset] has been repaired.");
+        game.player.equipment[part].durability == game.player.equipment[part].max_durability;
+        game.ui.animatedPrint(f"[purple]{game.player.equipment[part].name}[reset] has been repaired (OK).");
       else: game.ui.animatedPrint(f"cannot repair item on [red]{part}[reset]")
     except KeyError:
       game.ui.animatedPrint("not a valid bodypart");
@@ -163,10 +163,24 @@ def use_chest(item, game, combat_handler):
       recieved_str += (f"- [yellow]{item.name}[reset] ({item.rarity}) {amount_item} x\n");
       game.player.addItemToInventory(item, amount_item);
     game.ui.panelPrint(recieved_str.rstrip("\n"), title = "starter chest");
+
+def use_glove(item, game, combat_handler):
+  if game.player.attack_style != "basic":
+    game.ui.animatedPrint("you must have a basic attack style!");
+    return;
   
+  if game.player.equipItem(item) != True:
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
+    return;
+    
+  if item.name == "leather gloves":
+    game.ui.animatedPrint("you put on the leather gloves");
+    game.ui.animatedPrint("its feel comfy.. gained +3 strength");
+    game.player.stats["strength"] += 3;
+   
 ITEMS = {
   "wooden sword": {
-    "item": Item(name="wooden sword", durability = 1000, rank="E", weight=2.0, bodypart="right arm"),
+    "item": Item(name="wooden sword", max_durability = 1000, durability = 1000, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
   },
   "health potion": {
@@ -193,4 +207,8 @@ ITEMS = {
     "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.6),
     "action": use_potion
   },
+  "leather gloves": {
+    "item": Item(name = "leather gloves", bodypart = "left arm", rank = "D", rarity = "uncommon", weight = 0.5),
+    "action": use_glove,
+  }
 }

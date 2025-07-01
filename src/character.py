@@ -44,8 +44,9 @@ class Character:
     
     self.addSkill(getSkill("crimson edge"));
     self.addItemToInventory(getItem("health potion"), 100);
-    self.addItemToInventory(getItem("starter chest"), 5);
-    
+    self.addItemToInventory(getItem("starter chest"), 10);
+    self.addSkill(getSkill("soul shatter"));
+  
   def to_dict(self):
     return {
      "name": self.name,
@@ -173,6 +174,7 @@ class Character:
     while self.canLevelUp():
       self.exp -= (self.level * 100)
       self.level += 1
+      self.points += 2;
       self.statLevelUp()
       leveled_up = True
     return leveled_up
@@ -232,7 +234,7 @@ class Character:
   def giveStatus(self, status, n):
     try:
       self.status[status][0] = True;
-      self.status[status][1] += n;
+      self.status[status][1] += n + 1;
     except KeyError:
       pass;
   

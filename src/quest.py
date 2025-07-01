@@ -26,7 +26,13 @@ def progressQuest(quest, character, game, combat_handler = None):
     quest_data = character.quests[quest.name];
     
     if combat_handler.defender.name == "goblin" and combat_handler.defender.stats["health"] <= 0: quest_data["kills"] += 1;
-    if quest_data["kills"] >= 2: completeQuest(quest, character, game);
+    if quest_data["kills"] >= 4: completeQuest(quest, character, game);
+  
+  if quest.name == "slime slayer" and combat_handler != None:
+    quest_data = character.quests[quest.name];
+    
+    if combat_handler.defender.name == "slime" and combat_handler.defender.stats["health"] <= 0: quest_data["kills"] += 1;
+    if quest_data["kills"] >= 4: completeQuest(quest, character, game);
     
 def completeQuest(quest, character, game):
   game.ui.panelPrint(f"[bold yellow]You have compeleted {quest.name}![reset]");
@@ -36,8 +42,13 @@ def completeQuest(quest, character, game):
     game.ui.animatedPrint("your hatred for goblins has caused you to gain [yellow]5000[reset] exp!");
     game.givePlayerExp(5000);
   
+  elif quest.name == "slime slayer": 
+    game.ui.animatedPrint("your hatred for slimes has caused you to gain [yellow]3000[reset] exp!");
+    game.givePlayerExp(3000);
+  
   game.handlePlayerLevelUp();
 
 QUESTS = {
-  "goblin slayer" : Quest("goblin slayer", "show the goblins the hate you feel by killing 10 goblins"),
+  "goblin slayer" : Quest("goblin slayer", "show the goblins the hate you feel by killing 4 goblins"),
+  "slime slayer" : Quest("slime slayer", "crush 4 slimes to death.."),
 };

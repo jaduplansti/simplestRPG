@@ -12,6 +12,7 @@ from subprocess import run;
 
 from item import getItem;
 from skill import getSkill;
+import sys;
 
 class Game:
   """ 
@@ -37,7 +38,7 @@ class Game:
     self.ui = UI(self);
     self.menu = Menu(self);
     self.exploration_handler = Exploration(self);
-    
+ 
     self.areas = {};
     
     self.settings = { 
@@ -70,6 +71,7 @@ class Game:
     while True:
       if showFun != None: showFun();
       option = self.ui.getInput();
+      if option.isdigit(): option = list(options)[int(option)];
       if option == "help": self.menu.showTip();
       elif option == "quit": self.handleQuit();
       elif option in options.keys(): options[option]();
@@ -102,14 +104,15 @@ class Game:
         if len(option) > 1: count = int(option[1]);
       except ValueError:
         self.ui.normalPrint("[red bold]the amount must be an integer e.g wooden sword, 2[reset]\n");
-      
+        self.ui.awaitKey();
+        continue;
+        
       for _ in range(0, count):
         if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, combat_handler);
         elif option[0] == "close": 
           return;
         else: 
           self.ui.normalPrint(f"[red underline]{self.player.name} does not have {option[0]}[reset]\n");
-          self.ui.awaitKey();
           break;
       self.ui.awaitKey();
       
@@ -146,13 +149,15 @@ class Game:
     
     self.handleSave();
     
-  def handleName(self):
+  def handleName(self, name = None):
     """Gets character name"""
-    
     self.ui.clear();
-    self.ui.panelPrint("your name? : ");
-    self.player.name = self.ui.getInput();
-  
+    if name == None:
+      self.ui.panelPrint("your name? : ");
+      self.player.name = self.ui.getInput();
+    else:
+      self.player.name = name;
+      
   def handleStart(self):
     """Initializes the game."""
  
@@ -168,7 +173,7 @@ class Game:
     """Initiates a fight using CombatHandler, see combat.py."""
     
     combat_handler = CombatHandler(self);
-    combat_handler.initiateFightNpc(self.player, choices(["goblin"])[0]);
+    combat_handler.initiateFightNpc(self.player, choices(["goblin", "slime"])[0]);
     
   def handleCombatInitiateMenu(self, combat_handler):
     """
@@ -186,7 +191,7 @@ class Game:
       option = self.ui.getInput();
       
       if option == "fight":
-       return combat_handler.handleCombatNpc();
+        return combat_handler.handleCombatNpc();
       elif option == "bail":
         break;
       elif option == "talk":
@@ -246,10 +251,10 @@ class Game:
     self.ui.clear();
     self.ui.showHeader("Save Slots", "#");
     
-    if os.path.exists("saves") != True:
+    if os.path.exists(sys.path[0] + "/saves") != True:
       self.handleName();
       return;
-      
+     
     player_data = {};
     for save in os.listdir("saves"):
       self.ui.showStatus("fetching", 0.5);
@@ -257,13 +262,17 @@ class Game:
       player_data.update({plr.name : plr});
       self.ui.panelPrint(f"level {plr.level} ({plr.exp}/{plr.level * 100})", title = plr.name, alignment = "center");
     
-    self.ui.animatedPrint("[underline green]pick a character to load, leave it blank to ignore![reset]")
+    self.ui.animatedPrint("[underline green]pick a character to load, enter a new name to create![reset]")
     option = self.ui.getInput();
     
     if option not in player_data:
       self.ui.animatedPrint(f"character {option} does not exist!");
-      self.handleName();
-      return;
+      self.ui.animatedPrint(f"create {option}? (y/n)");
+      if self.ui.getInput().lower() == "y":
+        self.handleName(option);
+        return;
+      else:
+        self.handleQuit();
    
     try:
       self.ui.showStatus("loading", 2);
@@ -287,8 +296,8 @@ class Game:
    
   def giveQuest(self, name):
     if self.player.giveQuest(name) != -1:
-      self.ui.normalPrint(f"Quest {name} accepted!");
-      
+      self.ui.panelPrint(f"[bold yellow]{name}[reset]\n{self.player.quests[name]["obj"].desc}", "center", title = "QUEST RECEIVED");
+   
   def givePlayerExp(self, exp):
     self.player.exp += exp;
   
@@ -307,6 +316,7 @@ class Game:
    self.ui.animatedPrint(f"Acquired [bold yellow]{item.name}[reset] ([green]{item.rarity})[reset] {amount}x");
  
   def givePlayerSkill(self, name):
+   if name in self.player.skills: return;
    skill = getSkill(name);
    self.player.addSkill(skill);
    self.ui.panelPrint(f"[bold yellow]{skill.name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center", "Learned");
@@ -319,17 +329,20 @@ class Game:
       if self.player.points > 0:
         self.ui.normalPrint("[yellow]hint[reset]: type strength, 2 to allocate points to strength\n") 
         option = self.ui.getInput().split(",")
-
+        
         try:
           if len(option) != 2:
             raise ValueError("Invalid input format. Use: stat, amount")
 
           stat = option[0].strip()
           amount = int(option[1].strip())
-
+          
           if stat not in self.player.stats:
             raise KeyError(f"'{stat}' is not a valid stat")
-
+          
+          if stat == "luck":
+            raise ValueError("Luck cannot be increased");
+          
           if amount <= 0 or amount > self.player.points:
             raise ValueError("Invalid amount")
             

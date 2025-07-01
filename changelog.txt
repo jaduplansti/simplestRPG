@@ -52,7 +52,7 @@
 • changed ui into textual
 
 [version 1.6]
-• scratched existing exploration, ui and combst systems
+• scratched existing exploration, ui and combat systems
 • reverted ui back to rich
 • ui revamp (took an entire day)
 • implemented better attack handling, combat system
@@ -80,7 +80,7 @@
 • added simple local multiplayer, experimental
 • improved combat logs
 • added a basic block system
-• tried to port to web (failed attempt no. 21)
+• tried to port to web (failed attempt no. 21) this is satire..
 
 [version 2.0]
 • added a new move for basic style 
@@ -204,3 +204,17 @@
 • fixed equipment ui 
 • fixed equipment durability
 • you can now allocate points, each level grants 2 points
+
+[version 2.5.9]
+• readded slime
+• fixed item durability issue
+• fixed issue where allocating points to luck gives insane dmg
+• fixed loading
+• made scroll of repair, repair with max durability
+• big update coming next
+
+[version 2.6.0]
+• fixed skill duplication
+• added skill soul shatter
+• added command aliases
+• dungeon soon!

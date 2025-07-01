@@ -125,7 +125,6 @@ class DamageHandler:
       **self.createDamage("blade dance", 20, ["strength"], 1.5),
       **self.createDamage("push", 5, ["defense"], 2, "defender"),
       **self.createDamage("poke", 10, ["strength"], 0.8),
-      **self.createDamage("psy thrust", 20, ["strength"], 0.8),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -219,12 +218,6 @@ class AttackHandler:
     
     if move == "push": defender.giveStatus("stunned", 2);
   
-  def __imaginary_blade_style(self, attacker, defender):
-    move = choices(["mind flare", "psy thrust", "fictional slash"])[0];
-    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
-    self.ui.panelAnimatedPrintFile("imaginary blade style", move, [attacker.name, defender.name, dmg], move);
- 
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;
@@ -233,4 +226,3 @@ class AttackHandler:
     elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
     elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);
-    #elif attacker.attack_style == "imaginary blade": self.__imaginary_blade_style(attacker, defender);

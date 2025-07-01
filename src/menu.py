@@ -49,7 +49,7 @@ class Menu():
     self.ui.animatedPrint("[bold purple]=== EQUIPMENT ===[reset]");
     
     for part in character.equipment:
-      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset]:[italic yellow]{character.equipment[part].getDurability()}[reset] ([green]{character.equipment[part].rarity}[reset]) ([green]{character.equipment[part].durability}[reset]%)\n");
+      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset]:[italic yellow]{character.equipment[part].durability}/{character.equipment[part].max_durability}[reset] ([green]{character.equipment[part].getDurability()}[reset]%)\n");
       else: self.ui.normalPrint(f"[bold magenta]{part}[reset]: [red]Empty[reset]\n");
     
   def showMainMenu(self):
@@ -58,7 +58,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.5.8[reset] •\n")
+    self.ui.normalPrint("\n• version [green]2.6.0[reset] •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
