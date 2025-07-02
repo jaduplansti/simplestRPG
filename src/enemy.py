@@ -66,14 +66,14 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
 def getEnemyByName(name, plr = None):
   if name == "slime":
     return createEnemy(
-      "slime", randint(1, 2), {"strength" : 1}, "basic", [0.7, 0.2, 0.01, 0.01],
+      "slime", randint(3, 4), {"strength" : 4}, "basic", [0.7, 0.2, 0.01, 0.01],
       [
         [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8]
       ]
     );
   elif name == "goblin":
     return createEnemy(
-      "goblin", randint(3, 5), {"strength" : 5, "defense" : 3}, "basic", [0.7, 0.1, 0.5, 0.01],
+      "goblin", randint(5, 8), {"strength" : 10, "defense" : 20}, "basic", [0.7, 0.1, 0.5, 0.01],
       [
         [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8],
         [Item("health potion", rarity = "common"), 0.8],

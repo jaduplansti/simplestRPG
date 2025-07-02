@@ -158,6 +158,7 @@ class UI:
     parsed_s = Text.from_markup(s)
     print("~ ", end = "");
     for ch in parsed_s:
+      if ch in [".", ","]: sleep(1);
       print(ch, end='', flush=True)
       sleep(self.game.settings["type speed"]);
     self.newLine();

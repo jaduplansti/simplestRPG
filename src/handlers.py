@@ -19,6 +19,7 @@ class StatusEffectHandler:
     self.statuses = {
       "stunned" : self.__stunned,
       "bleeding" : self.__bleeding,
+      "poisoned": self.__poisoned,
     };
     
     self.other_status = {
@@ -43,6 +44,12 @@ class StatusEffectHandler:
     self.ui.animatedPrint(f"[red]{attacker.name} is bleeding, receiving {dmg} damage[reset]!");
     attacker.enemy.attackEnemy(dmg);
     attacker.status["bleeding"][1] -= 1;
+  
+  def __poisoned(self, attacker, defender):
+    dmg = round(attacker.stats["health"] * 0.15);
+    self.ui.animatedPrint(f"[bold green]{attacker.name} is poisoned, afflicting {dmg} damage[reset]!");
+    attacker.enemy.attackEnemy(dmg);
+    attacker.status["poisoned"][1] -= 1;
   
   def __parrying(self, attacker, defender):
     self.combat_handler.attack_handler.defense_handler.handleParry(attacker, defender);
@@ -82,17 +89,18 @@ class DefenseHandler:
     attacker.giveStatus("parrying", 2);
   
   def handleParry(self, attacker, defender):
-    if (isinstance(defender, Player) is True and self.combat_handler.enemy_option == "attack" and self.ui.getInputWithTimeout("type (f) to quickly parry!", 2) == "f") or (isinstance(defender, Enemy) is True):
+    if (isinstance(defender, Player) is True and self.combat_handler.enemy_option == "attack" and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f") or (isinstance(defender, Enemy) is True):
       self.ui.newLine();
       self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] parried [green]{attacker.name}[reset] with precision!", "parry");
       self.ui.panelPrint("[bold cyan]PARRIED[reset]");
-      #self.combat_handler.handleInput()
+      self.combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], defender.stats["strength"] * 0.2);
       self.combat_handler.attack_handler.status_handler.turn_passed = True;
     else:
       self.ui.newLine();
       self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] failed to parry!", "parry");
-      self.ui.panelPrint("[bold red]PARRY FAILED[reset]");
-
+      self.ui.panelPrint("[bold red]PARRY FAILED (-10% energy)[reset]");
+      attacker.energy -= attacker.energy * 0.1;
+      
 class TauntHandler:
   def __init__(self, combat_handler):
     self.combat_handler = combat_handler;

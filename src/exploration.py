@@ -66,6 +66,14 @@ class Exploration:
           status.update(f"[green]walking ({player.position} / {destination['position']})[reset]");
           if event is not None or player.position == destination["position"]: break;
       self.handleEvent(event);
+  
+  def move(self, loc):
+    if loc in AREAS:
+      self.game.player.location = loc;
+      self.game.player.position = AREAS[loc]["position"];
+      AREAS[loc]["handler"](self.game).enter();
+    else:
+      self.ui.animatedPrint("failed to teleport!");
 
   def explore(self):
     area = AREAS[self.game.player.location];

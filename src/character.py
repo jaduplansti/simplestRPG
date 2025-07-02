@@ -21,6 +21,7 @@ class Character:
     self.status = {
       "blocking" : [False, 0],
       "stunned" : [False, 0],
+      "poisoned" : [False, 0],
       "bleeding" : [False, 0],
       "parrying" : [False, 0],
     }
@@ -45,6 +46,7 @@ class Character:
     self.addSkill(getSkill("crimson edge"));
     self.addItemToInventory(getItem("health potion"), 100);
     self.addItemToInventory(getItem("starter chest"), 10);
+    self.addItemToInventory(getItem("scroll of teleport"), 10);
     self.addSkill(getSkill("soul shatter"));
   
   def to_dict(self):

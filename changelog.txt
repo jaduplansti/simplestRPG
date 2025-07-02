@@ -218,3 +218,14 @@
 • added skill soul shatter
 • added command aliases
 • dungeon soon!
+
+[version 2.6.1]
+• nerfed parrying hit frame (1.5 seconds) 
+• increased parrying energy consumption, 5 -> 12
+• parrying consumes weapon durability (20%)
+• failing to parry in time reduces your energy by 10%
+• buffed enemies
+• added dungeons
+• added scroll of teleport (rare)
+• added poisoned status effect
+• increased wooden sword durability to 2000

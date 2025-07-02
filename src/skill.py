@@ -51,7 +51,7 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
  
 def action_normal_defense(skill, combat_handler, attacker, defender):
   if skill.name == "parry":
-    attacker.giveStatus("parrying", 2);
+    attacker.giveStatus("parrying", 5);
 
 def getSkill(name):  
   try:
@@ -69,7 +69,7 @@ SKILLS = {
      "action" : action_normal_damage
   },
   "parry" : {
-    "skill" : Skill("parry", "inflicts a parrying status", 5, "E"), 
+    "skill" : Skill("parry", "inflicts a parrying status", 12, "D"), 
     "action" : action_normal_defense
   },
 };

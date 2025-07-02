@@ -40,7 +40,7 @@ class Player(Character):
       return -1;
     
   def removeQuest(self, name):
-    self.quests[name] = None;
+    del self.quests[name];
     
   def questExists(self, name):
     try:
@@ -50,6 +50,6 @@ class Player(Character):
       return False;
       
   def trackQuest(self, game, combat_handler = None):
-    for quest in self.quests:
+    for quest in list(self.quests):
       progressQuest(self.quests[quest]["obj"], self, game, combat_handler);
    

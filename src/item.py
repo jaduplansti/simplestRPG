@@ -129,7 +129,13 @@ def use_scroll(item, game, combat_handler):
       else: game.ui.animatedPrint(f"cannot repair item on [red]{part}[reset]")
     except KeyError:
       game.ui.animatedPrint("not a valid bodypart");
-      
+  
+  elif item.name == "scroll of teleport":
+    location = game.ui.getInput();
+    game.player.usedItem(item.name);
+    game.ui.clear();
+    game.exploration_handler.move(location);
+    
 def use_sword(item, game, combat_handler):
   if game.player.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
@@ -180,7 +186,7 @@ def use_glove(item, game, combat_handler):
    
 ITEMS = {
   "wooden sword": {
-    "item": Item(name="wooden sword", max_durability = 1000, durability = 1000, rank="E", weight=2.0, bodypart="right arm"),
+    "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
   },
   "health potion": {
@@ -210,5 +216,9 @@ ITEMS = {
   "leather gloves": {
     "item": Item(name = "leather gloves", bodypart = "left arm", rank = "D", rarity = "uncommon", weight = 0.5),
     "action": use_glove,
+  },
+  "scroll of teleport": {
+    "item": Item(name = "scroll of teleport", rank = "C", rarity = "rare", weight = 0.1),
+    "action": use_scroll,
   }
 }
