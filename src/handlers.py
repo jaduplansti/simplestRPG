@@ -133,6 +133,9 @@ class DamageHandler:
       **self.createDamage("blade dance", 20, ["strength"], 1.5),
       **self.createDamage("push", 5, ["defense"], 2, "defender"),
       **self.createDamage("poke", 10, ["strength"], 0.8),
+      **self.createDamage("quick shot", 15, ["strength"], 1.3),
+      **self.createDamage("half draw", 20, ["strength"], 1.5),
+      **self.createDamage("arrow throw", 10, ["strength"], 2),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -201,15 +204,26 @@ class AttackHandler:
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
-
+ 
   def __sword_style(self, attacker, defender):
     move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
     if move == "iron reversal" : self.defense_handler.giveBlock(attacker, defender);
-    elif move == "blade dance": attacker.stats["defense"] += 2; # balance this lmao
+    elif move == "blade dance": attacker.stats["defense"] += 0.5; # balance this lmao
     
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
+    
+    self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
+    if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
+  
+  def __bow_style(self, attacker, defender):
+    move = choices(["quick shot", "half draw", "arrow throw"])[0];
+    
+    if self.__bowMiniGame(move, attacker, defender) is False: return;
+    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
+    attacker.attackEnemy(dmg);
+    self.ui.panelAnimatedPrintFile("bow style", move, [attacker.name, defender.name, dmg], move);
     
     self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
     if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
@@ -224,8 +238,25 @@ class AttackHandler:
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("dirty style", move, [attacker.name, defender.name, dmg], move);
     
-    if move == "push": defender.giveStatus("stunned", 2);
+    if move == "push": defender.giveStatus("stunned", 3);
+    elif move == "poke": defender.giveStatus("bleeding", 3);
   
+  def __bowMiniGame(self, move, attacker, defender):
+    if move == "quick shot":
+      if self.ui.getInputWithTimeout("type (q) to quickly shoot a arrow", 1.4) == "q": return True;
+      else: self.ui.panelPrint("[red]QUICK SHOT FAILED[reset]");
+    
+    elif move == "half draw":
+      distance = randint(1, 9);
+      self.ui.animatedPrint(f"[yellow]draw half![reset], [cyan]divide {distance} by 2[reset]!");
+      try:
+        answer = self.ui.getInput();
+        if float(answer) == (distance / 2): return True;
+        else: self.ui.panelPrint("[red]WRONG, SKILL ISSUE[reset]");
+      except ValueError: self.ui.panelPrint("[red]MUST BE DECIMALS, (3.5)[reset]");
+    else: return True;
+    return False;
+    
   def handleAttack(self, attacker, defender):
     if self.handleBlock(attacker, defender) is True:
       return;
@@ -234,3 +265,6 @@ class AttackHandler:
     elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
     elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);
+    elif attacker.attack_style == "archer": self.__bow_style(attacker, defender);
+
+  

@@ -10,7 +10,7 @@ from exploration import Exploration, AREAS;
 from time import sleep;
 from subprocess import run;
 
-from item import getItem;
+from item import getItem, removeEquipment;
 from skill import getSkill;
 import sys;
 
@@ -81,7 +81,23 @@ class Game:
     """Handles quitting, stops audio player and enables echoing."""
     self.ui.enableEcho();
     os._exit(0);
-    
+  
+  def handleEquipment(self):
+    while True:
+      self.ui.clear();
+      self.menu.showEquipmentMenu(self.player);
+      option = self.ui.getInput();
+      
+      try:
+        if option == "close": return;
+        if not self.player.isOccupied(option): self.ui.animatedPrint("[red]thats an empty slot..[reset]");
+        else: 
+          self.player.unequipItem(option);
+          self.ui.panelPrint(f"[bold cyan]UNEQUIPPED[reset]", "center", option, "purple");
+      except KeyError:
+        self.ui.animatedPrint(f"[bold red]{option} is not a bodypart[reset]");
+      self.ui.awaitKey();
+      
   def handleUseItem(self, combat_handler = None):
     """
     Handles item usage by displaying the inventory and getting input.
@@ -173,7 +189,7 @@ class Game:
     """Initiates a fight using CombatHandler, see combat.py."""
     
     combat_handler = CombatHandler(self);
-    combat_handler.initiateFightNpc(self.player, choices(["goblin", "slime"])[0]);
+    combat_handler.initiateFightNpc(self.player, choices(["goblin", "slime", "orc", "skeleton", "bandit"])[0]);
     
   def handleCombatInitiateMenu(self, combat_handler):
     """
@@ -352,3 +368,6 @@ class Game:
         except Exception as e: self.ui.panelPrint(str(e), "center", "system", "red")
         self.ui.awaitKey()
       else: break;
+      
+  def giveStatus(self, status, n):
+    CombatHandler(self).attack_handler.status_handler.afflict(self.player, status, n);

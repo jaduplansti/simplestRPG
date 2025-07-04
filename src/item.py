@@ -71,6 +71,10 @@ def removeEquipment(plr, part):
   if "sword" in item.name:
     plr.attack_style = "basic";
     plr.stats["strength"] -= plr.stats["strength"] * 0.1;
+  elif "bow" in item.name:
+    plr.attack_style = "basic";
+    plr.stats["strength"] -= plr.stats["strength"] * 0.1;
+    
   plr.equipment[part] = None;
   
 # def createItem(name, durability = 1, rank = "E", rarity = "common", weight = 0.1, stat_bonus = None, bodypart = None):
@@ -91,10 +95,12 @@ def getItem(name):
     return None;
     
 def use_potion(item, game, combat_handler):
-  event = choices(["expired", None], [0.1, 0.9])[0];
+  event = choices(["poison", None], [0.1, 0.9])[0];
   
-  if event == "expired":
-    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a {item.name} but it was expired?");
+  if event == "poison":
+    game.giveStatus("poisoned", 1);
+    game.ui.animatedPrint(f"[cyan]{game.player.name}[reset] used a {item.name} but it was poisoned!");
+    game.ui.printDialogue(game.player.name, "yuck..");
     return;
     
   if item.name == "health potion":
@@ -111,7 +117,13 @@ def use_potion(item, game, combat_handler):
     strength_increased = round(2 + game.player.stats["luck"]);
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a strength potion and gained [green]{strength_increased} strength[reset]!");
     game.player.stats["strength"] += strength_increased;
-    
+  
+  elif item.name == "cleanse potion":
+    for status in game.player.status:
+      game.player.status[status][0] = False;
+      game.player.status[status][1] = 0;
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] used a cleanse potion, removing [green]status effects[reset]!");
+  
 def use_scroll(item, game, combat_handler):
   if item.name == "scroll of instant death" and combat_handler != None:
     combat_handler.defender.stats["health"] = 0;
@@ -183,11 +195,30 @@ def use_glove(item, game, combat_handler):
     game.ui.animatedPrint("you put on the leather gloves");
     game.ui.animatedPrint("its feel comfy.. gained +3 strength");
     game.player.stats["strength"] += 3;
-   
+
+def use_bow(item, game, combat_handler):
+  if game.player.equipItem(item) != True:
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
+    return;
+        
+  if item.name == "wooden bow":
+    strength_increased = 25;
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold blue]wooden bow[reset]!");
+    game.ui.animatedPrint("learned [bold green]archer[reset] style!");
+    game.ui.animatedPrint(f"strength [green]+{strength_increased}[reset]!");
+    game.player.attack_style = "archer";
+    game.player.stats["strength"] += strength_increased;
+    #game.givePlayerSkill("parry");
+    
+    
 ITEMS = {
   "wooden sword": {
     "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
+  },
+  "wooden bow": {
+    "item": Item(name="wooden bow", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
+    "action": use_bow
   },
   "health potion": {
     "item": Item(name="health potion", rank="E", weight=0.5),
@@ -211,6 +242,10 @@ ITEMS = {
   },
   "strength potion": {
     "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.6),
+    "action": use_potion
+  },
+  "cleanse potion": {
+    "item": Item(name="cleanse potion", rank="C", rarity="uncommon", weight=0.6),
     "action": use_potion
   },
   "leather gloves": {

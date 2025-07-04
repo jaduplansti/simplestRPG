@@ -6,6 +6,8 @@ from item import getItem, ITEMS;
 #todo: make commands more simple. refactor all classes
 # make dungeon, add more skills, refactor quest system
 
+#todo: fix equipment.
+
 class Dungeon():
   def __init__(self, game):
     self.game = game;
@@ -48,7 +50,7 @@ class Dungeon():
   def dungeonEvent(self):
     event = choices([
       "encounter", "item", "trap", "puzzle", 
-      #"lore", "rest", "npc", "hidden_passage", 
+      #"ambush", "rest", "npc", "hidden_passage", 
       #"scenic_view", "old_bones", "strange_flora", 
       #"echoing_chasm", "flickering_light", "rune_pedestal", 
       #"cracked_wall", "glowing_pool", "pressure_plate", 
@@ -62,7 +64,7 @@ class Dungeon():
     if event == "encounter": self.__encounterEvent();
     elif event == "item": self.__itemEvent();
     elif event == "trap" : self.__trapEvent();
-    elif event == "puzzle": pass;
+    elif event == "puzzle": self.__puzzleEvent();
     
     self.progress += 1;
     
@@ -81,7 +83,7 @@ class Dungeon():
     
     rewards = [];
     
-    xp_gain = self.game.player.exp * uniform(2.1, 4.1) + 100;
+    xp_gain = round(self.game.player.exp * uniform(2.1, 4.1) + 100);
     money_gain = randint(1, 100);
     for _ in range(0, randint(1, 5)): rewards.append(choices(list(ITEMS))[0]);
     self.game.ui.panelPrint(f"exp : {xp_gain}\nmoney: {money_gain}\n items: {rewards}", "center", "rewards");
@@ -111,7 +113,7 @@ class Dungeon():
     self.game.ui.printDialogue(self.game.player.name, choices(["an enemy!", "is that a monster?", "is this hostile?", "shit..", "oh great an enemy."])[0]);
     self.game.ui.awaitKey();
     combat_handler = CombatHandler(self.game);
-    combat_handler.initiateFightNpc(self.game.player, "slime");
+    combat_handler.initiateFightNpc(self.game.player, choices(["goblin", "slime", "orc", "skeleton", "bandit"])[0]);
   
   def __itemEvent(self):
     self.game.ui.animatedPrint("you see a object ahead, laying on the ground..");
@@ -137,7 +139,7 @@ class Dungeon():
     if trap == "fall": 
       self.game.ui.animatedPrint("you step forward, and the ground beneath your feet suddenly vanishes");
       self.game.ui.printDialogue(self.game.player.name, "[red]shit![reset]");
-      self.game.ui.animatedPrint("[bold red]you plummted towards darkness[reset]");
+      self.game.ui.animatedPrint("[bold red]you plummeted towards darkness[reset]");
       self.game.player.stats["health"] *= 0.95;
     elif trap == "poison":
       self.game.ui.animatedPrint("you step forward, only to be suddenly hit by a poison dart.");
@@ -147,4 +149,61 @@ class Dungeon():
       self.game.ui.animatedPrint("you step forward..");
       self.game.ui.animatedPrint("thankfully the trap was off..");
       self.game.ui.printDialogue(self.game.player.name, "*sigh*");
-    
+  
+  def __puzzleEvent(self):
+    puzzle = choices(["passcode"])[0];
+   
+    if puzzle == "passcode":
+      valid_code = f"{randint(1, 9)}{randint(1, 9)}{randint(1, 9)}";
+      hint = valid_code[randint(0, 2)];
+      
+      self.game.ui.animatedPrint(f"A massive door stands before [yellow]{self.game.player.name}[reset], right beside it holds a keypad.");
+      self.game.ui.printDialogue(self.game.player.name, "keypad? how the hell..");
+      self.game.ui.printDialogue(self.game.player.name, "better get this opened!");
+      self.game.ui.printDialogue(self.game.player.name, "what are the odds of this being a trap? perhaps a exit!");
+      
+      while True:
+        self.game.ui.printTreeMenu("door", ["unlock", "examine", "attack"]);
+        option = self.game.ui.getInput();
+        
+        if option == "unlock":
+          self.game.ui.printDialogue(self.game.player.name, "beep boop bop, 3 digits.");
+          passw = self.game.ui.getInput();
+          if passw == valid_code: 
+            self.game.ui.animatedPrint("The massive door screeches, slowly opening..");
+            self.game.ui.panelPrint("[bold cyan]DOOR UNLOCKED[reset]");
+            return;
+          else:
+            self.game.ui.animatedPrint("The massive door does not budge.");
+            self.game.ui.printDialogue(self.game.player.name, "must be the wrong passcode.");
+            self.game.ui.printDialogue(self.game.player.name, f"i think {hint} is one of the digits in the code!");
+        
+        elif option == "examine":
+          self.game.ui.animatedPrint("its a iron door, keypad on the right, 3 digits");
+          self.game.ui.animatedPrint("this door has [red]1000 hp[reset], [underline]dealing 1000 damage will break it[reset].");
+          self.game.ui.printDialogue(self.game.player.name, f"there's the digit {hint} written below!");
+          self.game.ui.printDialogue(self.game.player.name, f"a message? thou shall not pass");
+          self.game.ui.panelPrint(f"[cyan]CODE ({valid_code})[reset]");
+        
+        elif option == "attack":
+          self.game.ui.panelAnimatedPrint(f"[yellow]{self.game.player.name}[reset] tried to break the [yellow]door[reset], dealing [red]{self.game.player.stats["strength"]}[reset] damage!", "punch");
+          if self.game.player.stats["strength"] < 1000:
+            self.game.ui.animatedPrint("the door barely shook..");
+            self.game.ui.printDialogue(self.game.player.name, f"ouch!");
+            self.game.ui.panelPrint("[red]HEALTH (-2%)[reset]");
+            self.game.player.stats["strength"] *= 0.02;
+          elif self.game.player.stats["strength"] >= 1000:
+            self.game.ui.animatedPrint("[red]the door breaks down![reset]");
+            self.game.ui.panelPrint("[bold cyan]DOOR UNLOCKED[reset]");
+            return;
+            
+        self.game.ui.awaitKey();
+        self.game.ui.clear();
+        
+    elif puzzle == "pattern flash":
+      pass;
+      
+  def ambushEvent(self):
+    self.game.ui.animatedPrint();
+     
+

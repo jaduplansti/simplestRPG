@@ -80,6 +80,33 @@ def getEnemyByName(name, plr = None):
         [Item("health potion", rarity = "uncommon"), 0.5],
       ]
     );
- 
-  
+  elif name == "orc":
+    return createEnemy(
+      "orc", randint(8, 13), {"strength" : 25, "defense" : 40}, "swordsman", [0.7, 0.1, 0.5, 0.01],
+      [
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8],
+        [Item("health potion", rarity = "common"), 0.8],
+        [Item("health potion", rarity = "uncommon"), 0.5],
+      ]
+    );
+  elif name == "skeleton":
+    return createEnemy(
+      "skeleton", randint(9, 15), {"strength" : 20, "defense" : 10}, "basic", [0.7, 0.1, 0.5, 0.01],
+      [
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8],
+        [Item("health potion", rarity = "common"), 0.8],
+        [Item("health potion", rarity = "uncommon"), 0.5],
+      ]
+    );
+  elif name == "bandit":
+    return createEnemy(
+      "bandit", randint(10, 18), {"strength" : 15, "defense" : 10}, "dirty", [0.7, 0.1, 0.5, 0.01],
+      [
+        [Item("wooden sword", rarity = "common",  bodypart = "right arm", durability = 1000), 0.8],
+        [Item("health potion", rarity = "common"), 0.8],
+        [Item("health potion", rarity = "uncommon"), 0.5],
+      ]
+    );
+    
+
     

@@ -91,6 +91,30 @@
       "Utilizing a swift poking motion, [bold yellow]{0}[reset] lands a precise hit on [bold yellow]{1}[reset], dealing a surprising [bold red]{2}[reset] damage!"
     ]
   },
+   
+  "bow style": {
+    "quick shot": [
+      "[bold yellow]{0}[reset] loosed a quick arrow at [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] fired a swift shot, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] snapped an arrow toward [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] unleashed a rapid arrow at [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] released an arrow in a blur, delivering [bold red]{2}[reset] damage to [bold yellow]{1}[reset]!"
+    ],
+    "half draw": [
+      "[bold yellow]{0}[reset] drew their bow to a half-tension, striking [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] fired with a controlled half-draw, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] released a precise arrow from a half-drawn bow, dealing [bold red]{2}[reset] damage to [bold yellow]{1}[reset]!",
+      "[bold yellow]{0}[reset] sent a balanced shot from a half-draw, inflicting [bold red]{2}[reset] damage on [bold yellow]{1}[reset]!",
+      "[bold yellow]{0}[reset] smoothly executed a half-draw, landing a solid hit on [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!"
+    ],
+    "arrow throw": [
+      "[bold yellow]{0}[reset] swiftly threw an arrow at [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] lunged forward, stabbing with an arrow at [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] used an arrow like a dart, striking [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] tossed an arrow with surprising force, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] impaled [bold yellow]{1}[reset] with a thrown arrow, dealing [bold red]{2}[reset] damage!"
+    ]
+  },
   
   "fatigue handler": {
     "tired": [

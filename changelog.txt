@@ -229,3 +229,11 @@
 • added scroll of teleport (rare)
 • added poisoned status effect
 • increased wooden sword durability to 2000
+
+[version 2.6.2]
+• added orc, skeleton and bandit enemy
+• added archer attack style, very fun (half draw, quick shot, arrow throw)
+• added cleanse potion, remove all status effects
+• you can now unequip items!
+• energy can be increased! (1 energy every 5 levels)
+• all potions can accidentally inflict poison! (replacing expiry)

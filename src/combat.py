@@ -144,3 +144,4 @@ class CombatHandler:
       if self.checkDeath() is True or self.enemy_option == "flee": break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
+ 

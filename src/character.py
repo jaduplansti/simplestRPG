@@ -47,6 +47,7 @@ class Character:
     self.addItemToInventory(getItem("health potion"), 100);
     self.addItemToInventory(getItem("starter chest"), 10);
     self.addItemToInventory(getItem("scroll of teleport"), 10);
+    self.addItemToInventory(getItem("wooden bow"), 10);
     self.addSkill(getSkill("soul shatter"));
   
   def to_dict(self):
@@ -145,8 +146,13 @@ class Character:
     else:
       self.inventory[item]["amount"] -= 1
   
+  def unequipItem(self, bodypart):
+    item = self.equipment[bodypart];
+    self.addItemToInventory(item, 1);
+    removeEquipment(self, bodypart);
+    
   def equipItem(self, item):
-    if self.isEquipped(item) != True:
+    if self.isOccupied(item.bodypart) != True:
       self.equipment[item.bodypart] = deepcopy(item);
       return True;
     return False;
@@ -174,6 +180,7 @@ class Character:
   def tryLevelUp(self): 
     leveled_up = False
     while self.canLevelUp():
+      if (self.level % 5) == 0: self.energy += 1;
       self.exp -= (self.level * 100)
       self.level += 1
       self.points += 2;
@@ -200,6 +207,10 @@ class Character:
   def healPlayer(self, heal):
     self.stats["health"] = min(self.stats["health"] + heal, self.stats["max health"])
   
+  def isOccupied(self, bodypart):
+    if self.equipment[bodypart] != None: return True;
+    else: return False;
+    
   def isEquipped(self, item):
     if self.equipment[item.bodypart] != None and self.equipment[item.bodypart].name == item.name: 
       return True;

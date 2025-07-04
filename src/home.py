@@ -20,6 +20,7 @@ class Home(SubMenu):
       self.ui.normalPrint("≈ [green]stats[reset]");
       self.ui.normalPrint("≈ [cyan]items[reset]");
       self.ui.normalPrint("≈ [purple]practice[reset]");
+      self.ui.normalPrint("≈ [blue]gear[reset]");
       self.ui.normalPrint("≈ [yellow]next[reset]\n");
     else:
       self.ui.normalPrint("≈ [magenta]go outside[reset]");
@@ -35,6 +36,7 @@ class Home(SubMenu):
         "practice" : self.game.initiateFight,
         "sleep" : self.game.handleSleep,
         "settings" : self.game.handleSettings,
+        "gear" : self.game.handleEquipment,
         "go outside" : self.game.exploration_handler.explore,
         "next": self.nextPage,
         "back": self.prevPage,

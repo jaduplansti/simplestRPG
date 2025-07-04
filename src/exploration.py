@@ -36,6 +36,7 @@ class Exploration:
   def handleEvent(self, event):
     if event == "fight":
       CombatHandler(self.game).initiateFightNpc(self.game.player, "slime");
+      self.ui.awaitKey();
     elif event == "loot":
       #self.game.player.addInventory();
       pass;

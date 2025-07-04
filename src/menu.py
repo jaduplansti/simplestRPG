@@ -49,8 +49,10 @@ class Menu():
     self.ui.animatedPrint("[bold purple]=== EQUIPMENT ===[reset]");
     
     for part in character.equipment:
-      if character.equipment[part] != None: self.ui.normalPrint(f"[bold magenta]{part}[reset]:[italic yellow]{character.equipment[part].durability}/{character.equipment[part].max_durability}[reset] ([green]{character.equipment[part].getDurability()}[reset]%)\n");
-      else: self.ui.normalPrint(f"[bold magenta]{part}[reset]: [red]Empty[reset]\n");
+      item = character.equipment[part];
+      if item != None: self.ui.panelPrint(f"[yellow]{item.name}[reset] ([bold cyan]{item.getDurability()}[reset])", "center", f"{part}");
+      else: self.ui.panelPrint("[cyan]EMPTY[reset]", "center", f"{part}");
+    self.ui.normalPrint("[yellow]hint: specify the body part to unequip, type close to exit.[red]\n\n");
     
   def showMainMenu(self):
     self.ui.clear();
@@ -58,7 +60,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.1[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.2[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
