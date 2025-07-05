@@ -38,17 +38,19 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
     combat_handler.ui.printDialogue(attacker.name, "thy soul is stained..");
     combat_handler.ui.printDialogue(attacker.name, "this stained soul shall be cleansed.");
     combat_handler.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] reaches out their hand, grasping [yellow]{defender.name}'s[reset] soul and crushing it.", "soul shatter");
-    attacker.attackEnemy(999999);
+    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, 9999);
+    attacker.attackEnemy(dmg);
     
   elif combat_handler.attack_handler.handleBlock(attacker, defender) is True:
       return;  
       
   elif skill.name == "crimson edge": # this is just a placeholder
     combat_handler.ui.panelPrint(f"{attacker.name} unleashed a crimson edge!");
+    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, 500);
     for n in range(1, 100):
       combat_handler.ui.panelPrint(f"[bold red]DEALT 5 DAMAGE! {n}x[reset]");
       attacker.attackEnemy(5);
- 
+  
 def action_normal_defense(skill, combat_handler, attacker, defender):
   if skill.name == "parry":
     attacker.giveStatus("parrying", 5);

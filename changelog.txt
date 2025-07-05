@@ -237,3 +237,17 @@
 • you can now unequip items!
 • energy can be increased! (1 energy every 5 levels)
 • all potions can accidentally inflict poison! (replacing expiry)
+
+[version 2.6.3]
+• fixed scroll of repair bug.
+• archer attack style requires wooden arrow.
+• added items to shop.
+• fixed settings
+• fixed a couple of equipment issues
+• tweaked taunting
+• swordsman style mini games!
+• wooden sword now gives (30℅ + strength)
+• buffed blade dance
+• skills have been nerfed, skills can now crit and be reduced by defense.
+• added hunger, can replenish energy and health each turn (20%)
+• added starvation, reduces health and energy by 2% each turn

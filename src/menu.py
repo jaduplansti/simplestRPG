@@ -32,6 +32,7 @@ class Menu():
     info += f"[yellow]title[reset]: {character.title}\n";
     info += f"[red]health[reset]: {character.stats["health"]}/{character.stats["max health"]}\n";
     info += f"[blue]energy[reset]: {character.energy}\n";
+    info += f"[purple]hunger[reset]: {character.hunger}\n";
     info += f"[bold]points[reset]: [green]{character.points}[reset]\n\n"
     
     info += f"[green]stats[reset]:\n"
@@ -50,9 +51,9 @@ class Menu():
     
     for part in character.equipment:
       item = character.equipment[part];
-      if item != None: self.ui.panelPrint(f"[yellow]{item.name}[reset] ([bold cyan]{item.getDurability()}[reset])", "center", f"{part}");
+      if item != None: self.ui.panelPrint(f"[yellow]{item.name}[reset] ([bold cyan]{round(item.getDurability())}%[reset])", "center", f"{part}");
       else: self.ui.panelPrint("[cyan]EMPTY[reset]", "center", f"{part}");
-    self.ui.normalPrint("[yellow]hint: specify the body part to unequip, type close to exit.[red]\n\n");
+    self.ui.normalPrint("[yellow]hint: specify the body part to select, type close to exit.[red]\n");
     
   def showMainMenu(self):
     self.ui.clear();
@@ -60,7 +61,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.2[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.3[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -97,7 +98,6 @@ class Menu():
     self.ui.showHeader("Settings", ".");
     self.ui.normalPrint(f"• [yellow]type speed[reset] : {self.game.settings["type speed"]}");
     self.ui.normalPrint(f"• [cyan]delay speed[reset] : {self.game.settings["delay speed"]}");
-    self.ui.normalPrint(f"• [purple]audio[reset] : {self.game.audio_handler.enabled}");
     self.ui.newLine();
     
     

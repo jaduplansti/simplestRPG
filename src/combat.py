@@ -70,6 +70,27 @@ class CombatHandler:
     
     self.ui.panelPrint(f"([blue]-{attacker.getFatigueMultiplier() * 100}%[reset]) stat output.");
   
+  def handleHunger(self, attacker):
+    if attacker.hunger <= 10:
+      self.ui.panelAnimatedPrintFile("hunger handler", "starved", [attacker.name], "hunger");
+    elif attacker.hunger <= 25 and not isinstance(attacker, Enemy):
+      self.ui.panelAnimatedPrintFile("hunger handler", "very hungry", [attacker.name], "hunger");
+    elif attacker.hunger <= 50 and not isinstance(attacker, Enemy):
+      self.ui.panelAnimatedPrintFile("hunger handler", "moderately hungry", [attacker.name], "hunger");
+    elif attacker.hunger <= 75 and not isinstance(attacker, Enemy):
+      self.ui.panelAnimatedPrintFile("hunger handler", "slightly hungry", [attacker.name], "hunger");
+    else:
+      return False;
+  
+  def useHunger(self, attacker):
+    if attacker.hunger > 10 and attacker.berserk != True:
+      attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (attacker.hunger * 0.2));
+      attacker.energy = min(100, attacker.energy + (attacker.hunger * 0.2));
+      attacker.hunger = max(0, attacker.hunger - 2);
+    else:
+      attacker.stats["health"] -= round(attacker.stats["health"] * 0.02);
+      attacker.energy -= round(attacker.energy * 0.02);
+
   def tryBerserkNpc(self, npc):
     if randint(1, 7) == randint(1, 7) and npc.berserk is False:
       self.ui.animatedPrint(f"a mysterious aura covers [red]{npc.name}[reset]");
@@ -89,11 +110,11 @@ class CombatHandler:
       if won is False: return False;
     else:
       return False;
-      
     return True;
     
   def handleOption(self, option, attacker, defender):
     self.ui.showStatus("processing move", 1, "clock");
+    self.handleHunger(attacker);
     
     if self.handleFatigue(attacker) == "passed out":
       return "passed out";
@@ -114,6 +135,7 @@ class CombatHandler:
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
     
+    self.useHunger(attacker);
     attacker.deductEnergy();
   
   def handleCombatNpc(self, auto = False):

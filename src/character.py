@@ -14,6 +14,8 @@ class Character:
     self.location = "home";
     self.money = 1
     self.energy = 100
+    self.hunger = 100;
+    
     self.berserk = False;
     
     self.points = 5;
@@ -59,6 +61,7 @@ class Character:
       "location": self.location,
       "money": self.money,
       "energy": self.energy,
+      "hunger": self.hunger,
       "status": self.status,
       "berserk": self.berserk,
       "stats": self.stats,
@@ -87,6 +90,7 @@ class Character:
     char.location = data["location"]
     char.money = data["money"]
     char.energy = data["energy"]
+    char.hunger = data["hunger"]
     char.status = data["status"]
     char.berserk = data["berserk"]
     char.stats = data["stats"]

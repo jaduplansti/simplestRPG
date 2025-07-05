@@ -224,24 +224,17 @@ class Game:
     if option == "type speed" or option == "ts":
       self.ui.normalPrint("set type speed ⤵\n");
       try:
-        self.settings["type speed"] = int(self.ui.getInput());
+        self.settings["type speed"] = float(self.ui.getInput());
       except ValueError:
-        self.ui.normalPrint("type speed must be integers ⤴\n");
+        self.ui.normalPrint("type speed must be decimal/float ⤴\n");
     
     elif option == "delay speed" or option == "ds":
       self.ui.normalPrint("set delay speed ⤵\n");
       try:
-        self.settings["delay speed"] = int(self.ui.getInput());
+        self.settings["delay speed"] = float(self.ui.getInput());
       except ValueError:
-        self.ui.normalPrint("delay speed must be integers ⤴\n");
+        self.ui.normalPrint("delay speed must be decimal/float ⤴\n");
     
-    elif option == "audio":
-      self.ui.normalPrint("enable audio ⤵\n");
-      enable = self.ui.getInput();
-      
-      if enable == "true": self.audio_handler.enabled = True;
-      elif enable == "false": self.audio_handler.enabled = False;
-  
   def doUpdate(self):
     """Handles updates using git fetch"""
     

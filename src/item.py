@@ -33,8 +33,11 @@ class Item:
     
   def use(self, game, combat_handler = None):
     try:
-      ITEMS[self.name]["action"](self, game, combat_handler);
-      game.player.usedItem(self.name);
+      fn = ITEMS[self.name]["action"]
+      if fn is None: 
+        game.ui.animatedPrint("this item has no uses.");
+        return;
+      if fn(self, game, combat_handler) != -1: game.player.usedItem(self.name);
     except KeyError:
       game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
   
@@ -70,7 +73,7 @@ def removeEquipment(plr, part):
   item = plr.equipment[part];
   if "sword" in item.name:
     plr.attack_style = "basic";
-    plr.stats["strength"] -= plr.stats["strength"] * 0.1;
+    plr.stats["strength"] *= 0.6;
   elif "bow" in item.name:
     plr.attack_style = "basic";
     plr.stats["strength"] -= plr.stats["strength"] * 0.1;
@@ -136,7 +139,7 @@ def use_scroll(item, game, combat_handler):
     part = game.ui.getInput();
     try:
       if game.player.equipment[part] != None:
-        game.player.equipment[part].durability == game.player.equipment[part].max_durability;
+        game.player.equipment[part].durability = game.player.equipment[part].max_durability;
         game.ui.animatedPrint(f"[purple]{game.player.equipment[part].name}[reset] has been repaired (OK).");
       else: game.ui.animatedPrint(f"cannot repair item on [red]{part}[reset]")
     except KeyError:
@@ -151,13 +154,13 @@ def use_scroll(item, game, combat_handler):
 def use_sword(item, game, combat_handler):
   if game.player.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
-    return;
+    return -1;
         
   if item.name == "wooden sword":
-    strength_increased = game.player.level * 3;
+    strength_increased = round(game.player.stats["strength"] * 1.3);
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold cyan]wooden sword[reset]!");
-    game.ui.animatedPrint("Learned [bold green]swordsman[reset] style!");
-    game.ui.animatedPrint(f"Strength [green]+{strength_increased}[reset]!");
+    game.ui.animatedPrint("learned [bold green]swordsman[reset] style!");
+    game.ui.animatedPrint(f"strength increased by [green]1.3x[reset]!");
     game.player.attack_style = "swordsman";
     game.player.stats["strength"] += strength_increased;
     game.givePlayerSkill("parry");
@@ -185,7 +188,7 @@ def use_chest(item, game, combat_handler):
 def use_glove(item, game, combat_handler):
   if game.player.attack_style != "basic":
     game.ui.animatedPrint("you must have a basic attack style!");
-    return;
+    return -1;
   
   if game.player.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
@@ -199,7 +202,7 @@ def use_glove(item, game, combat_handler):
 def use_bow(item, game, combat_handler):
   if game.player.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] already has a [yellow]{game.player.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
-    return;
+    return -1;
         
   if item.name == "wooden bow":
     strength_increased = 25;
@@ -209,7 +212,6 @@ def use_bow(item, game, combat_handler):
     game.player.attack_style = "archer";
     game.player.stats["strength"] += strength_increased;
     #game.givePlayerSkill("parry");
-    
     
 ITEMS = {
   "wooden sword": {
@@ -255,5 +257,9 @@ ITEMS = {
   "scroll of teleport": {
     "item": Item(name = "scroll of teleport", rank = "C", rarity = "rare", weight = 0.1),
     "action": use_scroll,
+  },
+  "wooden arrow": {
+    "item": Item(name = "wooden arrow", rank = "D", rarity = "common", weight = 0.3),
+    "action": None,  
   }
 }

@@ -142,6 +142,36 @@
     ]
   },
 
+  "hunger handler": {
+    "slightly hungry": [
+      "[yellow]{0}[reset] feels a slight rumble in their stomach, a gentle reminder it's been a while since their last meal.",
+      "A faint grumble escapes [yellow]{0}[reset]'s stomach, hinting at an approaching hunger.",
+      "[yellow]{0}[reset]'s thoughts drift to food, a mild craving beginning to set in.",
+      "A subtle emptiness begins to niggle at [yellow]{0}[reset].",
+      "[yellow]{0}[reset] feels a minor pang, realizing they're not quite full anymore."
+    ],
+    "moderately hungry": [
+      "[yellow]{0}[reset]'s stomach growls insistently, a clear sign of growing hunger.",
+      "A noticeable hunger gnaws at [yellow]{0}[reset], making them feel a bit distracted.",
+      "[yellow]{0}[reset] feels their energy flagging slightly, a direct result of their empty stomach.",
+      "Food is definitely on [yellow]{0}[reset]'s mind; they're starting to feel quite hungry.",
+      "[yellow]{0}[reset] swallows hard, their stomach aching for something to eat."
+    ],
+    "very hungry": [
+      "[yellow]{0}[reset]'s stomach screams in protest, their hunger becoming a painful distraction.",
+      "A wave of weakness washes over [yellow]{0}[reset], their body crying out for nourishment.",
+      "[yellow]{0}[reset] feels lightheaded, their vision blurring slightly from intense hunger.",
+      "Every step feels heavier as [yellow]{0}[reset]'s hunger saps their strength.",
+      "[yellow]{0}[reset] clutches their stomach, a deep, pervasive hunger making them feel miserable."
+    ],
+    "starved": [
+      "[yellow]{0}[reset] stumbles, their energy and health are rapidly diminishing.",
+      "[yellow]{0}[reset] gasps, feeling their strength drain away with each passing moment. Extreme hunger is taking a toll.",
+      "On the verge of collapse, [yellow]{0}[reset]'s body shivers uncontrollably due to starvation.",
+      "[yellow]{0}[reset] clutches their chest, a searing pain accompanying the profound weakness."
+    ]
+  },
+
   "taunt": {
     "debuff": [
       "[yellow]{0}[reset] ridiculed [yellow]{1}[reset], causing their confidence to falter!",
@@ -223,9 +253,13 @@
   
   "tips": {
     "tips": [
-      "Did you know there's a [cyan]10%[reset] chance for potions to be [underline]expired[reset]?",
+      "[green]Archer style[red] can also inflict [red]bleeding[reset]",
+      "[yellow]Dungeons[reset] have a chance to be trapped, stay vigilant",
+      "[yellow]Dungeons[reset] give hefty rewards!",
+      "[green]Archer style[reset] requires [bold cyan]wooden arrows[reset]!",
+      "Did you know there's a [cyan]10%[reset] chance for potions to be [underline]poisoned[reset]?",
       "[green]Swordsman style[reset] can inflict [red]bleeding[reset]!",
-      "[yellow]Blade Dance[reset] is bound to get nerfed!",
+      "[yellow]Scroll of teleport[reset] is useful to skip travelling.",
       "Sleeping now fully restores your [green]health[reset] don't forget to rest!",
       "If your sword [red]breaks[reset], you lose [yellow]10%[reset] of your stats!",
       "Potions are useful but they [cyan]might expire[reset], so use them wisely!",
@@ -242,13 +276,17 @@
       "Taunts can lower enemy stats by [yellow]5%[reset] use them wisely.",
       "You can [green]pass out[reset] from low energy—keep an eye on your fatigue levels!",
       "Low fatigue affects your combat fight fresh for the best chance at victory.",
-      "Blocking is good, but some moves can [red]break through[reset] it!",
+      "Blocking is good, but some moves or skills can [red]break through[reset] it!",
       "Enemies behave dynamically they can defend, taunt, or go berserk at any time!",
-      "Combat logs give you hints read them carefully to learn enemy patterns.",
+      "Combat logs give you crucial details, read them carefully",
       "Try equipping a sword to unlock the [blue]Swordsman[reset] style!",
       "Use a [purple]Scroll of Repair[reset] to fix broken equipment!",
       "The [red]Scroll of Instant Death[reset] can end a fight in one move if you find one.",
-      "Some moves deal bonus damage based on [green]luck[reset] stack it high!"
+      "Some moves deal crits based on [green]luck[reset] stack it high!",
+      "Enemies keep running away?, [bold]stun them![reset]",
+      "The [cyan]Potion of cleanse[reset] clears all status effects, including blocking",
+      "[blue]Starter Chest[reset] have a chance to be empty.",
+      "Check out the shop!"
     ]
   }
 }

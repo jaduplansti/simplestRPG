@@ -1,6 +1,7 @@
-from random import randint, choices, uniform;
+from random import randint, choice, choices, uniform;
 from player import Player;
 from enemy import Enemy;
+import string;
 
 class CriticalHandler:
   def __init__(self):
@@ -110,7 +111,7 @@ class TauntHandler:
     if defender.name == "slime": self.ui.panelAnimatedPrintFile("taunt success response", "debuff slime", [defender.name], "slime");
     else: self.ui.panelAnimatedPrintFile("taunt success response", "debuff", [defender.name], defender.name);
     stat = choices(list(defender.stats))[0];
-    defender.stats[stat] -= max(0, defender.stats[stat] * 0.05);
+    defender.stats[stat] -= round(max(0, defender.stats[stat] * 0.05));
 
   def handleTaunt(self, attacker, defender):
     self.ui.panelAnimatedPrintFile("taunt", "debuff", [attacker.name, defender.name], "taunt");
@@ -130,7 +131,7 @@ class DamageHandler:
       **self.createDamage("slash", 30, ["strength"], 2),
       **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
       **self.createDamage("iron reversal", 30, ["strength"], 2),
-      **self.createDamage("blade dance", 20, ["strength"], 1.5),
+      **self.createDamage("blade dance", 40, ["strength"], 1.7),
       **self.createDamage("push", 5, ["defense"], 2, "defender"),
       **self.createDamage("poke", 10, ["strength"], 0.8),
       **self.createDamage("quick shot", 15, ["strength"], 1.3),
@@ -159,11 +160,17 @@ class DamageHandler:
       else:
         total_damage += defender.stats.get(stat);
     return self.attemptCritical(total_damage * damage.get("multiplier"), attacker) * attacker.getFatigueMultiplier();
-   
-  def calculateDamage(self, name, attacker, defender):
-    damage = self.attack_damages.get(name);
-    total_damage = round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
-    
+  
+  def __calculateDmg(self, dmg, attacker):
+    return self.attemptCritical(dmg, attacker) * attacker.getFatigueMultiplier();
+  
+  def calculateDamage(self, name, attacker, defender, dmg = 0):
+    total_damage = 0;
+    if name != None: 
+      damage = self.attack_damages.get(name);
+      total_damage = round(self.reduceDamage(self.__calculate(damage, attacker, defender), defender));
+    else: total_damage = round(self.reduceDamage(self.__calculateDmg(dmg, attacker), defender));
+
     if total_damage > 0:
       ratio = defender.stats["max health"] / total_damage;
       if ratio <= 0.01: self.ui.panelPrint("[bold purple]TRANSCENDENT![reset]");
@@ -207,6 +214,8 @@ class AttackHandler:
  
   def __sword_style(self, attacker, defender):
     move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
+    
+    if self.__swordMiniGame(move, attacker, defender) is False: return;
     if move == "iron reversal" : self.defense_handler.giveBlock(attacker, defender);
     elif move == "blade dance": attacker.stats["defense"] += 0.5; # balance this lmao
     
@@ -218,6 +227,9 @@ class AttackHandler:
     if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
   
   def __bow_style(self, attacker, defender):
+    if not attacker.itemExists("wooden arrow"):
+      self.ui.panelPrint("[bold red]NO ARROWS[reset]", "center", "bow");
+      return;
     move = choices(["quick shot", "half draw", "arrow throw"])[0];
     
     if self.__bowMiniGame(move, attacker, defender) is False: return;
@@ -226,6 +238,7 @@ class AttackHandler:
     self.ui.panelAnimatedPrintFile("bow style", move, [attacker.name, defender.name, dmg], move);
     
     self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
+    attacker.usedItem("wooden arrow");
     if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
     
   def __debug_style(self, attacker, defender):
@@ -241,7 +254,36 @@ class AttackHandler:
     if move == "push": defender.giveStatus("stunned", 3);
     elif move == "poke": defender.giveStatus("bleeding", 3);
   
+  def __swordMiniGame(self, move, attacker, defender):
+    if not isinstance(attacker, Player): return True;
+    
+    if move == "blade dance":
+      keys = [choice(string.ascii_letters).lower(), choice(string.ascii_letters).lower(), choice(string.ascii_letters).lower()];
+      if self.ui.getInputWithTimeout(f"type ({keys[0]}) to quickly 1x", 1.4) != keys[0]: return False;
+      self.ui.newLine();
+      if self.ui.getInputWithTimeout(f"type ({keys[1]}) quickly 2x", 1.4) != keys[1]: return False;
+      self.ui.newLine();
+      if self.ui.getInputWithTimeout(f"type ({keys[2]}) quickly 3x", 1.4) != keys[2]: return False;
+      self.ui.newLine();
+      return True;
+    
+    elif move == "iron reversal":
+      correct_answer = defender.stats["strength"] - attacker.stats["defense"];
+      self.ui.animatedPrint(f"iron reversal, [bold green]{defender.stats["strength"]} - {attacker.stats["defense"]}[reset]?");
+      answer = self.ui.getInput();
+      try:
+        if float(answer) != correct_answer:
+          self.ui.panelPrint("[bold red]FAILED TO REVERSE[reset]");
+          return False;
+        return True;
+      except KeyError:
+        self.ui.panelPrint("[bold red]THATS NOT A NUMBER[reset]");
+        return False;
+    else: return True;
+    
   def __bowMiniGame(self, move, attacker, defender):
+    if not isinstance(attacker, Player): return True;
+    
     if move == "quick shot":
       if self.ui.getInputWithTimeout("type (q) to quickly shoot a arrow", 1.4) == "q": return True;
       else: self.ui.panelPrint("[red]QUICK SHOT FAILED[reset]");
