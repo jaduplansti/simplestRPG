@@ -101,7 +101,14 @@ class DefenseHandler:
       self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] failed to parry!", "parry");
       self.ui.panelPrint("[bold red]PARRY FAILED (-10% energy)[reset]");
       attacker.energy -= attacker.energy * 0.1;
-      
+  
+  def handleDodge(self, attacker, defender):
+    dodge_chance = min(defender.stats["dexterity"] * 0.03, 25); # capped at 25%
+    if choices(["dodge", None], [dodge_chance, 100 - dodge_chance])[0] is None: return;
+    self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] managed to dodge [yellow]{attacker.name}'s[reset] attack just in time!", "dodge");
+    self.ui.panelPrint("[bold magenta]DODGED[reset]");
+    return True;
+    
 class TauntHandler:
   def __init__(self, combat_handler):
     self.combat_handler = combat_handler;
@@ -303,6 +310,9 @@ class AttackHandler:
     if self.handleBlock(attacker, defender) is True:
       return;
     
+    if self.defense_handler.handleDodge(attacker, defender) is True: 
+      return;
+
     if attacker.attack_style == "basic": self.__basic_style(attacker, defender);
     elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);

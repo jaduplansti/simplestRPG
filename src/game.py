@@ -12,6 +12,7 @@ from subprocess import run;
 
 from item import getItem, removeEquipment;
 from skill import getSkill;
+from enemy import ENEMIES;
 import sys;
 
 class Game:
@@ -189,7 +190,7 @@ class Game:
     """Initiates a fight using CombatHandler, see combat.py."""
     
     combat_handler = CombatHandler(self);
-    combat_handler.initiateFightNpc(self.player, choices(["goblin", "slime", "orc", "skeleton", "bandit"])[0]);
+    combat_handler.initiateFightNpc(self.player, choices(ENEMIES)[0]);
     
   def handleCombatInitiateMenu(self, combat_handler):
     """

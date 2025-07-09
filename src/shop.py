@@ -8,15 +8,18 @@ class Shop(SubMenu):
     self.items = {
       "health potion" : [getItem("health potion"), 50, 10],
       "wooden arrow" : [getItem("wooden arrow"), 9999, 2],
-      "wooden sword" : [getItem("wooden sword"), 20, 20],
+      "wooden sword" : [getItem("wooden sword"), 60, 20],
       "scroll of teleport" : [getItem("scroll of teleport"), 100, 50],
       "starter chest" : [getItem("starter chest"), 100, 80],
+      "bread" : [getItem("bread"), 100, 2],
+      "steel sword" : [getItem("steel sword"), 50, 50],
+      "kevins sword" : [getItem("kevins sword"), 30, 150],
     };
   
   def showShopInfo(self):
     self.ui.normalPrint(f"× [green]{self.game.player.name}[reset] has [yellow]{self.game.player.money} gold[reset]\n")
-    if len(self.game.player.inventory) > 0: self.ui.normalPrint(f"× top item is the [bold yellow]{list(self.game.player.inventory.keys())[-1]}[reset]\n");
-    else: self.ui.normalPrint("× [underline red]no items to sell![reset]\n");
+    #if len(self.game.player.inventory) > 0: self.ui.normalPrint(f"× items in stock ({len(self.items)})");
+    #else: self.ui.normalPrint("× [underline red]no items to sell![reset]\n");
     self.ui.normalPrint(f"× {len(self.items)} items in stock!\n");
     
   def showShopMenu(self):

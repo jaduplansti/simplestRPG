@@ -26,8 +26,10 @@ class CombatHandler:
     
     self.game.handleCombatInitiateMenu(self);
   
+  
   def __handleWin(self):
     if self.tryBerserkNpc(self.defender) is False:
+      if self.defender.boss is True: self.ui.panelPrint("BOSS DEFEATED", "center", "combat");
       self.giveExp(self.attacker, self.defender);
       self.handleLevelUp(self.attacker);
       self.giveLoot(self.attacker, self.defender);
@@ -154,7 +156,7 @@ class CombatHandler:
       if self.checkDeath() is True or option == "flee":
         break;
       
-      self.enemy_option = self.defender.getAction();
+      self.enemy_option = self.defender.getAction(self.ui);
       self.attack_handler.status_handler.handleStatus(self.defender, self.attacker);
       
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.enemy_option, self.defender, self.attacker);

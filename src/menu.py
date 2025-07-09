@@ -61,7 +61,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.3[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.4[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):

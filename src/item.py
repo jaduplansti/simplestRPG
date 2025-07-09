@@ -1,6 +1,8 @@
 from random import randint, choices;
 from copy import deepcopy;
 
+# CREATE EQUIPMENT CLASS, REFACTOR THIS SHIT 
+
 class Item:
   """
   an Item class.
@@ -73,11 +75,11 @@ def removeEquipment(plr, part):
   item = plr.equipment[part];
   if "sword" in item.name:
     plr.attack_style = "basic";
-    plr.stats["strength"] *= 0.6;
+    plr.stats["strength"] -= 0;
   elif "bow" in item.name:
     plr.attack_style = "basic";
-    plr.stats["strength"] -= plr.stats["strength"] * 0.1;
-    
+    plr.stats["strength"] -= 0;
+   
   plr.equipment[part] = None;
   
 # def createItem(name, durability = 1, rank = "E", rarity = "common", weight = 0.1, stat_bonus = None, bodypart = None):
@@ -157,10 +159,31 @@ def use_sword(item, game, combat_handler):
     return -1;
         
   if item.name == "wooden sword":
-    strength_increased = round(game.player.stats["strength"] * 1.3);
+    strength_increased = round(game.player.stats["strength"] * 0.1);
+    game.player.equipment[item.bodypart].bonus = strength_increased;
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold cyan]wooden sword[reset]!");
     game.ui.animatedPrint("learned [bold green]swordsman[reset] style!");
-    game.ui.animatedPrint(f"strength increased by [green]1.3x[reset]!");
+    game.ui.animatedPrint(f"strength increased by [green]10%[reset]!");
+    game.player.attack_style = "swordsman";
+    game.player.stats["strength"] += strength_increased;
+    game.givePlayerSkill("parry");
+  
+  if item.name == "steel sword":
+    strength_increased = round(game.player.stats["strength"] * 0.1);
+    game.player.equipment[item.bodypart].bonus = strength_increased;
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold blue]steel sword[reset]!");
+    game.ui.animatedPrint("learned [bold green]swordsman[reset] style!");
+    game.ui.animatedPrint(f"strength increased by [green]10%[reset]!");
+    game.player.attack_style = "swordsman";
+    game.player.stats["strength"] += strength_increased;
+    game.givePlayerSkill("parry");
+  
+  if item.name == "kevins sword":
+    strength_increased = round(game.player.stats["strength"] * 0.13);
+    game.player.equipment[item.bodypart].bonus = strength_increased;
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold blue]kevin's sword[reset]!");
+    game.ui.animatedPrint("learned [bold green]swordsman[reset] style!");
+    game.ui.animatedPrint(f"strength increased by [green]13%[reset]!");
     game.player.attack_style = "swordsman";
     game.player.stats["strength"] += strength_increased;
     game.givePlayerSkill("parry");
@@ -184,7 +207,7 @@ def use_chest(item, game, combat_handler):
       recieved_str += (f"- [yellow]{item.name}[reset] ({item.rarity}) {amount_item} x\n");
       game.player.addItemToInventory(item, amount_item);
     game.ui.panelPrint(recieved_str.rstrip("\n"), title = "starter chest");
-
+  
 def use_glove(item, game, combat_handler):
   if game.player.attack_style != "basic":
     game.ui.animatedPrint("you must have a basic attack style!");
@@ -206,21 +229,36 @@ def use_bow(item, game, combat_handler):
         
   if item.name == "wooden bow":
     strength_increased = 25;
+    game.player.equipment[item.bodypart].bonus = strength_increased;
     game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] equipped a [bold blue]wooden bow[reset]!");
     game.ui.animatedPrint("learned [bold green]archer[reset] style!");
     game.ui.animatedPrint(f"strength [green]+{strength_increased}[reset]!");
     game.player.attack_style = "archer";
     game.player.stats["strength"] += strength_increased;
     #game.givePlayerSkill("parry");
-    
+  
+def use_food(item, game, combat_handler):
+  if item.name == "bread":
+    game.ui.animatedPrint(f"[yellow]{game.player.name}[reset] ate a loaf of [bold green]bread[reset]!");
+    game.ui.animatedPrint(f"hunger: {game.player.hunger} + 10");
+    game.player.hunger = min(100, game.player.hunger + 10);
+  
 ITEMS = {
   "wooden sword": {
     "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
   },
   "wooden bow": {
-    "item": Item(name="wooden bow", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
+    "item": Item(name="wooden bow", max_durability = 2000, durability = 2000, rank = "E", weight = 2.0, bodypart = "right arm"),
     "action": use_bow
+  },
+  "steel sword": {
+    "item": Item(name="steel sword", max_durability = 5000, durability = 5000, rank="D+", weight = 5.0, bodypart= "right arm"),
+    "action": use_sword
+  },
+  "kevins sword": {
+    "item": Item(name="kevins sword", max_durability = 15000, durability = 15000, rank="C", weight = 2.0, bodypart = "right arm"),
+    "action": use_sword
   },
   "health potion": {
     "item": Item(name="health potion", rank="E", weight=0.5),
@@ -261,5 +299,29 @@ ITEMS = {
   "wooden arrow": {
     "item": Item(name = "wooden arrow", rank = "D", rarity = "common", weight = 0.3),
     "action": None,  
+  },
+  "bread": {
+    "item": Item(name = "bread", rank = "D", rarity = "common", weight = 0.01),
+    "action": use_food,  
   }
 }
+
+class Equipment:
+  def __init__(self, name, bodypart, durability, max_durability, bonus):
+    self.name = name;
+    self.bodypart = bodypart;
+    self.durability = durability;
+    self.max_durability = max_durability;
+    self.bonus = bonus;
+   
+  def removeEquipment(self, plr):
+    if "sword" in self.name:
+      plr.attack_style = "basic";
+      plr.stats["strength"] -= 0;
+    elif "bow" in self.name:
+      plr.attack_style = "basic";
+      plr.stats["strength"] -= 0;
+    plr.equipment[self.bodypart] = None;
+   
+def itemToEquipment(item, bonus):
+  return Equipment(item.name, item.bodypart, item.durability, item.max_durability);

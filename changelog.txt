@@ -251,3 +251,12 @@
 • skills have been nerfed, skills can now crit and be reduced by defense.
 • added hunger, can replenish energy and health each turn (20%)
 • added starvation, reduces health and energy by 2% each turn
+
+[version 2.6.4]
+• added food
+• improved enemies
+• added bosses, fallen knight
+• added steel sword, mithril sword
+• fixed equipment penalties
+• added dodge mechanic, capped at 30%
+

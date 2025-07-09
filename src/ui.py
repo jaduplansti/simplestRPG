@@ -110,7 +110,7 @@ class UI:
     
     self.disableEcho();
     with Progress(TextColumn(f"({s}): "), BarColumn()) as progress:
-      for _ in progress.track(range(n, n_max)):
+      for _ in progress.track(range(int(n), int(n_max))):
         sleep(speed);
     self.newLine();
     self.enableEcho();
@@ -220,7 +220,9 @@ class UI:
     
     if character.berserk is True:
       name += " ([bold red]berserk[reset])";
-      
+    if not isinstance(character, Player) and character.boss is True: 
+      name += " ([bold blue]boss[reset])";
+
     if character.stats["health"] / character.stats["max health"] > 0.6:
       color = "green";
     elif character.stats["health"] / character.stats["max health"] > 0.3:

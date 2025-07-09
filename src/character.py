@@ -33,6 +33,7 @@ class Character:
       "max health": 100,
       "strength": randint(5, 10),
       "defense": randint(5, 10),
+      "dexterity": randint(5, 10),
       "luck": 0.3,
     }
     
@@ -157,7 +158,7 @@ class Character:
     
   def equipItem(self, item):
     if self.isOccupied(item.bodypart) != True:
-      self.equipment[item.bodypart] = deepcopy(item);
+      self.equipment[item.bodypart] = getItem(item.name);
       return True;
     return False;
   
