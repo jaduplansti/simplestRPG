@@ -1,5 +1,5 @@
 from random import randint, uniform
-from item import Item, removeEquipment, getItem;
+from item import Item, Equipment, getItem, itemToEquipment, equipmentToItem;
 from skill import Skill, getSkill;
 from copy import deepcopy;
 import json;
@@ -46,11 +46,8 @@ class Character:
     self.skills = {}
     self.magic = {}
     
-    self.addSkill(getSkill("crimson edge"));
-    self.addItemToInventory(getItem("health potion"), 100);
-    self.addItemToInventory(getItem("starter chest"), 10);
-    self.addItemToInventory(getItem("scroll of teleport"), 10);
-    self.addItemToInventory(getItem("wooden bow"), 10);
+    self.addItemToInventory(getItem("health potion"), 10);
+    self.addItemToInventory(getItem("wooden sword"), 1);
     self.addSkill(getSkill("soul shatter"));
   
   def to_dict(self):
@@ -75,11 +72,11 @@ class Character:
       "magic": self.magic,
       "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
-        name: {
-          "item": item_data["item"].to_dict(),
-          "amount": item_data["amount"]
-        } for name, item_data in self.inventory.items()
-      },
+          name: {
+            "item": [item_obj.to_dict() for item_obj in item_data["item"]], 
+            "amount": item_data["amount"]
+          } for name, item_data in self.inventory.items()
+      }
     }
 
   @classmethod
@@ -98,7 +95,7 @@ class Character:
     char.points = data["points"]
     char.title = data["title"]
     char.equipment = {
-      k: Item.from_dict(v) if v else None for k, v in data["equipment"].items()
+      k: Equipment.from_dict(v) if v else None for k, v in data["equipment"].items()
     }
     char.skills = {
        k: Skill.from_dict(v) if v else None for k, v in data["skills"].items()
@@ -107,10 +104,11 @@ class Character:
     char._class = data["_class"]
     char.inventory = {
       name: {
-        "item": Item.from_dict(item_data["item"]),
+        "item": [Item.from_dict(item_dict) for item_dict in item_data["item"]], # Convert each dict to an Item object
         "amount": item_data["amount"]
       } for name, item_data in data["inventory"].items()
     }
+
     char.magic = data["magic"]
     return char;
 
@@ -134,40 +132,50 @@ class Character:
       
   def addItemToInventory(self, item, n = 1):
     for _ in range(0, n):
+      if self.getTotalItems() >= 50:
+        return -1;
+        
       if self.itemExists(item.name):
+        self.inventory[item.name]["item"].append(item);
         self.inventory[item.name]["amount"] += 1
       else:
-        self.inventory[item.name] = {"amount": 1, "item": item}
+        self.inventory[item.name] = {"amount": 1, "item": [item]}
   
   def getAmountOfItem(self, item):
     return self.inventory[item]["amount"]
   
+  def getTotalItems(self):
+    count = 0;
+    for item in self.inventory: count += self.inventory[item]["amount"];
+    return count;
+    
   def getItem(self, item):
-    return self.inventory[item]["item"]
+    return self.inventory[item]["item"][-1];
   
   def usedItem(self, item):
     if self.getAmountOfItem(item) <= 1:
       del self.inventory[item]
     else:
+      self.inventory[item]["item"].pop();
       self.inventory[item]["amount"] -= 1
   
-  def unequipItem(self, bodypart):
-    item = self.equipment[bodypart];
-    self.addItemToInventory(item, 1);
-    removeEquipment(self, bodypart);
+  def unequipItem(self, bodypart, game):
+    item = equipmentToItem(self.equipment[bodypart]);
+    if self.addItemToInventory(item, 1) == -1: return -1;
+    self.equipment[bodypart].removeEquipment(self, game);
     
-  def equipItem(self, item):
+  def equipItem(self, item, bonus = 0):
     if self.isOccupied(item.bodypart) != True:
-      self.equipment[item.bodypart] = getItem(item.name);
+      self.equipment[item.bodypart] = itemToEquipment(item, bonus);
       return True;
     return False;
   
-  def useEquipment(self, bodypart, n):
+  def useEquipment(self, bodypart, n, game):
     brokens = [];
     for part in bodypart:
       if self.equipment[part] != None and self.equipment[part].handleDurability(n) is True: 
         brokens.append(self.equipment[part].name)
-        removeEquipment(self, part);
+        self.equipment[part].removeEquipment(self, game);
     return brokens;
     
   def giveDamage(self, dmg):
@@ -261,4 +269,6 @@ class Character:
   
   def skillExists(self, skill):
     return skill in self.skills;
-      
+  
+  def removeSkill(self, skill_name):
+    del self.skills[skill_name];

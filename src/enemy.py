@@ -38,21 +38,21 @@ class Enemy(Character):
       else: self.stats[stat] += 1;
         
   def getAction(self, ui):
-    #action = self.customAction(ui);
-    #if action != None: return action;
+    action = self.customAction(ui);
+    if action != None: return action;
     
     if self.status["blocking"][0] is True:
-      return choices(["taunt", None])[0];
+      return choices(["taunt", ""])[0];
     elif self.stats["health"] <= self.stats["max health"] * 0.25:
-      return choices(["flee", "block", None], [self.flee_chance, self.block_chance, 0.5])[0];
+      return choices(["flee", "block", ""], [self.flee_chance, self.block_chance, 0.5])[0];
     else: return choices(["attack", "block"], [self.attack_chance, self.block_chance])[0];
 
   def customAction(self, ui):
-    if self.name == "slime":
-      ui.printDialogue("slime", choices([":O", ":-P"])[0]);
-      return choices(["flee", "block", None], [self.flee_chance, self.block_chance, 0.5])[0];
-    
-def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False):
+    if self.name == "fallen knight":
+      if self.stats["health"] <= self.stats["max health"] * 0.2: 
+        return choices(["use, health potion", "perform, parry"])[0];
+      
+def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None):
   enemy = Enemy(name);
   enemy.level = level;
   
@@ -67,13 +67,15 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
   enemy.flee_chance = action_chances[2];
   enemy.taunt_chance = action_chances[3];
   
-  enemy.attack_style = attack_style;
+  if game != None: game.giveStyle(enemy, attack_style, False);
+  else: enemy.attack_style = attack_style;
+  
   for loot in loots:
     enemy.putLoot(loot[0], loot[1]);
   enemy.boss = boss;
   return enemy;
 
-def getEnemyByName(name, plr = None):
+def getEnemyByName(name, plr = None, game = None):
   if name == "slime":
     return createEnemy(
       "slime", randint(3, 4), {"strength" : 4}, "basic", [0.7, 0.2, 0.01, 0.01],
@@ -125,6 +127,7 @@ def getEnemyByName(name, plr = None):
         [getItem("scroll of instant kill"), 0.1]    
       ],
       True,
+      game,
     );
  
 ENEMIES = [

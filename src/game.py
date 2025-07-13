@@ -10,8 +10,8 @@ from exploration import Exploration, AREAS;
 from time import sleep;
 from subprocess import run;
 
-from item import getItem, removeEquipment;
-from skill import getSkill;
+from item import getItem;
+from skill import getSkill, Skill;
 from enemy import ENEMIES;
 import sys;
 
@@ -63,7 +63,7 @@ class Game:
   def handleMenu(self, options : dict, showFun = None):
     """
     Creates a generic menu to display.
-    
+     
     Parameters:
     options, a dictionary holding the possible option that maps to a function.
     showFun, a function pointer that holds the function to display the options.
@@ -93,9 +93,10 @@ class Game:
         if option == "close": return;
         if not self.player.isOccupied(option): self.ui.animatedPrint("[red]thats an empty slot..[reset]");
         else: 
-          self.player.unequipItem(option);
-          self.ui.panelPrint(f"[bold cyan]UNEQUIPPED[reset]", "center", option, "purple");
-      except KeyError:
+          if self.player.unequipItem(option, self) != -1: 
+            self.ui.panelPrint(f"[bold cyan]UNEQUIPPED[reset]", "center", option, "purple");
+          else: self.ui.panelPrint(f"[bold res] UNEQUIP FAILED[reset]", "center", option, "red");
+      except KeyError as e:
         self.ui.animatedPrint(f"[bold red]{option} is not a bodypart[reset]");
       self.ui.awaitKey();
       
@@ -125,7 +126,7 @@ class Game:
         continue;
         
       for _ in range(0, count):
-        if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, combat_handler);
+        if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, self.player, combat_handler);
         elif option[0] == "close": 
           return;
         else: 
@@ -149,9 +150,10 @@ class Game:
       skill = self.ui.getInput();
     
     if attacker.skillExists(skill) is True:
-      if attacker.energy >= attacker.skills[skill].energy: attacker.skills[skill].use(combat_handler, attacker, defender);
+      if attacker.skills[skill].passive is True: self.ui.animatedPrint("[bold red]cannot use passive skills![reset]");
+      elif attacker.energy >= attacker.skills[skill].energy: attacker.skills[skill].use(combat_handler, attacker, defender);
       else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
-      
+    
   def handleSleep(self):
     """Handles Sleep, increases Player Health and Player Energy and then Saves."""
     
@@ -319,17 +321,17 @@ class Game:
   
   def isTermux(self):
     return "PREFIX" in os.environ and "/data/data/com.termux/files/usr" in os.environ["PREFIX"];
- 
+
   def givePlayerItem(self, name, amount = 1):
-   item = getItem(name);
-   self.player.addItemToInventory(item, amount);
-   self.ui.animatedPrint(f"Acquired [bold yellow]{item.name}[reset] ([green]{item.rarity})[reset] {amount}x");
- 
-  def givePlayerSkill(self, name):
-   if name in self.player.skills: return;
-   skill = getSkill(name);
-   self.player.addSkill(skill);
-   self.ui.panelPrint(f"[bold yellow]{skill.name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center", "Learned");
+    item = getItem(name);
+    if self.player.addItemToInventory(item, amount) != -1: self.ui.animatedPrint(f"Acquired [bold yellow]{item.name}[reset] ([green]{item.rarity}[reset]) {amount}x");
+    else: self.ui.animatedPrint(f"No space left for [bold yellow]{item.name}[reset]");
+    
+  def giveSkill(self, char, name):
+    if name in char.skills: return;
+    skill = getSkill(name);
+    char.addSkill(skill);
+    if isinstance(char, Player): self.ui.panelPrint(f"[bold yellow]{skill.name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center", "Learned");
   
   def handleStatsMenu(self):
     while True:
@@ -365,3 +367,21 @@ class Game:
       
   def giveStatus(self, status, n):
     CombatHandler(self).attack_handler.status_handler.afflict(self.player, status, n);
+  
+  def isPlayer(self, char):
+    return isinstance(char, Player);
+ 
+  def giveStyle(self, char, style, announce = True):
+    char.attack_style = style;
+    if announce is True: self.ui.animatedPrint(f"[yellow]{char.name}[reset] switched to [bold magenta]{style}[reset] style!");
+    if style == "swordsman": 
+      self.giveSkill(char, "parry");
+      self.giveSkill(char, "hyper precision");
+      self.giveSkill(char, "flowing blade");
+
+  def removeStyle(self, char):
+    if char.attack_style == "swordsman": 
+      char.removeSkill("parry");
+      char.removeSkill("hyper precision");
+      char.removeSkill("flowing blade");
+    char.attack_style = "basic";

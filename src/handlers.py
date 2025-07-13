@@ -90,18 +90,22 @@ class DefenseHandler:
     attacker.giveStatus("parrying", 2);
   
   def handleParry(self, attacker, defender):
-    if (isinstance(defender, Player) is True and self.combat_handler.enemy_option == "attack" and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f") or (isinstance(defender, Enemy) is True):
+    if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"]:
+      if not isinstance(defender, Player): pass;
+      elif isinstance(defender, Player) and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f": pass;
+      else:
+        self.ui.newLine();
+        self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] failed to parry!", "parry");
+        self.ui.panelPrint("[bold red]PARRY FAILED (-10% energy)[reset]");
+        defender.energy -= defender.energy * 0.1;
+        return;
+        
       self.ui.newLine();
       self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] parried [green]{attacker.name}[reset] with precision!", "parry");
       self.ui.panelPrint("[bold cyan]PARRIED[reset]");
-      self.combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], defender.stats["strength"] * 0.2);
+      self.combat_handler.attack_handler.consumeEquipment(defender, ["left arm", "right arm"], defender.stats["strength"] * 0.2);
       self.combat_handler.attack_handler.status_handler.turn_passed = True;
-    else:
-      self.ui.newLine();
-      self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] failed to parry!", "parry");
-      self.ui.panelPrint("[bold red]PARRY FAILED (-10% energy)[reset]");
-      attacker.energy -= attacker.energy * 0.1;
-  
+    
   def handleDodge(self, attacker, defender):
     dodge_chance = min(defender.stats["dexterity"] * 0.03, 25); # capped at 25%
     if choices(["dodge", None], [dodge_chance, 100 - dodge_chance])[0] is None: return;
@@ -196,8 +200,13 @@ class AttackHandler:
     self.status_handler = StatusEffectHandler(combat_handler);
     self.ui = self.combat_handler.ui;
   
+  def handlePassiveSkills(self, attacker, defender):
+    for skill in attacker.skills:
+      if attacker.skills[skill].passive is True:
+        attacker.skills[skill].use(self.combat_handler, attacker, defender);
+        
   def consumeEquipment(self, character, parts, dmg):
-    for broken in character.useEquipment(parts, dmg):
+    for broken in character.useEquipment(parts, dmg, self.combat_handler.game):
       self.ui.animatedPrint(f"[red]{broken} was broken![reset]");
       
   def handleBlock(self, attacker, defender): # move this to defense handler
@@ -307,6 +316,8 @@ class AttackHandler:
     return False;
     
   def handleAttack(self, attacker, defender):
+    self.handlePassiveSkills(attacker, defender);
+    
     if self.handleBlock(attacker, defender) is True:
       return;
     

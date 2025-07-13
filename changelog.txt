@@ -260,3 +260,17 @@
 • fixed equipment penalties
 • added dodge mechanic, capped at 30%
 
+[version 2.6.5]
+• enemies can now use items and skills
+• item rework!
+• fixed major bug (unequipping restores item durability)
+• inventory limit (50)
+• fixed parrying
+• fallen knight uses health potion and parry below 20% health.
+• added more skills.
+• added passive skills.
+• tweaked berserk (14.29%)
+• you now lose skills upon changing styles.
+• buffed kevins sword
+• buffed swords (30%)
+• combat rework soon

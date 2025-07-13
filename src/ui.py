@@ -236,7 +236,7 @@ class UI:
     for status in character.status:
       if character.status[status][0] is True:
         symbol = "";
-        if status in ["blocking"]: symbol = "⬆";
+        if status in ["blocking", "parrying"]: symbol = "⬆";
         else: symbol = "⬇";
         statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1] - 1}x[reset] {symbol})");
     

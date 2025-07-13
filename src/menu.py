@@ -12,12 +12,14 @@ class Menu():
     self.ui.normalPrint("× [underline bold magenta]check status for more details.[reset]\n");
     
   def showItemsMenu(self, character):
-    self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset] item(s)");
+    if character.getTotalItems() < 50: self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset]({character.getTotalItems()}) item(s)");
+    else: self.ui.animatedPrint(f"[bold red]INVENTORY FULL[reset]");
+    
     for name in character.inventory:
       item = character.inventory[name];
       self.ui.normalPrint(f"- [underline yellow]{name}[reset] [purple]({item["amount"]}x)[reset]");
-      for info in item["item"].__dict__: 
-        if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"].__dict__[info]})");
+      for info in item["item"][-1].__dict__: 
+        if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"][-1].__dict__[info]})");
       self.ui.newLine();
     self.ui.normalPrint("[bold yellow]you can close the bag by typing 'close'[reset]\n");
       
@@ -25,8 +27,9 @@ class Menu():
     self.ui.animatedPrint(f"[magenta]==SKILLS==[reset]");
     for skill_name in character.skills:
       skill = character.skills[skill_name];
-      self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center");
-      
+      if skill.passive is False: self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy[reset]", "center");
+      else: self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([cyan]PASSIVE[reset]) ([green]{skill.rank}[reset])\n[underline]{skill.desc}", "center");
+
   def showStatsMenu(self, character):
     info = f"[green]name[reset]: [bold yellow]{character.name}[reset]\n[blue]level[reset]: {character.level} ({character.exp}/{100 * character.level})\n";
     info += f"[yellow]title[reset]: {character.title}\n";
@@ -61,7 +64,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.4[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.5[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -99,5 +102,5 @@ class Menu():
     self.ui.normalPrint(f"• [yellow]type speed[reset] : {self.game.settings["type speed"]}");
     self.ui.normalPrint(f"• [cyan]delay speed[reset] : {self.game.settings["delay speed"]}");
     self.ui.newLine();
-    
+  
     
