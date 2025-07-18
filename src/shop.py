@@ -11,7 +11,9 @@ class Shop(SubMenu):
       "wooden sword" : [getItem("wooden sword"), 60, 20],
       "scroll of teleport" : [getItem("scroll of teleport"), 100, 50],
       "starter chest" : [getItem("starter chest"), 100, 80],
-      "bread" : [getItem("bread"), 100, 2],
+      "bread" : [getItem("bread"), 100, 30],
+      "apple" : [getItem("apple"), 100, 5],
+      "biscuit" : [getItem("biscuit"), 100, 10],
       "steel sword" : [getItem("steel sword"), 50, 50],
       "kevins sword" : [getItem("kevins sword"), 30, 150],
     };

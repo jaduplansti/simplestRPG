@@ -63,7 +63,7 @@ class Exploration:
           if player.position < destination["position"]: player.position += 1;
           elif player.position > destination["position"]: player.position -= 1;
           event = self.getRandomEvent();
-          sleep(0.5);
+          sleep(0.2);
           status.update(f"[green]walking ({player.position} / {destination['position']})[reset]");
           if event is not None or player.position == destination["position"]: break;
       self.handleEvent(event);

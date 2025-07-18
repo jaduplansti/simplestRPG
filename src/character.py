@@ -26,6 +26,7 @@ class Character:
       "poisoned" : [False, 0],
       "bleeding" : [False, 0],
       "parrying" : [False, 0],
+      "karma" : [False, 0],
     }
     
     self.stats = {
@@ -46,6 +47,7 @@ class Character:
     self.skills = {}
     self.magic = {}
     
+    self.addItemToInventory(getItem("bible"), 1);
     self.addItemToInventory(getItem("health potion"), 10);
     self.addItemToInventory(getItem("wooden sword"), 1);
     self.addSkill(getSkill("soul shatter"));
@@ -272,3 +274,6 @@ class Character:
   
   def removeSkill(self, skill_name):
     del self.skills[skill_name];
+    
+  def clearStatus(self):
+    for status in self.status: self.status[status] = [False, 0];

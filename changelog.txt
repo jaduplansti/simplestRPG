@@ -274,3 +274,17 @@
 • buffed kevins sword
 • buffed swords (30%)
 • combat rework soon
+
+[version 2.6.6]
+• added 1 slam minigame to basic.
+• added a new skill and passive skill for archer
+• reduced energy skill costs
+• cleric attack style!
+• karma status effect.
+• adjust dodge rate (30% -> 60%)
+• adjusted walk speed.
+• can now gain money when fighting enemies.
+• added a new enemy (elf) a adaptive archer, will use a sword to change to swordsman style when out of arrows.
+• added biscuit and apple as a food source
+• fixed passive skills.
+• added a new skill for swordsman and archer

@@ -272,7 +272,7 @@ class Game:
       self.ui.showStatus("fetching", 0.5);
       plr = Player(None).load(save.replace(".save", ""));
       player_data.update({plr.name : plr});
-      self.ui.panelPrint(f"level {plr.level} ({plr.exp}/{plr.level * 100})", title = plr.name, alignment = "center");
+      self.ui.panelPrint(f"level {plr.level} ({plr.exp}/{plr.level * 100})", title = f"{plr.name} ({plr.attack_style})", alignment = "center");
     
     self.ui.animatedPrint("[underline green]pick a character to load, enter a new name to create![reset]")
     option = self.ui.getInput();
@@ -378,10 +378,31 @@ class Game:
       self.giveSkill(char, "parry");
       self.giveSkill(char, "hyper precision");
       self.giveSkill(char, "flowing blade");
+      self.giveSkill(char, "trislash");
+    elif style == "archer": 
+      self.giveSkill(char, "arrow return");
+      self.giveSkill(char, "arrow rain");
+      self.giveSkill(char, "bow bash");
+    elif style == "cleric":
+      self.giveSkill(char, "divine protection");
+      self.giveSkill(char, "blunt recovery");
+      self.giveSkill(char, "status wipe");
+      self.giveSkill(char, "divine restriction");
 
   def removeStyle(self, char):
     if char.attack_style == "swordsman": 
       char.removeSkill("parry");
       char.removeSkill("hyper precision");
       char.removeSkill("flowing blade");
+      char.removeSkill("trislash");
+    elif char.attack_style == "archer": 
+      char.removeSkill("arrow return");
+      char.removeSkill("arrow rain");
+      char.removeSkill("bow bash");
+    elif style == "cleric":
+      self.removeSkill(char, "divine protection");
+      self.removeSkill(char, "blunt recovery");
+      self.removeSkill(char, "status wipe");
+      self.removeSkill(char, "divine restriction");
+
     char.attack_style = "basic";

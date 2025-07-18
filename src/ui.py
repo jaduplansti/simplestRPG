@@ -188,7 +188,8 @@ class UI:
   def newLine(self):
     print("");
   
-  def getKey(self):
+  def getKey(self, s = ""):
+    self.normalPrint(s + "\n");
     return readkey();
     
   def awaitKey(self):

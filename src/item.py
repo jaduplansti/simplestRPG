@@ -236,7 +236,6 @@ def use_bow(item, game, combat_handler, user):
     strength_increased = 25;
     user.equipment[item.bodypart].bonus = strength_increased;
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] equipped a [bold blue]wooden bow[reset]!");
-    game.ui.animatedPrint("learned [bold green]archer[reset] style!");
     game.ui.animatedPrint(f"strength [green]+{strength_increased}[reset]!");
     game.giveStyle(user, "archer");
     user.stats["strength"] += strength_increased;
@@ -245,9 +244,24 @@ def use_bow(item, game, combat_handler, user):
 def use_food(item, game, combat_handler, user):
   if item.name == "bread":
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate a loaf of [bold green]bread[reset]!");
-    game.ui.animatedPrint(f"hunger: {user.hunger} + 10");
+    game.ui.animatedPrint(f"hunger: {user.hunger + 20}");
+    user.hunger = min(100, user.hunger + 20);
+  
+  elif item.name == "biscuit":
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate crunchy [bold green]biscuits[reset]!");
+    game.ui.animatedPrint(f"hunger: {user.hunger + 10}");
     user.hunger = min(100, user.hunger + 10);
   
+  elif item.name == "apple":
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate a fresh [bold cyan]apple[reset]!");
+    game.ui.animatedPrint(f"hunger: {user.hunger + 15}");
+    user.hunger = min(100, user.hunger + 15);
+  
+def use_book(item, game, combat_handler, user):
+  if item.name == "bible":
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] opens up the [bold yellow]bible[reset]!");
+    game.giveStyle(user, "cleric");
+    
 ITEMS = {
   "wooden sword": {
     "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
@@ -306,8 +320,20 @@ ITEMS = {
     "action": None,  
   },
   "bread": {
-    "item": Item(name = "bread", rank = "D", rarity = "common", weight = 0.01),
+    "item": Item(name = "bread", rank = "D", rarity = "common", weight = 0.04),
     "action": use_food,  
+  },
+  "biscuit": {
+    "item": Item(name = "biscuit", rank = "D", rarity = "common", weight = 0.02),
+    "action": use_food,  
+  },
+  "apple": {
+    "item": Item(name = "apple", rank = "D", rarity = "common", weight = 0.015),
+    "action": use_food,  
+  },
+  "bible": {
+    "item": Item(name = "bible", rank = "???", rarity = "???", weight = 0.05),
+    "action": use_book,  
   }
 };
 

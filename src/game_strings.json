@@ -116,6 +116,21 @@
     ]
   },
   
+  "cleric style": {
+    "heal override": [
+      "[bold cyan]{0}[reset] bathed in a radiant glow, mending [bold green]{2}[reset] of their wounds, then delivered a holy strike to [bold yellow]{1}[reset]!",
+      "A divine light enveloped [bold cyan]{0}[reset], restoring [bold green]{2}[reset] health before they unleashed righteous fury upon [bold yellow]{1}[reset]!",
+      "[bold cyan]{0}[reset] invoked sacred energies, healing [bold green]{2}[reset] of their ailments, and then smote [bold yellow]{1}[reset]!",
+      "With a whispered prayer, [bold cyan]{0}[reset] was revitalized by [bold green]{2}[reset] health, then dealt divine justice to [bold yellow]{1}[reset]!",
+      "A blessed aura healed [bold cyan]{0}[reset] for [bold green]{2}[reset] points, as they simultaneously condemned [bold yellow]{1}[reset] to receive karma!",
+      "[bold cyan]{0}[reset] drew upon heavenly power, recovering [bold green]{2}[reset] health, and then brought down judgment upon [bold yellow]{1}[reset]!",
+      "The very air shimmered as [bold cyan]{0}[reset] healed for [bold green]{2}[reset], then turned their divine might against [bold yellow]{1}[reset]!",
+      "[bold cyan]{0}[reset] felt their vitality renewed by [bold green]{2}[reset], and with a stern gaze, inflicted the burden of karma upon [bold yellow]{1}[reset]!",
+      "A surge of faith healed [bold cyan]{0}[reset] for [bold green]{2}[reset] health, then they channelled pure energy into an attack on [bold yellow]{1}[reset]!",
+      "[bold cyan]{0}[reset] embraced divine grace, regaining [bold green]{2}[reset] health, then blessed [bold yellow]{1}[reset] with a heavy dose of karma!"
+    ]
+  },
+
   "fatigue handler": {
     "tired": [
       "[yellow]{0}[reset] breathes deeply, fighting against the mounting fatigue.",

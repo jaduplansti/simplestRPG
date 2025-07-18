@@ -21,6 +21,7 @@ class StatusEffectHandler:
       "stunned" : self.__stunned,
       "bleeding" : self.__bleeding,
       "poisoned": self.__poisoned,
+      "karma": self.__karma,
     };
     
     self.other_status = {
@@ -51,6 +52,12 @@ class StatusEffectHandler:
     self.ui.animatedPrint(f"[bold green]{attacker.name} is poisoned, afflicting {dmg} damage[reset]!");
     attacker.enemy.attackEnemy(dmg);
     attacker.status["poisoned"][1] -= 1;
+  
+  def __karma(self, attacker, defender):
+    dmg = round((attacker.stats["health"] * 0.2) * (attacker.level / randint(10, 15)));
+    self.ui.animatedPrint(f"[yellow]{attacker.name} feels their sins crawling, punishing for {dmg} damage[reset]!");
+    attacker.enemy.attackEnemy(dmg);
+    attacker.status["karma"][1] -= 1;
   
   def __parrying(self, attacker, defender):
     self.combat_handler.attack_handler.defense_handler.handleParry(attacker, defender);
@@ -91,7 +98,7 @@ class DefenseHandler:
   
   def handleParry(self, attacker, defender):
     if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"]:
-      if not isinstance(defender, Player): pass;
+      if not isinstance(defender, Player) and randint(1, 3) == randint(1, 3): pass;
       elif isinstance(defender, Player) and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f": pass;
       else:
         self.ui.newLine();
@@ -107,7 +114,7 @@ class DefenseHandler:
       self.combat_handler.attack_handler.status_handler.turn_passed = True;
     
   def handleDodge(self, attacker, defender):
-    dodge_chance = min(defender.stats["dexterity"] * 0.03, 25); # capped at 25%
+    dodge_chance = min(defender.stats["dexterity"] * 0.1, 60); # capped at 60%
     if choices(["dodge", None], [dodge_chance, 100 - dodge_chance])[0] is None: return;
     self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] managed to dodge [yellow]{attacker.name}'s[reset] attack just in time!", "dodge");
     self.ui.panelPrint("[bold magenta]DODGED[reset]");
@@ -148,6 +155,8 @@ class DamageHandler:
       **self.createDamage("quick shot", 15, ["strength"], 1.3),
       **self.createDamage("half draw", 20, ["strength"], 1.5),
       **self.createDamage("arrow throw", 10, ["strength"], 2),
+      **self.createDamage("heal override", 1, ["strength", "dexterity"], 5),
+      **self.createDamage("stab", 20, ["strength", "dexterity"], 1.5),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
@@ -200,9 +209,9 @@ class AttackHandler:
     self.status_handler = StatusEffectHandler(combat_handler);
     self.ui = self.combat_handler.ui;
   
-  def handlePassiveSkills(self, attacker, defender):
+  def handlePassiveSkills(self, _type, attacker, defender):
     for skill in attacker.skills:
-      if attacker.skills[skill].passive is True:
+      if attacker.skills[skill].passive is True and attacker.skills[skill].passive_type == _type:
         attacker.skills[skill].use(self.combat_handler, attacker, defender);
         
   def consumeEquipment(self, character, parts, dmg):
@@ -224,6 +233,7 @@ class AttackHandler:
   
   def __basic_style(self, attacker, defender):
     move = choices(["punch", "strong punch", "double punch", "slam"])[0];
+    if self.__basicMiniGame(move, attacker, defender) is False: return;
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
     attacker.attackEnemy(dmg);
     self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
@@ -270,6 +280,31 @@ class AttackHandler:
     if move == "push": defender.giveStatus("stunned", 3);
     elif move == "poke": defender.giveStatus("bleeding", 3);
   
+  def __cleric_style(self, attacker, defender):
+    self.ui.printDialogue(attacker.name, "repent..");
+    dmg = self.damage_handler.calculateDamage("heal override", attacker, defender);
+    dmg = dmg * max(defender.status["karma"][1], 1);
+    
+    attacker.stats["health"] = min(attacker.stats["health"] + (dmg * 0.5), attacker.stats["max health"]);
+    attacker.attackEnemy(dmg);
+    defender.giveStatus("karma", 2);
+    self.ui.panelAnimatedPrintFile("cleric style", "heal override", [attacker.name, defender.name, dmg], "heal override");
+  
+  def __thief_style(self, attacker, defender):
+    move = choices(["stab", "throw", "feint", "chain"])[0];
+    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
+    attacker.attackEnemy(dmg);
+    self.ui.panelAnimatedPrintFile("thief style", move, [attacker.name, defender.name, dmg], move);
+    
+    if move == "stab": defender.giveStatus("poisoned", 3);
+    elif move == "feint": attacker.giveStatus("parrying", 2);
+    
+  def __thiefMiniGame(self, move, attacker, defender):
+    if not isinstance(attacker, Player): return True;
+    
+    if move == "stab":
+      pass;
+      
   def __swordMiniGame(self, move, attacker, defender):
     if not isinstance(attacker, Player): return True;
     
@@ -314,10 +349,20 @@ class AttackHandler:
       except ValueError: self.ui.panelPrint("[red]MUST BE DECIMALS, (3.5)[reset]");
     else: return True;
     return False;
+  
+  def __basicMiniGame(self, move, attacker, defender):
+    if not isinstance(attacker, Player): return True;
+    if move == "slam":
+      for n in range(3):
+        if self.ui.getKey("press (q)") != "q": return False;
+        if self.ui.getKey("press (e)") != "e": return False;
+      return True;
+      
+    else: return True;
+    return False;
     
   def handleAttack(self, attacker, defender):
-    self.handlePassiveSkills(attacker, defender);
-    
+    self.handlePassiveSkills("attack", attacker, defender);
     if self.handleBlock(attacker, defender) is True:
       return;
     
@@ -329,5 +374,5 @@ class AttackHandler:
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
     elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);
     elif attacker.attack_style == "archer": self.__bow_style(attacker, defender);
-
-  
+    elif attacker.attack_style == "cleric": self.__cleric_style(attacker, defender);
+    elif attacker.attack_style == "thief": self.__thief_style(attacker, defender);

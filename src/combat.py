@@ -55,7 +55,8 @@ class CombatHandler:
   def giveLoot(self, won, lost):
     item = lost.getLoot();
     if item != None: self.game.givePlayerItem(item.name, 1);
-      
+    won.money += randint(5, 10) * lost.level;
+    
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhaustion.[reset]", "fatigue");
@@ -103,6 +104,8 @@ class CombatHandler:
     return False;
   
   def checkDeath(self):
+    self.attack_handler.handlePassiveSkills("death", self.attacker, self.defender);
+    self.attack_handler.handlePassiveSkills("death", self.defender, self.attacker);
     self.game.player.trackQuest(self.game, self);
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");

@@ -43,7 +43,7 @@ class Enemy(Character):
     
     if self.status["blocking"][0] is True:
       return choices(["taunt", ""])[0];
-    elif self.stats["health"] <= self.stats["max health"] * 0.25:
+    elif self.stats["health"] <= self.stats["max health"] * 0.20:
       return choices(["flee", "block", ""], [self.flee_chance, self.block_chance, 0.5])[0];
     else: return choices(["attack", "block"], [self.attack_chance, self.block_chance])[0];
 
@@ -51,8 +51,19 @@ class Enemy(Character):
     if self.name == "fallen knight":
       if self.stats["health"] <= self.stats["max health"] * 0.2: 
         return choices(["use, health potion", "perform, parry"])[0];
+      else: return choices(["perform, trislash", None])[0];
       
-def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None):
+    if self.name == "elf":
+      if self.attack_style == "archer" and self.itemExists("wooden sword") and not self.itemExists("wooden arrow"): return "use, wooden sword";
+      elif self.attack_style == "archer": return choices(["perform, arrow rain", None], [0.2, 0.8])[0];
+      elif self.attack_style == "swordsman": return choices(["perform, parry", "perform, trislash", None], [0.2, 0.8])[0];
+
+    if self.name == "priest":
+      if self.stats["health"] <= self.stats["max health"] * 0.5: return "perform, blunt recovery";
+      elif randint(1, 2) == randint(1, 2) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
+      elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
+     
+def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None, items = None):
   enemy = Enemy(name);
   enemy.level = level;
   
@@ -70,6 +81,9 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
   if game != None: game.giveStyle(enemy, attack_style, False);
   else: enemy.attack_style = attack_style;
   
+  if items != None:
+    for item in items: enemy.addItemToInventory(getItem(item[0]), item[1]);
+    
   for loot in loots:
     enemy.putLoot(loot[0], loot[1]);
   enemy.boss = boss;
@@ -78,7 +92,7 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
 def getEnemyByName(name, plr = None, game = None):
   if name == "slime":
     return createEnemy(
-      "slime", randint(3, 4), {"strength" : 4}, "basic", [0.7, 0.2, 0.01, 0.01],
+      "slime", randint(1, 2), {"strength" : 4}, "basic", [0.7, 0.2, 0.01, 0.01],
       [
         [getItem("wooden sword"), 0.5],
         [getItem("wooden bow"), 0.5],
@@ -87,7 +101,7 @@ def getEnemyByName(name, plr = None, game = None):
     );
   elif name == "goblin":
     return createEnemy(
-      "goblin", randint(5, 8), {"strength" : 10, "defense" : 20}, "basic", [0.7, 0.1, 0.5, 0.01],
+      "goblin", randint(3, 5), {"strength" : 6, "defense" : 6}, "basic", [0.7, 0.1, 0.5, 0.01],
       [
         [getItem("wooden sword"), 0.5],
         [getItem("starter chest"), 0.01],
@@ -96,7 +110,7 @@ def getEnemyByName(name, plr = None, game = None):
     );
   elif name == "orc":
     return createEnemy(
-      "orc", randint(8, 13), {"strength" : 25, "defense" : 40}, "swordsman", [0.7, 0.1, 0.5, 0.01],
+      "orc", randint(6, 8), {"strength" : 12, "defense" : 10}, "swordsman", [0.7, 0.1, 0.5, 0.01],
       [
         [getItem("wooden sword"), 0.5],
         [getItem("starter chest"), 0.01],
@@ -105,7 +119,7 @@ def getEnemyByName(name, plr = None, game = None):
     );
   elif name == "skeleton":
     return createEnemy(
-      "skeleton", randint(9, 15), {"strength" : 20, "defense" : 10}, "basic", [0.7, 0.1, 0.5, 0.01],
+      "skeleton", randint(6, 8), {"strength" : 15}, "basic", [0.7, 0.1, 0.5, 0.01],
       [
         [getItem("wooden sword"), 0.5],
         [getItem("wooden bow"), 0.5],
@@ -114,27 +128,51 @@ def getEnemyByName(name, plr = None, game = None):
     );
   elif name == "bandit":
     return createEnemy(
-      "bandit", randint(10, 18), {"strength" : 15, "defense" : 10}, "dirty", [0.7, 0.1, 0.5, 0.01],
+      "bandit", randint(9, 11), {"strength" : 10, "dexterity": 20}, "dirty", [0.7, 0.1, 0.5, 0.01],
       [
         [getItem("leather gloves"), 0.5],
         [getItem("scroll of teleport"), 0.01]      
       ]
     );
+  elif name == "elf":
+    return createEnemy(
+      "elf", randint(10, 12), {"strength" : 20, "defense" : 20, "dexterity" : 30}, "archer", [0.7, 0.1, 0.5, 0.01],
+      [
+        [getItem("leather gloves"), 0.5],
+        [getItem("scroll of teleport"), 0.01]      
+      ],
+      game = game,
+      items = [
+        ["wooden sword", 1],
+        ["wooden arrow", randint(3, 7)]
+      ],
+    );
   elif name == "fallen knight":
     return createEnemy(
-      "fallen knight", randint(25, 40), {"strength" : 300, "defense" : 300}, "swordsman", [0.5, 0.4, 0.1, 0],
+      "fallen knight", randint(25, 30), {"strength" : 100, "defense" : 100}, "swordsman", [0.5, 0.4, 0.1, 0],
       [
         [getItem("scroll of instant kill"), 0.1]    
       ],
       True,
       game,
     );
- 
+  elif name == "priest":
+    return createEnemy(
+      "priest", randint(30, 35), {"strength" : 50, "defense" : 200}, "cleric", [0.7, 0.3, 0.1, 0],
+      [
+        [getItem("bible"), 0.3]    
+      ],
+      True,
+      game,
+    );
+    
 ENEMIES = [
   "bandit", 
   "slime", 
   "orc", 
   "goblin", 
   "skeleton",
+  "elf",
   "fallen knight",
+  "priest",
 ]
