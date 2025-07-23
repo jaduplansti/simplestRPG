@@ -288,3 +288,19 @@
 • added biscuit and apple as a food source
 • fixed passive skills.
 • added a new skill for swordsman and archer
+• added priest boss.
+
+[version 2.6.7]
+• added move mechanic
+• added range mechanic, you can now miss attack.
+• skills and attacks now use range
+• archer buffed
+• buffed some skills and attacks
+• can now view quests
+• added new skills
+• fixed input bug
+• parry range from (9999 -> 2)
+• cleric and swordsman buffed
+• added new quests
+• added guild hall
+• added armor

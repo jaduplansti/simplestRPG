@@ -54,7 +54,7 @@ class StatusEffectHandler:
     attacker.status["poisoned"][1] -= 1;
   
   def __karma(self, attacker, defender):
-    dmg = round((attacker.stats["health"] * 0.2) * (attacker.level / randint(10, 15)));
+    dmg = round((attacker.stats["health"] * 0.3) * (attacker.level / randint(10, 15)));
     self.ui.animatedPrint(f"[yellow]{attacker.name} feels their sins crawling, punishing for {dmg} damage[reset]!");
     attacker.enemy.attackEnemy(dmg);
     attacker.status["karma"][1] -= 1;
@@ -98,6 +98,9 @@ class DefenseHandler:
   
   def handleParry(self, attacker, defender):
     if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"]:
+      if self.combat_handler.attack_handler.handleRange(None, attacker, defender, 2) is False: return;
+      elif defender.status["parrying"][0] is True: return;
+      
       if not isinstance(defender, Player) and randint(1, 3) == randint(1, 3): pass;
       elif isinstance(defender, Player) and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f": pass;
       else:
@@ -142,25 +145,27 @@ class DamageHandler:
     self.game = self.combat_handler.game;
     
     self.attack_damages = {
-      **self.createDamage("punch", 10, ["strength"]),
-      **self.createDamage("strong punch", 20, ["strength"], 2),
-      **self.createDamage("double punch", 10, ["strength"], 2),
-      **self.createDamage("slam", 0, ["defense", "strength"]),
-      **self.createDamage("slash", 30, ["strength"], 2),
-      **self.createDamage("thrust", 25, ["strength", "defense"], 1.5),
-      **self.createDamage("iron reversal", 30, ["strength"], 2),
-      **self.createDamage("blade dance", 40, ["strength"], 1.7),
-      **self.createDamage("push", 5, ["defense"], 2, "defender"),
-      **self.createDamage("poke", 10, ["strength"], 0.8),
-      **self.createDamage("quick shot", 15, ["strength"], 1.3),
-      **self.createDamage("half draw", 20, ["strength"], 1.5),
-      **self.createDamage("arrow throw", 10, ["strength"], 2),
-      **self.createDamage("heal override", 1, ["strength", "dexterity"], 5),
-      **self.createDamage("stab", 20, ["strength", "dexterity"], 1.5),
+      **self.createDamage("punch", 10, ["strength"], _range = 1),
+      **self.createDamage("strong punch", 20, ["strength"], _range = 1),
+      **self.createDamage("double punch", 10, ["strength"], _range = 1),
+      **self.createDamage("slam", 0, ["defense", "strength"], _range = 1),
+      **self.createDamage("slash", 30, ["strength"], _range = 2),
+      **self.createDamage("thrust", 25, ["strength", "defense"], _range = 3),
+      **self.createDamage("iron reversal", 30, ["strength"], _range = 1),
+      **self.createDamage("blade dance", 40, ["strength"], _range = 2),
+      **self.createDamage("push", 5, ["defense"], _range = 1, origin = "defender"),
+      **self.createDamage("poke", 10, ["strength"], _range = 2),
+      **self.createDamage("quick shot", 15, ["strength"], _range = 5),
+      **self.createDamage("half draw", 20, ["strength"], _range = 7),
+      **self.createDamage("arrow throw", 10, ["strength"], _range = 5),
+      **self.createDamage("heal override", 6, ["strength", "dexterity"], _range = 2),
+      **self.createDamage("stab", 10, ["strength", "dexterity"], _range = 1),
+      **self.createDamage("feint", 5, ["dexterity"], _range = 1),
+      **self.createDamage("chain", 15, ["strength"], _range = 1),
     }
    
-  def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = []):
-    return {name : {"origin" : origin, "dmg" : basedmg, "stats" : stats, "multiplier" :  multiplier, "ignores" : ignores}};
+  def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = [], _range = 1):
+    return {name : {"origin" : origin, "dmg" : basedmg, "stats" : stats, "multiplier" :  multiplier, "ignores" : ignores, "range" : _range}};
   
   def reduceDamage(self, dmg, defender):
     return max(0, dmg - defender.stats.get("defense"));
@@ -208,12 +213,18 @@ class AttackHandler:
     self.defense_handler = DefenseHandler(combat_handler);
     self.status_handler = StatusEffectHandler(combat_handler);
     self.ui = self.combat_handler.ui;
-  
+    
   def handlePassiveSkills(self, _type, attacker, defender):
     for skill in attacker.skills:
       if attacker.skills[skill].passive is True and attacker.skills[skill].passive_type == _type:
         attacker.skills[skill].use(self.combat_handler, attacker, defender);
-        
+  
+  def validateAttack(self, attacker, defender, move, _range = None, ignore_block = False):
+    if self.handleRange(move, attacker, defender, _range) is False: return False;
+    if self.defense_handler.handleDodge(attacker, defender) is True: return False;
+    if ignore_block is False and self.handleBlock(attacker, defender) is True: return False;
+    return True;
+    
   def consumeEquipment(self, character, parts, dmg):
     for broken in character.useEquipment(parts, dmg, self.combat_handler.game):
       self.ui.animatedPrint(f"[red]{broken} was broken![reset]");
@@ -231,22 +242,32 @@ class AttackHandler:
       return True;
     return False;
   
+  def handleRange(self, move, attacker, defender, _range = None):
+    if _range is None: _range = self.damage_handler.attack_damages[move]["range"];
+    if self.combat_handler.isHit(attacker.direction, _range, attacker, defender): return True;
+    self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] tried to hit [yellow]{defender.name}[reset] but missed!", "miss");
+    self.ui.panelPrint(f"[yellow]MISSED[reset]");
+    return False;
+      
   def __basic_style(self, attacker, defender):
     move = choices(["punch", "strong punch", "double punch", "slam"])[0];
+    if self.validateAttack(attacker, defender, move) != True: return;
+    
     if self.__basicMiniGame(move, attacker, defender) is False: return;
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
- 
+  
   def __sword_style(self, attacker, defender):
     move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
-    
+    if self.validateAttack(attacker, defender, move) != True: return;
+
     if self.__swordMiniGame(move, attacker, defender) is False: return;
     if move == "iron reversal" : self.defense_handler.giveBlock(attacker, defender);
     elif move == "blade dance": attacker.stats["defense"] += 0.5; # balance this lmao
     
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
     
     self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
@@ -257,52 +278,53 @@ class AttackHandler:
       self.ui.panelPrint("[bold red]NO ARROWS[reset]", "center", "bow");
       return;
     move = choices(["quick shot", "half draw", "arrow throw"])[0];
-    
+    if self.validateAttack(attacker, defender, move) != True: return;
+
     if self.__bowMiniGame(move, attacker, defender) is False: return;
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     self.ui.panelAnimatedPrintFile("bow style", move, [attacker.name, defender.name, dmg], move);
     
     self.consumeEquipment(attacker, ["left arm", "right arm"], dmg - attacker.stats["strength"]);
     attacker.usedItem("wooden arrow");
     if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
     
-  def __debug_style(self, attacker, defender):
-    self.ui.panelAnimatedPrint(f"[cyan]{attacker.name}[reset] deleted [yellow]{defender.name}[reset], dealt [bold purple]∞[reset] damage", "delete");
-    attacker.attackEnemy(99999999999999999);
-  
   def __dirty_style(self, attacker, defender):
     move = choices(["push", "poke"])[0];
+    if self.validateAttack(attacker, defender, move) != True: return;
+
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     self.ui.panelAnimatedPrintFile("dirty style", move, [attacker.name, defender.name, dmg], move);
     
     if move == "push": defender.giveStatus("stunned", 3);
     elif move == "poke": defender.giveStatus("bleeding", 3);
   
   def __cleric_style(self, attacker, defender):
+    if self.validateAttack(attacker, defender, "heal override") != True: return;
     self.ui.printDialogue(attacker.name, "repent..");
     dmg = self.damage_handler.calculateDamage("heal override", attacker, defender);
     dmg = dmg * max(defender.status["karma"][1], 1);
     
     attacker.stats["health"] = min(attacker.stats["health"] + (dmg * 0.5), attacker.stats["max health"]);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     defender.giveStatus("karma", 2);
     self.ui.panelAnimatedPrintFile("cleric style", "heal override", [attacker.name, defender.name, dmg], "heal override");
   
   def __thief_style(self, attacker, defender):
-    move = choices(["stab", "throw", "feint", "chain"])[0];
+    move = choices(["stab", "feint", "chain"])[0]; # todo back stab mechanic
+    if self.validateAttack(attacker, defender, move) != True: return;
     dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    attacker.attackEnemy(dmg);
+    attacker.attackEnemy(dmg, self.combat_handler);
     self.ui.panelAnimatedPrintFile("thief style", move, [attacker.name, defender.name, dmg], move);
     
     if move == "stab": defender.giveStatus("poisoned", 3);
-    elif move == "feint": attacker.giveStatus("parrying", 2);
+    elif move == "feint": attacker.giveStatus("parrying", 1);
     
   def __thiefMiniGame(self, move, attacker, defender):
     if not isinstance(attacker, Player): return True;
     
-    if move == "stab":
+    if move == "chain":
       pass;
       
   def __swordMiniGame(self, move, attacker, defender):
@@ -363,14 +385,8 @@ class AttackHandler:
     
   def handleAttack(self, attacker, defender):
     self.handlePassiveSkills("attack", attacker, defender);
-    if self.handleBlock(attacker, defender) is True:
-      return;
-    
-    if self.defense_handler.handleDodge(attacker, defender) is True: 
-      return;
 
     if attacker.attack_style == "basic": self.__basic_style(attacker, defender);
-    elif attacker.attack_style == "debug": self.__debug_style(attacker, defender);
     elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
     elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);
     elif attacker.attack_style == "archer": self.__bow_style(attacker, defender);

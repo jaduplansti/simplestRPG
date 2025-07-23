@@ -24,7 +24,7 @@ from rich.live import Live;
 from rich.tree import Tree;
 from readchar import readkey;
 
-from timedinput import timedinput;
+from inputimeout import inputimeout, TimeoutOccurred;
 from threading import Thread
 from player import Player;
 
@@ -202,11 +202,16 @@ class UI:
     self.newLine();
     return _input;
   
+  def dialogueAsk(self, s):
+    _input = Prompt.ask(s + "\n\n");
+    self.newLine();
+    return _input;
+    
   def getInputWithTimeout(self, msg, n):
     self.normalPrint(msg + "\n");
     try:
-      return timedinput(f": ", timeout = n);
-    except:
+      return inputimeout(prompt = f": ", timeout = n);
+    except TimeoutOccurred:
       return "";
       
   def showBar(self, n, total, bar_length, color):

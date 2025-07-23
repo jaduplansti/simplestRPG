@@ -17,8 +17,10 @@ class Character:
     self.hunger = 100;
     
     self.berserk = False;
+    self.zone = 5;
+    self.direction = None;
     
-    self.points = 5;
+    self.points = 20;
     self.title = "unawakened";
     self.status = {
       "blocking" : [False, 0],
@@ -47,11 +49,14 @@ class Character:
     self.skills = {}
     self.magic = {}
     
+    self.guild_info = {};
+    
     self.addItemToInventory(getItem("bible"), 1);
     self.addItemToInventory(getItem("health potion"), 10);
     self.addItemToInventory(getItem("wooden sword"), 1);
     self.addSkill(getSkill("soul shatter"));
-  
+    self.addSkill(getSkill("analyze"));
+
   def to_dict(self):
     return {
      "name": self.name,
@@ -63,6 +68,7 @@ class Character:
       "energy": self.energy,
       "hunger": self.hunger,
       "status": self.status,
+      "guild info": self.guild_info,
       "berserk": self.berserk,
       "stats": self.stats,
       "equipment": {k: v.to_dict() if v else None for k, v in self.equipment.items()},
@@ -94,6 +100,7 @@ class Character:
     char.status = data["status"]
     char.berserk = data["berserk"]
     char.stats = data["stats"]
+    char.guild_info = data["guild info"]
     char.points = data["points"]
     char.title = data["title"]
     char.equipment = {
@@ -182,9 +189,6 @@ class Character:
     
   def giveDamage(self, dmg):
     self.stats["health"] -= min(self.stats["health"], dmg)
-    
-  def attackEnemy(self, dmg):
-    self.enemy.giveDamage(dmg);
     
   def giveExp(self, exp):
     self.exp += exp
@@ -277,3 +281,7 @@ class Character:
     
   def clearStatus(self):
     for status in self.status: self.status[status] = [False, 0];
+    
+  def attackEnemy(self, dmg, combat_handler = None):
+    if combat_handler != None: combat_handler.attack_handler.consumeEquipment(self.enemy, ["chest"], dmg * 0.2);
+    self.enemy.stats["health"] -= dmg;

@@ -46,9 +46,6 @@ class CombatHandler:
   def handleLevelUp(self, won):
     old_level = won.level;
     if won.tryLevelUp() is True:
-      if won.level in range(2, 4): self.game.giveQuest("slime slayer");
-      elif won.level in range(4, 8): self.game.giveQuest("goblin slayer");
- 
       self.ui.animatedPrint(f"[yellow]{won.name}[reset] feels a surge of [blue]power[reset], [yellow]{won.name}[reset], leveled up!");
       self.ui.panelPrint(f"level [yellow]{old_level}[reset] -> [green]{won.level}[reset]");
       
@@ -131,7 +128,27 @@ class CombatHandler:
   
   def storeAction(self, option):
     self.previous_action = option;
-    
+  
+  def isHit(self, direction, n, attacker, defender):
+    if attacker.zone == defender.zone: return True;
+    elif direction == "backward" and defender.zone in range(attacker.zone - 1, attacker.zone - n - 1, -1): return True;
+    elif direction == "forward" and defender.zone in range(attacker.zone + 1, attacker.zone + n + 1): return True;
+    else: return False;
+  
+  def lockTarget(self, attacker, defender):
+    if attacker.zone < defender.zone: 
+      attacker.direction = "forward";
+      defender.direction = "backward";
+    elif attacker.zone > defender.zone: 
+      attacker.direction = "backward";
+      defender.direction = "forward";
+    else:
+      pass;
+  
+  def move(self, offset, direction, attacker):
+    if direction == "backward" and attacker.zone - offset >= 0 : attacker.zone -= offset;
+    elif direction == "forward" and attacker.zone - offset <= 10 : attacker.zone += offset;
+
   def handleOption(self, option, attacker, defender):
     self.ui.showStatus("processing move", 1, "clock");
     self.handleHunger(attacker);
@@ -161,6 +178,12 @@ class CombatHandler:
     elif len(option.split(",")) > 1 and option.split(",")[0] == "perform" and isinstance(attacker, Enemy):
       if attacker.skillExists(option.split(",")[1].lstrip()) is True: attacker.skills[option.split(",")[1].lstrip()].use(self, attacker, defender);
       else: self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] tried to use a skill, but they haven't learned {option.split(",")[1].lstrip()}", title = "skill");
+    elif len(option.split(" ")) > 1 and option.split(" ")[0] == "move":
+      direction = option.split(" ")[1];
+      if direction.lower() in ["backward", "forward"]: 
+        self.move(1, direction, attacker);
+        self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] moved [cyan]{direction}[reset] by a step!", "move");
+      else: self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] moved [cyan]{direction}[reset] but failed!", "move");
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
       self.setCurrentTurnOption(attacker, "");
@@ -179,23 +202,25 @@ class CombatHandler:
       self.ui.showSeperator("-");
       self.attack_handler.status_handler.handleStatus(self.attacker, self.defender);
       
+      self.lockTarget(self.attacker, self.defender);
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.player_option, self.attacker, self.defender);
       self.ui.showSeperator("-");
       
-      if self.checkDeath() is True or self.player_option == "flee":
+      if self.checkDeath() is True or (self.player_option == "flee" and self.attacker.status["stunned"] is False):
         break;
       
       self.enemy_option = self.defender.getAction(self.ui);
       self.storeAction(self.enemy_option);
       self.attack_handler.status_handler.handleStatus(self.defender, self.attacker);
       
+      self.lockTarget(self.attacker, self.defender);
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
 
       if isinstance(self.defender, Enemy):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
-      if self.checkDeath() is True or self.enemy_option == "flee": break;
+      if self.checkDeath() is True or (self.enemy_option == "flee" and self.defender.status["stunned"] is False): break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
  

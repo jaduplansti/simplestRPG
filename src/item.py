@@ -11,7 +11,7 @@ class Equipment:
   name, a string holding the name for the equipment, very important
   durability, a integer containing the current health potion
   max_durability, a integer containing the max health point of an item
-  bodypart, a string containing either left arm, right arm, head, torso and boots.
+  bodypart, a string containing either left arm, right arm, head, chest and boots.
   bonus, a integer storing bonuses
   """
   
@@ -34,11 +34,10 @@ class Equipment:
       return True;
     
   def removeEquipment(self, plr, game):
-    if "sword" in self.name:
+    if self.name in ["sword", "bow"]:
       game.removeStyle(plr);
       plr.stats["strength"] -= self.bonus;
-    elif "bow" in self.name:
-      plr.stats["strength"] -= self.bonus;
+    elif self.bodypart == "chest": plr.stats["defense"] -= self.bonus;
     plr.equipment[self.bodypart] = None;
   
   @classmethod
@@ -239,7 +238,6 @@ def use_bow(item, game, combat_handler, user):
     game.ui.animatedPrint(f"strength [green]+{strength_increased}[reset]!");
     game.giveStyle(user, "archer");
     user.stats["strength"] += strength_increased;
-    user.equipment[item.bodypart].bonus = strength_increased;
 
 def use_food(item, game, combat_handler, user):
   if item.name == "bread":
@@ -261,11 +259,38 @@ def use_book(item, game, combat_handler, user):
   if item.name == "bible":
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opens up the [bold yellow]bible[reset]!");
     game.giveStyle(user, "cleric");
+
+def use_armor(item, game, combat_handler, user):
+  if user.equipItem(item) != True:
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] already has a [yellow]{user.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
+    return -1;
     
+  game.ui.animatedPrint(f"[yellow]{user.name}[reset] equipped a [bold cyan]{item.name}[reset]!");
+
+  if item.name == "peasant tunic":
+    defense_increased = 30;
+    user.equipment[item.bodypart].bonus = defense_increased;
+    game.ui.animatedPrint(f"defense [green]+{defense_increased}[reset]!");
+    user.stats["defense"] += defense_increased;
+
+  if item.name == "worn leather vest":
+    defense_increased = 50;
+    user.equipment[item.bodypart].bonus = defense_increased;
+    game.ui.animatedPrint(f"defense [green]+{defense_increased}[reset]!");
+    user.stats["defense"] += defense_increased;
+
 ITEMS = {
   "wooden sword": {
     "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
+  },
+  "peasant tunic": {
+    "item": Item(name="peasant tunic", max_durability = 5000, durability = 5000, rank="E", weight=3.0, bodypart="chest"),
+    "action": use_armor,
+  },
+  "worn leather vest": {
+    "item": Item(name="worn leather vest", max_durability = 6000, durability = 6000, rank="E", weight=4.0, bodypart="chest"),
+    "action": use_armor,
   },
   "wooden bow": {
     "item": Item(name="wooden bow", max_durability = 2000, durability = 2000, rank = "E", weight = 2.0, bodypart = "right arm"),

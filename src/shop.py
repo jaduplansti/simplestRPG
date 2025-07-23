@@ -11,11 +11,13 @@ class Shop(SubMenu):
       "wooden sword" : [getItem("wooden sword"), 60, 20],
       "scroll of teleport" : [getItem("scroll of teleport"), 100, 50],
       "starter chest" : [getItem("starter chest"), 100, 80],
-      "bread" : [getItem("bread"), 100, 30],
-      "apple" : [getItem("apple"), 100, 5],
-      "biscuit" : [getItem("biscuit"), 100, 10],
+      "bread" : [getItem("bread"), 100, 6],
+      "apple" : [getItem("apple"), 100, 1],
+      "biscuit" : [getItem("biscuit"), 100, 3],
       "steel sword" : [getItem("steel sword"), 50, 50],
       "kevins sword" : [getItem("kevins sword"), 30, 150],
+      "peasant tunic" : [getItem("peasant tunic"), 30, 100],
+      "worn leather vest" : [getItem("worn leather vest"), 30, 200],
     };
   
   def showShopInfo(self):

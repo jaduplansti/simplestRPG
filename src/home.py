@@ -25,6 +25,7 @@ class Home(SubMenu):
     else:
       self.ui.normalPrint("≈ [magenta]go outside[reset]");
       self.ui.normalPrint("≈ [blue]sleep[reset]");
+      self.ui.normalPrint("≈ [blue]quest[reset]");
       self.ui.normalPrint("≈ [green]settings[reset]");
       self.ui.normalPrint("≈ [yellow]back[reset]\n");
     
@@ -37,6 +38,7 @@ class Home(SubMenu):
         "sleep" : self.game.handleSleep,
         "settings" : self.game.handleSettings,
         "gear" : self.game.handleEquipment,
+        "quest" : self.game.handleQuest,
         "go outside" : self.game.exploration_handler.explore,
         "next": self.nextPage,
         "back": self.prevPage,

@@ -36,8 +36,26 @@ class Enemy(Character):
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck": self.stats[stat] += 0.001;
       else: self.stats[stat] += 1;
-        
+  
+  def move(self, away = False):
+    if not away:
+      if self.enemy.zone < self.zone:
+        return choices(["move backward", None], [0.8, 0.2])[0]
+      elif self.enemy.zone > self.zone:
+        return choices(["move forward", None], [0.8, 0.2])[0]
+    else:
+      if self.enemy.zone < self.zone:
+        return choices(["move forward", None], [0.8, 0.2])[0]
+      elif self.enemy.zone > self.zone:
+        return choices(["move backward", None], [0.8, 0.2])[0]
+    
+    return choices(["move backward", "move forward", None], [0.4, 0.4, 0.2])[0]
+    
   def getAction(self, ui):
+    if randint(1, 3) == 1:
+      _move = self.move(choices([True, False])[0]);
+      if _move != None: return _move;
+     
     action = self.customAction(ui);
     if action != None: return action;
     
@@ -56,13 +74,13 @@ class Enemy(Character):
     if self.name == "elf":
       if self.attack_style == "archer" and self.itemExists("wooden sword") and not self.itemExists("wooden arrow"): return "use, wooden sword";
       elif self.attack_style == "archer": return choices(["perform, arrow rain", None], [0.2, 0.8])[0];
-      elif self.attack_style == "swordsman": return choices(["perform, parry", "perform, trislash", None], [0.2, 0.8])[0];
+      elif self.attack_style == "swordsman": return choices(["perform, parry", "perform, trislash", None], [0.2, 0.2, 0.6])[0];
 
     if self.name == "priest":
       if self.stats["health"] <= self.stats["max health"] * 0.5: return "perform, blunt recovery";
-      elif randint(1, 2) == randint(1, 2) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
+      elif randint(1, 4) == randint(1, 4) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
       elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
-     
+    
 def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None, items = None):
   enemy = Enemy(name);
   enemy.level = level;
@@ -167,12 +185,12 @@ def getEnemyByName(name, plr = None, game = None):
     );
     
 ENEMIES = [
-  "bandit", 
+  #"bandit", 
   "slime", 
-  "orc", 
-  "goblin", 
-  "skeleton",
-  "elf",
-  "fallen knight",
-  "priest",
+#   "orc", 
+#   "goblin", 
+#   "skeleton",
+#   "elf",
+#   "fallen knight",
+#   "priest",
 ]

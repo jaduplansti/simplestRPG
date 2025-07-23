@@ -8,6 +8,7 @@ from forest import Forest;
 from shop import Shop;
 
 from dungeon import Dungeon;
+from guild_hall import GuildHall;
 
 def createArea(name, handler, _next = [], prev = [], enemies = None, position = 0):
   return {name : {
@@ -19,8 +20,9 @@ def createArea(name, handler, _next = [], prev = [], enemies = None, position = 
   }};
 
 AREAS = {
-  **createArea("home", Home, _next = ["forest", "shop"], position = 0),
+  **createArea("home", Home, _next = ["forest", "shop", "guild hall"], position = 0),
   **createArea("forest", Forest, prev = ["home"], _next = ["dungeon"], position = 10),
+  **createArea("guild hall", GuildHall, prev = ["home"], position = 8),
   **createArea("shop", Shop, prev = ["home"], position = 5),
   **createArea("dungeon", Dungeon, prev = ["forest"], position = 25),
 };
@@ -52,7 +54,8 @@ class Exploration:
         return [AREAS[destination_name], destination_name];
       except KeyError:
         self.ui.normalPrint("not a valid destination");
-
+        self.ui.awaitKey();
+        
   def handleExplore(self, player, destination):
     event = None;
     while player.position != destination["position"]:

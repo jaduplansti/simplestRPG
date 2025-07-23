@@ -3,11 +3,6 @@ from random import choices, randint, uniform;
 from combat import CombatHandler;
 from item import getItem, ITEMS;
 
-#todo: make commands more simple. refactor all classes
-# make dungeon, add more skills, refactor quest system
-
-#todo: fix equipment.
-
 class Dungeon():
   def __init__(self, game):
     self.game = game;
@@ -64,7 +59,7 @@ class Dungeon():
     if event == "encounter": self.__encounterEvent();
     elif event == "item": self.__itemEvent();
     elif event == "trap" : self.__trapEvent();
-    elif event == "puzzle": self.__puzzleEvent();
+    #elif event == "puzzle": self.__puzzleEvent();
     
     self.progress += 1;
     
@@ -110,8 +105,6 @@ class Dungeon():
     self.handleInitiateMenu();
   
   def __encounterEvent(self):
-    self.game.ui.printDialogue(self.game.player.name, choices(["an enemy!", "is that a monster?", "is this hostile?", "shit..", "oh great an enemy."])[0]);
-    self.game.ui.awaitKey();
     combat_handler = CombatHandler(self.game);
     combat_handler.initiateFightNpc(self.game.player, choices(["goblin", "slime", "orc", "skeleton", "bandit"])[0]);
   

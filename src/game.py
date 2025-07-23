@@ -83,6 +83,10 @@ class Game:
     self.ui.enableEcho();
     os._exit(0);
   
+  def handleQuest(self):
+    self.ui.clear();
+    self.menu.showQuestMenu(self.player);
+    
   def handleEquipment(self):
     while True:
       self.ui.clear();
@@ -190,9 +194,14 @@ class Game:
   
   def initiateFight(self):
     """Initiates a fight using CombatHandler, see combat.py."""
-    
+    enemy = "";
+    if self.player.level in range(1, 6): enemy = choices(["slime", "goblin"])[0];
+    elif self.player.level in range(6, 9): enemy = choices(["orc", "skeleton"])[0];
+    elif self.player.level in range(9, 13): enemy = choices(["elf", "bandit"])[0];
+    else: enemy = choices(["fallen knight", "priest"])[0];
+
     combat_handler = CombatHandler(self);
-    combat_handler.initiateFightNpc(self.player, choices(ENEMIES)[0]);
+    combat_handler.initiateFightNpc(self.player, enemy);
     
   def handleCombatInitiateMenu(self, combat_handler):
     """
@@ -309,7 +318,8 @@ class Game:
   def giveQuest(self, name):
     if self.player.giveQuest(name) != -1:
       self.ui.panelPrint(f"[bold yellow]{name}[reset]\n{self.player.quests[name]["obj"].desc}", "center", title = "QUEST RECEIVED");
-   
+    else: return -1;
+    
   def givePlayerExp(self, exp):
     self.player.exp += exp;
   
@@ -364,7 +374,7 @@ class Game:
         except Exception as e: self.ui.panelPrint(str(e), "center", "system", "red")
         self.ui.awaitKey()
       else: break;
-      
+ 
   def giveStatus(self, status, n):
     CombatHandler(self).attack_handler.status_handler.afflict(self.player, status, n);
   
