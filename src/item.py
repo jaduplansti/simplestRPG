@@ -1,8 +1,6 @@
 from random import randint, choices;
 from copy import deepcopy;
 
-# CREATE EQUIPMENT CLASS, REFACTOR THIS SHIT 
-
 class Equipment:
   """
   an Equipment class.
@@ -34,9 +32,13 @@ class Equipment:
       return True;
     
   def removeEquipment(self, plr, game):
-    if self.name in ["sword", "bow"]:
+    if "sword" in self.name or "bow" in self.name:
       game.removeStyle(plr);
       plr.stats["strength"] -= self.bonus;
+    elif "dagger" in self.name:
+      game.removeStyle(plr);
+      plr.stats["dexterity"] = max(0, plr.stats["dexterity"] - self.bonus[0]);
+      plr.stats["defense"] += self.bonus[1];
     elif self.bodypart == "chest": plr.stats["defense"] -= self.bonus;
     plr.equipment[self.bodypart] = None;
   
@@ -178,7 +180,7 @@ def use_scroll(item, game, combat_handler, user):
     user.usedItem(item.name);
     game.ui.clear();
     game.exploration_handler.move(location);
-    
+   
 def use_sword(item, game, combat_handler, user):
   if user.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] already has a [yellow]{user.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
@@ -188,17 +190,38 @@ def use_sword(item, game, combat_handler, user):
   strength_increased = round(user.stats["strength"] * 0.3);
   
   if item.name == "kevins sword": strength_increased *= 1.5;
+  elif item.name == "ashrend sword": strength_increased = 30 * user.level;
+
   game.ui.animatedPrint(f"strength increased by [green]{strength_increased}[reset]!");
     
   game.giveStyle(user, "swordsman");
   user.stats["strength"] += strength_increased;
     
   user.equipment[item.bodypart].bonus = strength_increased;
+  
+def use_dagger(item, game, combat_handler, user):
+  if user.equipItem(item) != True:
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] already has a [yellow]{user.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
+    return -1;
+  
+  game.ui.animatedPrint(f"[yellow]{user.name}[reset] equipped a [bold yellow]{item.name}[reset]!");
+  dexterity_increased = round(user.stats["dexterity"] * 2);
+  defense_decreased = round(user.stats["defense"] * 0.5);
+ 
+  game.ui.animatedPrint(f"dexterity increased by [green]{dexterity_increased}[reset]!");
+  game.ui.animatedPrint(f"defense decreased by [red]{defense_decreased}[reset]!");
+
+  game.giveStyle(user, "thief");
+  user.stats["dexterity"] += dexterity_increased;
+  user.stats["defense"] = max(0, user.stats["defense"] - defense_decreased);
+
+  user.equipment[item.bodypart].bonus = [dexterity_increased, defense_decreased]
     
 def use_chest(item, game, combat_handler, user):
   if item.name == "starter chest":
-    possible_loot = [getItem("wooden sword"), getItem("energy potion"), getItem("health potion"), getItem("scroll of repair"), getItem("strength potion")];
-    
+    possible_loot = [];
+    for item in ITEMS: 
+      if ITEMS[item]["item"].rarity in ["common", "uncommon"]: possible_loot.append(ITEMS[item]["item"]);
     amount_loot = randint(0, len(possible_loot));
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opened up a [bold green]starter chest[reset]!");
     
@@ -259,7 +282,19 @@ def use_book(item, game, combat_handler, user):
   if item.name == "bible":
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opens up the [bold yellow]bible[reset]!");
     game.giveStyle(user, "cleric");
-
+  
+  elif item.name == "skill book":
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] opened a [bold cyan]skill book[reset]!");
+    skills = [];
+    all_skills = game.getSkills();
+    for skill in all_skills: 
+      if all_skills[skill]["skill"]._class == None: skills.append(skill);
+    skill = choices(list(skills))[0];
+ 
+    game.ui.showStatus("reading", 3);
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] learnt [underline green]{skill}[reset]!");
+    game.giveSkill(user, skill);
+    
 def use_armor(item, game, combat_handler, user):
   if user.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] already has a [yellow]{user.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
@@ -281,27 +316,35 @@ def use_armor(item, game, combat_handler, user):
 
 ITEMS = {
   "wooden sword": {
-    "item": Item(name="wooden sword", max_durability = 2000, durability = 2000, rank="E", weight=2.0, bodypart="right arm"),
+    "item": Item(name="wooden sword", max_durability = 150, durability = 150, rank="E", weight=2.0, bodypart="right arm"),
     "action": use_sword
   },
+  "wooden dagger": {
+    "item": Item(name="wooden dagger", max_durability = 100, durability = 100, rank="E", weight=2.0, bodypart="right arm"),
+    "action": use_dagger
+  },
   "peasant tunic": {
-    "item": Item(name="peasant tunic", max_durability = 5000, durability = 5000, rank="E", weight=3.0, bodypart="chest"),
+    "item": Item(name="peasant tunic", max_durability = 100, durability = 100, rank="E", weight=3.0, bodypart="chest"),
     "action": use_armor,
   },
   "worn leather vest": {
-    "item": Item(name="worn leather vest", max_durability = 6000, durability = 6000, rank="E", weight=4.0, bodypart="chest"),
+    "item": Item(name="worn leather vest", max_durability = 250, durability = 250, rank="E", weight=4.0, bodypart="chest"),
     "action": use_armor,
   },
   "wooden bow": {
-    "item": Item(name="wooden bow", max_durability = 2000, durability = 2000, rank = "E", weight = 2.0, bodypart = "right arm"),
+    "item": Item(name="wooden bow", max_durability = 100, durability = 100, rank = "E", weight = 2.0, bodypart = "right arm"),
     "action": use_bow
   },
   "steel sword": {
-    "item": Item(name="steel sword", max_durability = 5000, durability = 5000, rank="D+", weight = 5.0, bodypart= "right arm"),
+    "item": Item(name="steel sword", max_durability = 400, durability = 400, rank="D+", weight = 5.0, bodypart= "right arm"),
+    "action": use_sword
+  },
+  "ashrend sword": {
+    "item": Item(name="ashrend sword", max_durability = 800, durability = 800, rarity = "legendary", rank="A", weight = 5.0, bodypart= "right arm"),
     "action": use_sword
   },
   "kevins sword": {
-    "item": Item(name="kevins sword", max_durability = 15000, durability = 15000, rank="C", weight = 2.0, bodypart = "right arm"),
+    "item": Item(name="kevins sword", max_durability = 1, durability = 1, rank="C", weight = 2.0, bodypart = "right arm"),
     "action": use_sword
   },
   "health potion": {
@@ -332,10 +375,6 @@ ITEMS = {
     "item": Item(name="cleanse potion", rank="C", rarity="uncommon", weight=0.6),
     "action": use_potion
   },
-  "leather gloves": {
-    "item": Item(name = "leather gloves", bodypart = "left arm", rank = "D", rarity = "uncommon", weight = 0.5),
-    "action": use_glove,
-  },
   "scroll of teleport": {
     "item": Item(name = "scroll of teleport", rank = "C", rarity = "rare", weight = 0.1),
     "action": use_scroll,
@@ -358,6 +397,10 @@ ITEMS = {
   },
   "bible": {
     "item": Item(name = "bible", rank = "???", rarity = "???", weight = 0.05),
+    "action": use_book,  
+  },
+  "skill book": {
+    "item": Item(name = "skill book", rank = "A", rarity = "epic", weight = 0.09),
     "action": use_book,  
   }
 };

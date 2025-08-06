@@ -154,12 +154,13 @@ class UI:
 	  formatted_s = self.getString(key, n).format(*args);
 	  self.panelAnimatedPrint(formatted_s, title);
   
-  def animatedPrint(self, s):
+  def animatedPrint(self, s, punc = False):
     self.disableEcho();
     parsed_s = Text.from_markup(s)
     print("~ ", end = "");
     for ch in parsed_s:
-      if ch in [".", ","]: sleep(1);
+      if punc is True and str(ch) == ".": sleep(0.3);
+      elif punc is True and str(ch) == ",": sleep(0.1);
       print(ch, end='', flush=True)
       sleep(self.game.settings["type speed"]);
     self.newLine();
@@ -169,7 +170,7 @@ class UI:
     self.clearStdinBuffer();
   
   def printDialogue(self, name, s):
-    self.animatedPrint(f"{name}: {s}");
+    self.animatedPrint(f"{name}: {s}", punc = True);
     
   def printTreeMenu(self, title, options): 
     tree = Tree(title);
@@ -193,9 +194,7 @@ class UI:
     return readkey();
     
   def awaitKey(self):
-    self.normalPrint("(type anything to continue)\n");
-    input("> ");
-    self.newLine();
+    self.getKey("([bold red]press anything to continue[reset])");
     
   def getInput(self):
     _input = Prompt.ask(f"[yellow](enter command)[reset] ⤵\n\n");

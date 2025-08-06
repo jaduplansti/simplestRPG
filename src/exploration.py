@@ -9,6 +9,7 @@ from shop import Shop;
 
 from dungeon import Dungeon;
 from guild_hall import GuildHall;
+from character import Character;
 
 def createArea(name, handler, _next = [], prev = [], enemies = None, position = 0):
   return {name : {
@@ -27,22 +28,45 @@ AREAS = {
   **createArea("dungeon", Dungeon, prev = ["forest"], position = 25),
 };
 
+class ExplorationEventHandler:
+  def __init__(self, game):
+    self.game = game;
+    self.ui = game.ui;
+    
+    self.merchant = Character("jacob");
+    
+  def getRandomEvent(self):
+    return choices(["fight", None], [0.05, 0.99])[0];
+
+  def __merchant_buy(self):
+    if len(self.merchant.inventory) <= 0:
+      self.ui.printDialogue(self.merchant.name, "sorry adventurer...");
+      self.ui.printDialogue(self.merchant.name, "i dont have any items sell!");
+      self.ui.printDialogue(self.merchant.name, "but i would be willing to buy your stuff.");
+      return;
+    
+    while True:
+      pass;
+      
+  def handleMerchant(self):
+    self.ui.clear();
+    self.ui.animatedPrint(f"a wandering merchant, approaches you..");
+    self.ui.printDialogue(self.merchant.name, "hello adventurer!");
+    
+    while True:
+      self.ui.printTreeMenu("", ["buy", "sell", "talk"]);
+      option = self.ui.getInput();
+      if option == "buy": self.__merchant_buy();
+      elif option == "sell": pass;
+      elif option == "talk": pass;
+      self.ui.clear();
+    
 class Exploration:
   def __init__(self, game):
     self.game = game;
     self.ui = self.game.ui;
-
-  def getRandomEvent(self):
-    return choices(["fight", None], [0.05, 0.99])[0];
-
-  def handleEvent(self, event):
-    if event == "fight":
-      CombatHandler(self.game).initiateFightNpc(self.game.player, "slime");
-      self.ui.awaitKey();
-    elif event == "loot":
-      #self.game.player.addInventory();
-      pass;
-      
+    self.event_handler = ExplorationEventHandler(game);
+    
   def handleGetNext(self, area):
     while True:
       self.ui.clear();
@@ -65,11 +89,12 @@ class Exploration:
         while True:
           if player.position < destination["position"]: player.position += 1;
           elif player.position > destination["position"]: player.position -= 1;
-          event = self.getRandomEvent();
+          #event = self.getRandomEvent();
           sleep(0.2);
           status.update(f"[green]walking ({player.position} / {destination['position']})[reset]");
-          if event is not None or player.position == destination["position"]: break;
-      self.handleEvent(event);
+          # event is None
+          if player.position == destination["position"]: break;
+      #self.handleEvent(event);
   
   def move(self, loc):
     if loc in AREAS:

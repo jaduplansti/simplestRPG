@@ -130,7 +130,29 @@
       "[bold cyan]{0}[reset] embraced divine grace, regaining [bold green]{2}[reset] health, then blessed [bold yellow]{1}[reset] with a heavy dose of karma!"
     ]
   },
-
+  "thief style": {
+    "stab": [
+      "[bold yellow]{0}[reset] lunged forward with a precise stab, piercing [bold yellow]{1}[reset] and dealing [bold red]{2}[reset] damage! Poison seeps in...",
+      "[bold yellow]{0}[reset] stabbed deep into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage as toxins enter the wound!",
+      "[bold yellow]{0}[reset] struck fast with a poisoned blade, hitting [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] delivered a venom-laced stab to [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] jabbed a coated dagger into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage! The poison takes hold..."
+    ],
+    "feint": [
+      "[bold yellow]{0}[reset] faked a strike before stabbing [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage while preparing to parry.",
+      "[bold yellow]{0}[reset] used a subtle feint, slipping past [bold yellow]{1}[reset]'s guard for [bold red]{2}[reset] damage.",
+      "[bold yellow]{0}[reset] tricked [bold yellow]{1}[reset] with a misleading move, landing a controlled stab for [bold red]{2}[reset] damage.",
+      "[bold yellow]{0}[reset] drew [bold yellow]{1}[reset] off balance with a clever feint, hitting for [bold red]{2}[reset] damage.",
+      "[bold yellow]{0}[reset] sidestepped and stabbed with deceptive finesse, dealing [bold red]{2}[reset] damage and readying to counter."
+    ],
+    "chain": [
+      "[bold yellow]{0}[reset] stabbed quickly at [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage with fluid motion.",
+      "[bold yellow]{0}[reset] struck with a sharp stab at [bold yellow]{1}[reset], leaving an opening for another move after [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] flowed through the attack, stabbing [bold yellow]{1}[reset] and inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] landed a clean hit on [bold yellow]{1}[reset], delivering [bold red]{2}[reset] damage in a smooth combo rhythm.",
+      "[bold yellow]{0}[reset] attacked with practiced speed, stabbing [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!"
+    ]
+  },
   "fatigue handler": {
     "tired": [
       "[yellow]{0}[reset] breathes deeply, fighting against the mounting fatigue.",

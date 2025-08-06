@@ -144,7 +144,7 @@ class CombatHandler:
       defender.direction = "forward";
     else:
       pass;
-  
+      
   def move(self, offset, direction, attacker):
     if direction == "backward" and attacker.zone - offset >= 0 : attacker.zone -= offset;
     elif direction == "forward" and attacker.zone - offset <= 10 : attacker.zone += offset;
@@ -194,7 +194,7 @@ class CombatHandler:
   def handleCombatNpc(self, auto = False):
     while True:
       self.menu.showCombatMenu(self, self.attacker);
-      self.player_option = self.ui.getInputWithTimeout("[green](enter action)[reset] ⤵", 15);
+      self.player_option = self.ui.getInput();
       self.storeAction(self.player_option);
 
       self.ui.clear();
@@ -206,7 +206,7 @@ class CombatHandler:
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.player_option, self.attacker, self.defender);
       self.ui.showSeperator("-");
       
-      if self.checkDeath() is True or (self.player_option == "flee" and self.attacker.status["stunned"] is False):
+      if self.checkDeath() is True or (self.player_option == "flee" and self.attacker.status["stunned"][0] is False):
         break;
       
       self.enemy_option = self.defender.getAction(self.ui);
@@ -220,7 +220,7 @@ class CombatHandler:
       if isinstance(self.defender, Enemy):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
-      if self.checkDeath() is True or (self.enemy_option == "flee" and self.defender.status["stunned"] is False): break;
+      if self.checkDeath() is True or (self.enemy_option == "flee" and self.defender.status["stunned"][0] is False): break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
  

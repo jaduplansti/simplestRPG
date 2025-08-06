@@ -10,11 +10,96 @@ from exploration import Exploration, AREAS;
 from time import sleep;
 from subprocess import run;
 
-from item import getItem;
-from skill import getSkill, Skill;
+from item import getItem, ITEMS;
+from skill import getSkill, Skill, SKILLS;
 from enemy import ENEMIES;
 import sys;
 
+class Tutorial:
+  """This class handles the tutorial"""
+  def __init__(self, game):
+    self.game = game;
+    self.ui = game.ui;
+    self.player = game.player;
+    
+  def start(self):
+    self.ui.showSeperator("-");
+    self.ui.printDialogue("???", f"welcome [yellow]{self.player.name}[reset]...");
+    self.ui.printDialogue("???", f"this game requires [bold]fast reading skills[reset], for a better experience");
+    self.ui.panelAnimatedPrintFile("sword style", "blade dance", [self.player.name, "dummy", 2], "blade dance");
+    self.ui.printDialogue("???", f"the example above is a [yellow]action log[reset] and is common in simplestRPG");
+    self.ui.printDialogue("???", f"some of the important words are [yellow]highlighted[reset] with colors");
+    self.ui.printDialogue("???", f"[green]read the log carefully, enter when done[reset]!");
+    self.ui.printDialogue("system", f"current type speed: {self.game.settings["type speed"]}");
+    self.ui.awaitKey();
+   
+    self.ui.clear();
+    self.ui.printDialogue("???", f"great work, [yellow]{self.player.name}[reset]!");
+    self.ui.printDialogue("???", f"the next step is learning how to type commands!");
+    self.ui.printDialogue("???", f"[yellow]simplestRPG[reset] was primarily made for android (termux) users, where there is an [bold cyan]on-screen keyboard[reset]");
+    self.ui.printDialogue("???", f"one problem is.. The keyboard takes up screen space, especially on mobile phones!");
+    self.ui.printDialogue("???", f"the solution is to hide the keyboard!, press the [blue]back button[reset] on your phone!");
+    self.ui.printDialogue("???", f"then press the [blue]screen[reset] on your phone to open the keyboard.");
+    self.ui.printDialogue("???", f"[yellow]you may skip this part on desktop, tablet and etc.[reset]");
+    self.ui.awaitKey();
+  
+    self.ui.clear();
+    self.ui.printDialogue("???", f"the next part is [purple]scrolling[reset]!");
+    self.ui.printDialogue("???", f"ill print a ton of action logs, try scrolling up!");
+    self.ui.printDialogue("???", f"[green]enter when ready[reset]!");
+    self.ui.awaitKey();
+    for n in range(1, 6): self.ui.panelAnimatedPrintFile("sword style", "iron reversal", [self.player.name, "dummy", 999], "iron reversal");
+    self.ui.awaitKey();
+    self.ui.printDialogue("???", f"did you scroll properly? make sure to scroll through action logs!");
+    self.ui.awaitKey();
+
+    self.ui.clear();
+    self.ui.printDialogue("???", f"finally, we have [green]commands[reset]!");
+    self.ui.printDialogue("???", f"in [yellow]simplestRPG[reset], there are no [red]buttons[reset]");
+    self.ui.printDialogue("???", f"you can interact with the game by typing [yellow]highlighted[reset] commands using your keyboard.");
+    self.ui.printDialogue("???", f"lets try one right now!");
+    self.ui.printTreeMenu("commands", ["hi", "hello", "wassup"]);
+    self.ui.printDialogue("???", f"remember [underline green]type the command[reset], not click!");
+    command = self.ui.getInput();
+    
+    if command in ["hi", "hello", "wassup"]:
+      self.ui.printDialogue("???", f"well done!, remember close your keyboard after typing!");
+    else:
+      self.ui.printDialogue("???", f"uh..., you typed [red]{command}[reset]?");
+      self.ui.printDialogue("???", f"you got it wrong! but its fine, just close your keyboard..");
+    self.ui.awaitKey();
+    
+    self.ui.clear();
+    self.ui.printDialogue("???", "lets try another one shall we?");
+    self.ui.normalPrint("≈ [blue]hi[reset]");
+    self.ui.normalPrint("≈ [green]hello[reset]");
+    self.ui.normalPrint("≈ [red]bye[reset]\n");
+    command = self.ui.getInput();
+    
+    if command in ["hi", "hello", "bye"]:
+      self.ui.printDialogue("???", f"fantastic!, you did great");
+    else:
+      self.ui.printDialogue("???", f"damn, you have to work on your typing skills!");
+    self.ui.awaitKey();
+    
+    self.ui.clear();
+    self.ui.printDialogue("???", f"one last thing, before we end this basic tutorial.");
+    self.ui.printDialogue("???", f"there are [yellow]quick time[reset] events, where you have to type quickly!");
+    self.ui.printDialogue("???", f"lets try one shall we?, press enter any time to start!");
+    self.ui.awaitKey();
+    
+    if self.ui.getInputWithTimeout("type (pineapple) quickly!", 10) == f"pineapple": 
+      self.ui.newLine();
+      self.ui.printDialogue("???", f"[yellow]great job!, truly a keyboard wizard[reset]!");
+    else: 
+      self.ui.newLine();
+      self.ui.printDialogue("???", f"oh. you need to practice speed typing!");
+    self.ui.printDialogue("???", f"i set the time limit for 10 seconds just in case, but for other events it might be...");
+    self.ui.printDialogue("???", f"around 1.5 seconds or maybe 3-7 seconds, honestly it depends.");
+    self.ui.printDialogue("???", f"well thats all for the tutorial, i wish you luck!");
+    self.game.givePlayerItem("starter chest");
+    self.ui.awaitKey();
+    
 class Game:
   """ 
   This class handles the interaction between other classes.
@@ -180,7 +265,7 @@ class Game:
       self.player.name = self.ui.getInput();
     else:
       self.player.name = name;
-      
+
   def handleStart(self):
     """Initializes the game."""
  
@@ -247,6 +332,9 @@ class Game:
       except ValueError:
         self.ui.normalPrint("delay speed must be decimal/float ⤴\n");
     
+    elif option == "delete":
+      self.handleDelete();
+      
   def doUpdate(self):
     """Handles updates using git fetch"""
     
@@ -274,6 +362,7 @@ class Game:
     
     if os.path.exists(sys.path[0] + "/saves") != True:
       self.handleName();
+      Tutorial(self).start();
       return;
      
     player_data = {};
@@ -291,6 +380,7 @@ class Game:
       self.ui.animatedPrint(f"create {option}? (y/n)");
       if self.ui.getInput().lower() == "y":
         self.handleName(option);
+        Tutorial(self).start();
         return;
       else:
         self.handleQuit();
@@ -314,7 +404,15 @@ class Game:
     
     self.ui.showStatus("saving", 2);
     self.player.save();
-   
+  
+  def handleDelete(self):
+    try:
+      os.remove(f"saves/{self.player.name}.save");
+      self.ui.animatedPrint(f"[cyan]deleted {self.player.name} (OK)[reset]")
+      self.handleQuit();
+    except FileNotFoundError:
+      self.ui.panelPrint("FAILED TO DELETE", "center", "settings");
+      
   def giveQuest(self, name):
     if self.player.giveQuest(name) != -1:
       self.ui.panelPrint(f"[bold yellow]{name}[reset]\n{self.player.quests[name]["obj"].desc}", "center", title = "QUEST RECEIVED");
@@ -328,7 +426,7 @@ class Game:
     if self.player.tryLevelUp() is True:
       self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] feels a surge of [blue]power[reset], [yellow]{self.player.name}[reset], leveled up!");
       self.ui.panelPrint(f"level [yellow]{old_level}[reset] -> [green]{self.player.level}[reset]");
-  
+      
   def isTermux(self):
     return "PREFIX" in os.environ and "/data/data/com.termux/files/usr" in os.environ["PREFIX"];
 
@@ -375,44 +473,34 @@ class Game:
         self.ui.awaitKey()
       else: break;
  
+  def getItems(self):
+    return ITEMS;
+    
+  def getSkills(self):
+    return SKILLS;
+    
   def giveStatus(self, status, n):
     CombatHandler(self).attack_handler.status_handler.afflict(self.player, status, n);
   
   def isPlayer(self, char):
     return isinstance(char, Player);
- 
+  
   def giveStyle(self, char, style, announce = True):
+    self.removeStyle(char);
     char.attack_style = style;
-    if announce is True: self.ui.animatedPrint(f"[yellow]{char.name}[reset] switched to [bold magenta]{style}[reset] style!");
-    if style == "swordsman": 
-      self.giveSkill(char, "parry");
-      self.giveSkill(char, "hyper precision");
-      self.giveSkill(char, "flowing blade");
-      self.giveSkill(char, "trislash");
-    elif style == "archer": 
-      self.giveSkill(char, "arrow return");
-      self.giveSkill(char, "arrow rain");
-      self.giveSkill(char, "bow bash");
-    elif style == "cleric":
-      self.giveSkill(char, "divine protection");
-      self.giveSkill(char, "blunt recovery");
-      self.giveSkill(char, "status wipe");
-      self.giveSkill(char, "divine restriction");
+    self.evolveStyle(char);
+    if announce is True: self.ui.animatedPrint(f"[yellow]{char.name}[reset] switched to [bold magenta]{char.attack_style}[reset] style!");
+    for skill in SKILLS:
+      if SKILLS[skill]["skill"]._class == char.attack_style: self.giveSkill(char, skill);
+    if char.attack_style == "swordsman": self.giveSkill(char, "parry")
+    elif char.attack_style == "cleric": self.giveSkill(char, "blunt recovery");
 
   def removeStyle(self, char):
-    if char.attack_style == "swordsman": 
-      char.removeSkill("parry");
-      char.removeSkill("hyper precision");
-      char.removeSkill("flowing blade");
-      char.removeSkill("trislash");
-    elif char.attack_style == "archer": 
-      char.removeSkill("arrow return");
-      char.removeSkill("arrow rain");
-      char.removeSkill("bow bash");
-    elif style == "cleric":
-      self.removeSkill(char, "divine protection");
-      self.removeSkill(char, "blunt recovery");
-      self.removeSkill(char, "status wipe");
-      self.removeSkill(char, "divine restriction");
-
+    for skill in SKILLS:
+      if SKILLS[skill]["skill"]._class == char.attack_style: char.removeSkill(skill);
     char.attack_style = "basic";
+  
+  def evolveStyle(self, char):
+    pass;
+    #if char.attack_style == "swordsman" >= 10: char.attack_style = "duelist";
+    

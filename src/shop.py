@@ -18,6 +18,8 @@ class Shop(SubMenu):
       "kevins sword" : [getItem("kevins sword"), 30, 150],
       "peasant tunic" : [getItem("peasant tunic"), 30, 100],
       "worn leather vest" : [getItem("worn leather vest"), 30, 200],
+      "ashrend sword" : [getItem("worn leather vest"), 30, 1500],
+
     };
   
   def showShopInfo(self):

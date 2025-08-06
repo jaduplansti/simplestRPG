@@ -51,12 +51,6 @@ class Character:
     
     self.guild_info = {};
     
-    self.addItemToInventory(getItem("bible"), 1);
-    self.addItemToInventory(getItem("health potion"), 10);
-    self.addItemToInventory(getItem("wooden sword"), 1);
-    self.addSkill(getSkill("soul shatter"));
-    self.addSkill(getSkill("analyze"));
-
   def to_dict(self):
     return {
      "name": self.name,
@@ -277,11 +271,18 @@ class Character:
     return skill in self.skills;
   
   def removeSkill(self, skill_name):
-    del self.skills[skill_name];
-    
+    try:
+      del self.skills[skill_name];
+    except KeyError:
+      pass;
+      
   def clearStatus(self):
     for status in self.status: self.status[status] = [False, 0];
     
   def attackEnemy(self, dmg, combat_handler = None):
-    if combat_handler != None: combat_handler.attack_handler.consumeEquipment(self.enemy, ["chest"], dmg * 0.2);
-    self.enemy.stats["health"] -= dmg;
+    self.dmg = dmg;
+    if combat_handler != None: 
+      combat_handler.attack_handler.consumeEquipment(self.enemy, ["chest"], dmg * 0.8);
+      combat_handler.attack_handler.handlePassiveSkills("damage", self.enemy, self);
+      if hasattr(self.enemy, "shadow"): self.enemy.shadow = 0;
+    self.enemy.giveDamage(self.dmg);

@@ -70,7 +70,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.7[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.8[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -110,6 +110,7 @@ class Menu():
     self.ui.showHeader("Settings", ".");
     self.ui.normalPrint(f"• [yellow]type speed[reset] : {self.game.settings["type speed"]}");
     self.ui.normalPrint(f"• [cyan]delay speed[reset] : {self.game.settings["delay speed"]}");
+    self.ui.normalPrint(f"• [red]delete[reset]");
     self.ui.newLine();
   
     

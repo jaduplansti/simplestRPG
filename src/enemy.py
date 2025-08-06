@@ -32,7 +32,7 @@ class Enemy(Character):
   def statLevelUp(self):
     for stat in self.stats:
       if stat == "max health":
-        self.stats[stat] += 70;
+        self.stats[stat] += 40;
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck": self.stats[stat] += 0.001;
       else: self.stats[stat] += 1;
@@ -77,7 +77,7 @@ class Enemy(Character):
       elif self.attack_style == "swordsman": return choices(["perform, parry", "perform, trislash", None], [0.2, 0.2, 0.6])[0];
 
     if self.name == "priest":
-      if self.stats["health"] <= self.stats["max health"] * 0.5: return "perform, blunt recovery";
+      if self.stats["health"] <= self.stats["max health"] * 0.5 and randint(1, 4) == 1: return "perform, blunt recovery";
       elif randint(1, 4) == randint(1, 4) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
       elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
     
@@ -110,7 +110,7 @@ def createEnemy(name, level, stats : dict, attack_style : str, action_chances : 
 def getEnemyByName(name, plr = None, game = None):
   if name == "slime":
     return createEnemy(
-      "slime", randint(1, 2), {"strength" : 4}, "basic", [0.7, 0.2, 0.01, 0.01],
+      "slime", randint(1, 1), {"strength" : 1}, "basic", [0.7, 0.2, 0.01, 0.01],
       [
         [getItem("wooden sword"), 0.5],
         [getItem("wooden bow"), 0.5],
@@ -178,7 +178,7 @@ def getEnemyByName(name, plr = None, game = None):
     return createEnemy(
       "priest", randint(30, 35), {"strength" : 50, "defense" : 200}, "cleric", [0.7, 0.3, 0.1, 0],
       [
-        [getItem("bible"), 0.3]    
+        [getItem("bible"), 0.1]    
       ],
       True,
       game,

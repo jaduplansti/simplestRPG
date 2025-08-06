@@ -304,3 +304,23 @@
 • added new quests
 • added guild hall
 • added armor
+
+[version 2.6.8]
+• changed soul shatter (S+) to soul fracture (B-)
+• fixed parrying bug
+• removed slam minigame
+• fixed ui elements
+• removed time limit for actions
+• fixed swordsman ValueError Bug
+• added limitless passive (DEBUG)
+• added skill books
+• style skills and skills are seperated now.
+• added tutorial
+• added thief style
+• added backstabs for thief
+• added shadow mechanic for thief
+• adjusted item durabilities
+• swords use 10% durability, archer uses 1% and thief uses 5%
+• removed leather gloves
+• added a new mechanic for swordsman
+• get ready for massive exploration content next update.

@@ -1,11 +1,22 @@
 from character import Character;
 from quest import Quest,progressQuest, getQuest;
 
+from item import getItem;
+from skill import getSkill;
+
 class Player(Character):
   def __init__(self, name):
     super().__init__(name);
     self.quests = {};
   
+    self.addItemToInventory(getItem("bible"), 1);
+    self.addItemToInventory(getItem("skill book"), 20);
+    self.addItemToInventory(getItem("health potion"), 10);
+    self.addItemToInventory(getItem("wooden sword"), 1);
+    self.addItemToInventory(getItem("wooden dagger"), 1);
+    self.addSkill(getSkill("soul fracture"));
+    self.addSkill(getSkill("analyze"));
+
   def to_dict(self):
     data = super().to_dict();
     data.update({"quests": {

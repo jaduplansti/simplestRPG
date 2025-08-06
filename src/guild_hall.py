@@ -33,6 +33,7 @@ class GuildHall(SubMenu):
     plr.guild_info = {
       "rank" : "E",
       "completed" : 0,
+      "highest rank": "E",
     };
   
   def generateBoard(self):
