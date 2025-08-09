@@ -1,5 +1,6 @@
 from rich.table import Table;
 from rich import print, box;
+from art import ARTS;
 
 class Menu():
   def __init__(self, game):
@@ -16,26 +17,41 @@ class Menu():
     for quest_name in character.quests:
       quest = character.quests[quest_name];
       self.ui.panelPrint(f"{quest["obj"].desc}", "center", f"{quest_name} ({quest["kills"]})");
-      
+ 
+  def showItemDetails(self, character, name):
+    item = character.getItem(name);
+    self.ui.panelPrint(f"[yellow]{item.name}[reset] ([green]{item.rarity}[reset]) ([blue]{item.rank}[reset])\n\n{item.desc}\n\nAmount: {character.getAmountOfItem(name)}\nWeight: {item.weight} kg\nSlot: {item.bodypart}\nDurability: {item.durability}/{item.max_durability}", "center", "item details");
+
+    self.ui.normalPrint("≈ [green]use[reset]");
+    self.ui.normalPrint("≈ [red]drop[reset]");
+    self.ui.normalPrint("≈ [yellow]back[reset]\n");
+  
   def showItemsMenu(self, character):
-    if character.getTotalItems() < 50: self.ui.animatedPrint(f"[magenta]{character.name}[reset] is carrying [green]{len(character.inventory)}[reset]({character.getTotalItems()}) item(s)");
-    else: self.ui.animatedPrint(f"[bold red]INVENTORY FULL[reset]");
-    
+    items = "";
     for name in character.inventory:
-      item = character.inventory[name];
-      self.ui.normalPrint(f"- [underline yellow]{name}[reset] [purple]({item["amount"]}x)[reset]");
-      for info in item["item"][-1].__dict__: 
-        if info != "name": self.ui.normalPrint(f"  • [bold green]{info.capitalize()}[reset] ({item["item"][-1].__dict__[info]})");
-      self.ui.newLine();
-    self.ui.normalPrint("[bold yellow]you can close the bag by typing 'close'[reset]\n");
-      
+      items += f"> [yellow]{name}[reset] ([green]{character.getAmountOfItem(name)}[reset])\n";
+    items = items.rstrip("\n");
+    self.ui.animatedPrint(f"[cyan]===INVENTORY===[reset]");
+    self.ui.panelPrint(items, title = f"ITEMS ({character.getTotalItems()})");
+    self.ui.normalPrint(f"[yellow]hint: select an item by typing its name or type close to exit[reset]\n");
+  
+  def showSkillDetails(self, character, name):
+    skill = character.skills[name];
+    if skill.passive is False: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([blue]{skill.energy}[reset] mp)\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nClass: {skill._class}", "center", "skill details");
+    else: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([yellow]PASSIVE[reset])\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nClass: {skill._class}", "center", "skill details");
+
+    if skill.passive != True: self.ui.normalPrint("≈ [green]use[reset]");
+    self.ui.normalPrint("≈ [yellow]back[reset]\n");
+
   def showSkillsMenu(self, character):
     self.ui.animatedPrint(f"[magenta]==SKILLS==[reset]");
+    skills = "";
     for skill_name in character.skills:
       skill = character.skills[skill_name];
-      if skill.passive is False: self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([magenta]{skill.rank}[reset])\n[underline]{skill.desc}, consumes {skill.energy} energy and {skill.range} range[reset]", "center");
-      else: self.ui.panelPrint(f"[bold yellow]{skill_name}[reset] ([cyan]PASSIVE[reset]) ([green]{skill.rank}[reset])\n[underline]{skill.desc}", "center");
-
+      skills += f"💠 [bold]{skill_name}[reset]\n   Rank: [green]{skill.rank}[reset]\n   Energy: [blue]{skill.energy}[reset]\n\n";
+    skills = skills.rstrip("\n");
+    self.ui.panelPrint(skills, title = "skills");
+      
   def showStatsMenu(self, character):
     info = f"[green]name[reset]: [bold yellow]{character.name}[reset]\n[blue]level[reset]: {character.level} ({character.exp}/{100 * character.level})\n";
     info += f"[yellow]title[reset]: {character.title}\n";
@@ -63,18 +79,31 @@ class Menu():
       if item != None: self.ui.panelPrint(f"[yellow]{item.name}[reset] ([bold cyan]{round(item.getDurability())}%[reset])", "center", f"{part}");
       else: self.ui.panelPrint("[cyan]EMPTY[reset]", "center", f"{part}");
     self.ui.normalPrint("[yellow]hint: specify the body part to select, type close to exit.[red]\n");
-    
+  
+  def showEquipmentDetails(self, character, part):
+    item = character.equipment[part];
+    if item != None: self.ui.panelPrint(f"[underline yellow]{item.name} ({round(item.getDurability())}%)[reset]\n\n{item.desc}\n\n{item.formatBonus()}", "center", "item details");
+    else: self.ui.panelPrint(f"[underline yellow]empty[reset]\n\ntheres nothing here..", "center", "item details");
+
+    if item != None: self.ui.normalPrint("≈ [red]unequip[reset]");
+    self.ui.normalPrint("≈ [yellow]back[reset]\n");
+
   def showMainMenu(self):
     self.ui.clear();
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.8[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.6.9[reset] ([bold red]DEBUG[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
     self.ui.clear();
+    try:
+      self.ui.printArtPanel(ARTS[self.game.player.enemy.name]);
+    except KeyError:
+      pass;
+      
     self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] encounters a [cyan]{self.game.player.enemy.name}[cyan]!");
     self.ui.printTreeMenu("[green](options)[reset]\n", ["[red]fight[reset]", "[red]bail[reset]", "[purple]talk[reset]"]);
     self.showTip();
@@ -86,11 +115,11 @@ class Menu():
     
     self.ui.showSeperator("+");
     
-    self.ui.normalPrint("≈ [yellow]attack[reset]");
-    self.ui.normalPrint("≈ [cyan]block[reset]");
-    self.ui.normalPrint("≈ [blue]taunt[reset]");
-    self.ui.normalPrint("≈ [green]items[reset]");
-    self.ui.normalPrint("≈ [magenta]skills[reset]");
+    self.ui.normalPrint("≈ [yellow]attack[reset] (🗡)");
+    self.ui.normalPrint("≈ [cyan]block[reset] (🛑)");
+    self.ui.normalPrint("≈ [blue]taunt[reset] (🖕)");
+    self.ui.normalPrint("≈ [green]items[reset] (💼)");
+    self.ui.normalPrint("≈ [magenta]skills[reset] (💥)");
     
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.ui.normalPrint("≈ [red]flee[reset]");

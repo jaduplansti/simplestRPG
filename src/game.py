@@ -21,8 +21,14 @@ class Tutorial:
     self.game = game;
     self.ui = game.ui;
     self.player = game.player;
+  
+  def askSkip(self):
+    self.ui.animatedPrint("skip tutorial? ([cyan]y[reset]/[red]n[reset])");
+    if self.ui.getInput() == "y": return True;
+    
     
   def start(self):
+    if self.askSkip(): return;
     self.ui.showSeperator("-");
     self.ui.printDialogue("???", f"welcome [yellow]{self.player.name}[reset]...");
     self.ui.printDialogue("???", f"this game requires [bold]fast reading skills[reset], for a better experience");
@@ -157,7 +163,7 @@ class Game:
     while True:
       if showFun != None: showFun();
       option = self.ui.getInput();
-      if option.isdigit(): option = list(options)[int(option)];
+      
       if option == "help": self.menu.showTip();
       elif option == "quit": self.handleQuit();
       elif option in options.keys(): options[option]();
@@ -171,7 +177,24 @@ class Game:
   def handleQuest(self):
     self.ui.clear();
     self.menu.showQuestMenu(self.player);
-    
+  
+  def handleEquipmentDetail(self, part):
+    while True:
+      self.ui.clear();
+      self.menu.showEquipmentDetails(self.player, part);
+      option = self.ui.getInput();
+      
+      if option == "unequip" and self.player.equipment[part] != None:
+        if self.player.unequipItem(part, self) != -1: 
+          self.ui.panelPrint(f"[bold cyan]UNEQUIPPED[reset]", "center", part, "purple");
+        else: self.ui.panelPrint(f"[bold res] UNEQUIP FAILED[reset]", "center", part, "red");  
+        return;
+      elif option == "back":
+        return;
+        
+      self.ui.awaitKey();
+      self.ui.clear();
+      
   def handleEquipment(self):
     while True:
       self.ui.clear();
@@ -180,13 +203,25 @@ class Game:
       
       try:
         if option == "close": return;
-        if not self.player.isOccupied(option): self.ui.animatedPrint("[red]thats an empty slot..[reset]");
-        else: 
-          if self.player.unequipItem(option, self) != -1: 
-            self.ui.panelPrint(f"[bold cyan]UNEQUIPPED[reset]", "center", option, "purple");
-          else: self.ui.panelPrint(f"[bold res] UNEQUIP FAILED[reset]", "center", option, "red");
+        self.handleEquipmentDetail(option);
       except KeyError as e:
-        self.ui.animatedPrint(f"[bold red]{option} is not a bodypart[reset]");
+        self.ui.animatedPrint(f"[bold red]{option} not a bodypart[reset]");
+      self.ui.awaitKey();
+  
+  def handleItemDetail(self, name, combat_handler = None):
+    while self.player.itemExists(name):
+      self.ui.clear();
+      self.menu.showItemDetails(self.player, name);
+      option = self.ui.getInput();
+      
+      if option == "use":
+        self.player.getItem(name).use(self, self.player, combat_handler);
+      elif option == "drop":
+        self.player.usedItem(name);
+        continue;
+      elif option == "back":
+        return;
+        
       self.ui.awaitKey();
       
   def handleUseItem(self, combat_handler = None):
@@ -204,23 +239,29 @@ class Game:
     while True:
       self.ui.clear();   
       self.menu.showItemsMenu(self.player);
-      option = self.ui.getInput().lower().split(",");
-      count = 1;
-      
-      try:
-        if len(option) > 1: count = int(option[1]);
-      except ValueError:
-        self.ui.normalPrint("[red bold]the amount must be an integer e.g wooden sword, 2[reset]\n");
-        self.ui.awaitKey();
+      option = self.ui.getInput();
+     
+      if option == "close": return;
+      elif self.player.itemExists(option): 
+        self.handleItemDetail(option, combat_handler);
         continue;
-        
-      for _ in range(0, count):
-        if self.player.itemExists(option[0]): self.player.getItem(option[0]).use(self, self.player, combat_handler);
-        elif option[0] == "close": 
+      else: self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] does not have [yellow]{option}[reset]");
+      self.ui.awaitKey();
+  
+  def handleSkillDetail(self, skill, combat_handler = None, attacker = None, defender = None):
+    while True:
+      self.ui.clear();
+      self.menu.showSkillDetails(self.player, skill);
+      option = self.ui.getInput();
+      
+      if option == "use" and attacker.skills[skill].passive != True:
+        if attacker.energy >= attacker.skills[skill].energy: 
+          attacker.skills[skill].use(combat_handler, attacker, defender);
           return;
-        else: 
-          self.ui.normalPrint(f"[red underline]{self.player.name} does not have {option[0]}[reset]\n");
-          break;
+        else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
+      elif option == "back":
+        return -1;
+        
       self.ui.awaitKey();
       
   def handleUseSkill(self, skill = None, combat_handler = None, attacker = None, defender = None):
@@ -235,14 +276,15 @@ class Game:
     """
     
     if skill is None:
+      self.ui.clear();
       self.menu.showSkillsMenu(attacker);
       skill = self.ui.getInput();
-    
+      
     if attacker.skillExists(skill) is True:
-      if attacker.skills[skill].passive is True: self.ui.animatedPrint("[bold red]cannot use passive skills![reset]");
-      elif attacker.energy >= attacker.skills[skill].energy: attacker.skills[skill].use(combat_handler, attacker, defender);
-      else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
-    
+       if self.handleSkillDetail(skill, combat_handler, attacker, defender) == -1: return self.handleUseSkill(None, combat_handler, attacker, defender);
+    else:
+      pass;
+      
   def handleSleep(self):
     """Handles Sleep, increases Player Health and Player Energy and then Saves."""
     
@@ -349,7 +391,7 @@ class Game:
         self.ui.console.log("update complete!");
         self.handleQuit();
     except FileNotFoundError:
-      self.ui.console.log("git is not installed!");
+      self.ui.console.log("git  installed!");
       return;
     except Exception:
       return;
@@ -458,7 +500,7 @@ class Game:
           amount = int(option[1].strip())
           
           if stat not in self.player.stats:
-            raise KeyError(f"'{stat}' is not a valid stat")
+            raise KeyError(f"'{stat}'  a valid stat")
           
           if stat == "luck":
             raise ValueError("Luck cannot be increased");

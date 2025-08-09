@@ -1,4 +1,4 @@
-from rich import print
+from rich import print, box
 from rich.align import Align;
 from os import system;
 
@@ -157,7 +157,7 @@ class UI:
   def animatedPrint(self, s, punc = False):
     self.disableEcho();
     parsed_s = Text.from_markup(s)
-    print("~ ", end = "");
+    print("× ", end = "");
     for ch in parsed_s:
       if punc is True and str(ch) == ".": sleep(0.3);
       elif punc is True and str(ch) == ",": sleep(0.1);
@@ -170,8 +170,9 @@ class UI:
     self.clearStdinBuffer();
   
   def printDialogue(self, name, s):
-    self.animatedPrint(f"{name}: {s}", punc = True);
-    
+    if not isinstance(s, list): self.animatedPrint(f"{name}: {s}", punc = True);
+    else: self.animatedPrint(f"{name}: {choices(s)[0]}", punc = True);
+
   def printTreeMenu(self, title, options): 
     tree = Tree(title);
     for option in options:
@@ -271,3 +272,13 @@ class UI:
     quest = self.game.player.quests[name]["obj"];
     self.panelPrint(quest.desc, "center", quest.name);
   
+  def printArtPanel(self, art):
+    panel = Panel(
+      Text(art.strip("\n"), justify="center"),
+      padding=(1, 4),
+      expand=False,
+      box=box.DOUBLE
+    )
+    centered_panel = Align.center(panel)
+    print(centered_panel);
+    self.newLine();

@@ -50,6 +50,7 @@ class Character:
     self.magic = {}
     
     self.guild_info = {};
+    self.area_data = {};
     
   def to_dict(self):
     return {
@@ -124,7 +125,7 @@ class Character:
     with open(f"saves/{name}.save", "r") as f:
       data = json.load(f)
       return cls.from_dict(data)
-    
+ 
   def rerollStats(self):
     for stat in self.stats:
       if stat != "health":
@@ -167,9 +168,9 @@ class Character:
     if self.addItemToInventory(item, 1) == -1: return -1;
     self.equipment[bodypart].removeEquipment(self, game);
     
-  def equipItem(self, item, bonus = 0):
+  def equipItem(self, item):
     if self.isOccupied(item.bodypart) != True:
-      self.equipment[item.bodypart] = itemToEquipment(item, bonus);
+      self.equipment[item.bodypart] = itemToEquipment(item);
       return True;
     return False;
   

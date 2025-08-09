@@ -80,7 +80,10 @@ class Enemy(Character):
       if self.stats["health"] <= self.stats["max health"] * 0.5 and randint(1, 4) == 1: return "perform, blunt recovery";
       elif randint(1, 4) == randint(1, 4) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
       elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
-    
+
+def characterToEnemy(self, char):
+  enemy = createEnemy(char.name, char.level, None, char.attack_style, [0.3, 0.3, 0.3, 0.1], False);
+  
 def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None, items = None):
   enemy = Enemy(name);
   enemy.level = level;

@@ -45,7 +45,7 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
     
   elif skill.name == "arrow rain" and attacker.itemExists("wooden arrow"):
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
-    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, attacker.stats["strength"] * 1.5);
+    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, (attacker.stats["strength"] + attacker.getAmountOfItem("wooden arrow")) * 1.5);
     combat_handler.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] unleashed a volley of arrows at [yellow]{defender.name}[reset], hitting for [red]{dmg}[reset] damage!", "arrow rain");
     attacker.attackEnemy(dmg, combat_handler);
     combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.4);
@@ -65,7 +65,7 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset]'s sword rotated and thrusted [yellow]{defender.name}[reset] 2x");
     combat_handler.ui.printDialogue(attacker.name, "the finale!");
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] put every ounce of strength and cut [yellow]{defender.name}[reset] 3x");
-    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, attacker.stats["strength"] * 2.5);
+    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, (attacker.stats["strength"] + randint(10, 20)) * 2.5);
     combat_handler.ui.panelAnimatedPrint(f"{attacker.name} drew his blade and sliced [yellow]{defender.name}[reset] 3x, dealing [red]{dmg}[reset] damage!", skill.name);
     attacker.attackEnemy(dmg, combat_handler);
     combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.4);

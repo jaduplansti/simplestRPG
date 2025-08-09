@@ -324,3 +324,17 @@
 • removed leather gloves
 • added a new mechanic for swordsman
 • get ready for massive exploration content next update.
+
+[version 2.6.9]
+• improved ui elements
+• added enemy ascii art
+• improved equipment menu
+• improved item menu
+• you can now drop item
+• overall items and equipment menu's were made better
+• improved skill menu
+• added exp potion (risky)
+• exp potion takes a toll, drink when full hp.
+• improved shop
+• item values, shop economy!
+• selling is now dynamic, dave can bargain (increase or reduce price) dont get scammed.

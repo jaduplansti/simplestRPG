@@ -8,7 +8,8 @@ class Player(Character):
   def __init__(self, name):
     super().__init__(name);
     self.quests = {};
-  
+    
+    self.addItemToInventory(getItem("exp potion"), 1);
     self.addItemToInventory(getItem("bible"), 1);
     self.addItemToInventory(getItem("skill book"), 20);
     self.addItemToInventory(getItem("health potion"), 10);

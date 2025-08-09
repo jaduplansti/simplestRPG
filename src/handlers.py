@@ -342,7 +342,7 @@ class AttackHandler:
 
     if move == "stab": defender.giveStatus("poisoned", 3);
     elif move == "feint": attacker.giveStatus("parrying", 1);
-    elif move == "chain": self.__thief_style(attacker, defender);
+    elif move == "chain" and attacker.equipment["right arm"] != None: self.__thief_style(attacker, defender);
     
     if attacker.shadow >= 25: 
       attacker.shadow = 1;
@@ -364,11 +364,11 @@ class AttackHandler:
       self.ui.printDialogue(defender.name, "augh..");
       defender.giveStatus("stunned", 2);
       
-    elif defender.status["bleeding"][1] >= 5:
+    elif defender.status["bleeding"][1] > 3:
       defender.status["bleeding"] = [False, 0];
-      dmg = round(defender.stats["health"] * uniform(0.2, 0.4));
+      dmg = round(defender.stats["max health"] * uniform(0.3, 0.6));
       self.ui.printDialogue(attacker.name, "scatter!");
-      self.ui.panelAnimatedPrint(f"[yellow]{defender.name}'s[reset] injuries exploded, dealing {dmg} damage!");
+      self.ui.panelAnimatedPrint(f"[yellow]{defender.name}'s[reset] injuries throb in pain, permanently dealing [red]{dmg}[reset] damage!", "injury");
       attacker.attackEnemy(dmg);
     
   def __swordMiniGame(self, move, attacker, defender):

@@ -59,7 +59,7 @@ class Dungeon():
     if event == "encounter": self.__encounterEvent();
     elif event == "item": self.__itemEvent();
     elif event == "trap" : self.__trapEvent();
-    #elif event == "puzzle": self.__puzzleEvent();
+    elif event == "puzzle": self.__puzzleEvent();
     
     self.progress += 1;
     

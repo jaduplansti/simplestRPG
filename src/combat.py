@@ -52,7 +52,9 @@ class CombatHandler:
   def giveLoot(self, won, lost):
     item = lost.getLoot();
     if item != None: self.game.givePlayerItem(item.name, 1);
-    won.money += randint(5, 10) * lost.level;
+    earned = randint(5, 10) * lost.level;
+    self.ui.animatedPrint(f"[yellow]{won.name}[reset] earned [green]{earned}[reset] gold!");
+    won.money += earned;
     
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
