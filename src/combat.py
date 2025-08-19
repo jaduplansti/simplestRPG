@@ -1,6 +1,7 @@
 from enemy import Enemy, getEnemyByName;
 from random import randint, choices;
 from handlers import AttackHandler;
+from style import StyleHandler;
 
 from time import time;
 
@@ -11,30 +12,44 @@ class CombatHandler:
     self.menu = self.game.menu;
     self.attack_handler = AttackHandler(self);
     
+    self.style_handler = StyleHandler(game, self);
     self.attacker = None;
     self.defender = None;
     self.enemy_option = ""; # temporary solution
     self.player_option = "";
     
     self.previous_action = "";
+    self.won = None;
     
   def initiateFightNpc(self, character, name):
+    self.game.animator.transition();
     enemy = getEnemyByName(name, character, self.game);
     self.attacker = character
     self.attacker.enemy = enemy;
     
     self.defender = enemy;
     self.defender.enemy = self.attacker;
-    self.attacker.status["blocking"] = [False, 0]; # temporary fix
-    
+    self.attacker.clearStatus();
+
     self.game.handleCombatInitiateMenu(self);
   
+  def initiateFight(self, char1, char2):
+    self.attacker = char1;
+    self.defender = char2;
+    
+    self.attacker.enemy = char2;
+    self.defender.enemy = char1;
+
+    self.attacker.clearStatus();
+    self.game.handleCombatInitiateMenu(self);
+
   def __handleWin(self):
     if self.tryBerserkNpc(self.defender) is False:
       if self.defender.boss is True: self.ui.panelPrint("BOSS DEFEATED", "center", "combat");
       self.giveExp(self.attacker, self.defender);
       self.handleLevelUp(self.attacker);
       self.giveLoot(self.attacker, self.defender);
+      self.won = self.attacker.name;
       return True;
     return False;
     
@@ -63,10 +78,6 @@ class CombatHandler:
       return "passed out";
     elif attacker.energy <= 25 and not isinstance(attacker, Enemy):
       self.ui.panelAnimatedPrintFile("fatigue handler", "exhausted", [attacker.name], "fatigue");
-    elif attacker.energy <= 50 and not isinstance(attacker, Enemy):
-      self.ui.panelAnimatedPrintFile("fatigue handler", "fatigued", [attacker.name], "fatigue");
-    elif attacker.energy <= 75 and not isinstance(attacker, Enemy):
-      self.ui.panelAnimatedPrintFile("fatigue handler", "tired", [attacker.name], "fatigue");
     else:
       return False;
     
@@ -77,10 +88,6 @@ class CombatHandler:
       self.ui.panelAnimatedPrintFile("hunger handler", "starved", [attacker.name], "hunger");
     elif attacker.hunger <= 25 and not isinstance(attacker, Enemy):
       self.ui.panelAnimatedPrintFile("hunger handler", "very hungry", [attacker.name], "hunger");
-    elif attacker.hunger <= 50 and not isinstance(attacker, Enemy):
-      self.ui.panelAnimatedPrintFile("hunger handler", "moderately hungry", [attacker.name], "hunger");
-    elif attacker.hunger <= 75 and not isinstance(attacker, Enemy):
-      self.ui.panelAnimatedPrintFile("hunger handler", "slightly hungry", [attacker.name], "hunger");
     else:
       return False;
   
@@ -108,6 +115,7 @@ class CombatHandler:
     self.game.player.trackQuest(self.game, self);
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
+      self.won = self.defender.name;
     elif self.defender.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
       won = self.__handleWin();
@@ -198,16 +206,16 @@ class CombatHandler:
       self.menu.showCombatMenu(self, self.attacker);
       self.player_option = self.ui.getInput();
       self.storeAction(self.player_option);
-
+      
       self.ui.clear();
       self.ui.showHeader("Combat Logs", "=");
-      self.ui.showSeperator("-");
+      self.ui.showSeperator("×");
       self.attack_handler.status_handler.handleStatus(self.attacker, self.defender);
       
       self.lockTarget(self.attacker, self.defender);
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.player_option, self.attacker, self.defender);
-      self.ui.showSeperator("-");
-      
+      self.ui.showSeperator("×");
+
       if self.checkDeath() is True or (self.player_option == "flee" and self.attacker.status["stunned"][0] is False):
         break;
       
@@ -226,3 +234,8 @@ class CombatHandler:
       self.ui.showSeperator("-");
       self.ui.awaitKey();
  
+  def handleSpare(self, won, lost):
+    self.ui.animatedPrint(f"[yellow]{lost.name}[reset] is asking for mercy!");
+    self.ui.printDialogue(lost.name, "...");
+    self.ui.normalPrint("([red]skill[reset]) or ([cyan]mercy[resey])\n");
+    # todo here

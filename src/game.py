@@ -13,7 +13,12 @@ from subprocess import run;
 from item import getItem, ITEMS;
 from skill import getSkill, Skill, SKILLS;
 from enemy import ENEMIES;
+
+from audio import AudioHandler;
 import sys;
+
+from copy import deepcopy;
+from animation import Animator;
 
 class Tutorial:
   """This class handles the tutorial"""
@@ -25,7 +30,6 @@ class Tutorial:
   def askSkip(self):
     self.ui.animatedPrint("skip tutorial? ([cyan]y[reset]/[red]n[reset])");
     if self.ui.getInput() == "y": return True;
-    
     
   def start(self):
     if self.askSkip(): return;
@@ -106,6 +110,40 @@ class Tutorial:
     self.game.givePlayerItem("starter chest");
     self.ui.awaitKey();
     
+    self.startCombat();
+    
+  def startCombat(self):
+    self.ui.clear();
+    self.ui.printDialogue("???", f"lets test your skills shall we?");
+    self.ui.printDialogue("???", f"here take some exp..");
+    self.ui.showStatus("leveling up!, take a seat", 5);
+    
+    player_backup = deepcopy(self.game.player);
+    self.game.givePlayerExp(999999);
+    self.game.handlePlayerLevelUp();
+    
+    self.ui.printDialogue("???", f"are you ready?");
+    self.ui.normalPrint("([yellow]yes[reset]) | ([green]yeah[reset])\n");
+    self.ui.getInput();
+    
+    combat_handler = CombatHandler(self.game)
+    combat_handler.initiateFightNpc(self.game.player, "fallen knight");
+    
+    self.game.player = player_backup;
+
+    if combat_handler.won == self.game.player.name:
+      self.ui.printDialogue("???", f"impressive, here take this!");
+      self.game.givePlayerItem("wooden sword");
+      self.game.givePlayerItem("peasant tunic");
+      self.game.givePlayerItem("bread", 5);
+      self.game.givePlayerItem("health potion", 5);
+    else:
+      self.ui.printDialogue("???", f"uh.. how did you fail?");
+      self.game.givePlayerItem("skill book");
+      self.game.givePlayerItem("strength potion", 10);
+
+    self.ui.awaitKey();
+    
 class Game:
   """ 
   This class handles the interaction between other classes.
@@ -130,7 +168,9 @@ class Game:
     self.ui = UI(self);
     self.menu = Menu(self);
     self.exploration_handler = Exploration(self);
- 
+    self.audio_handler = AudioHandler(self);
+    self.animator = Animator(self);
+    
     self.areas = {};
     
     self.settings = { 
@@ -172,6 +212,7 @@ class Game:
   def handleQuit(self):
     """Handles quitting, stops audio player and enables echoing."""
     self.ui.enableEcho();
+    self.audio_handler.popTracks();
     os._exit(0);
   
   def handleQuest(self):
@@ -195,7 +236,7 @@ class Game:
       self.ui.awaitKey();
       self.ui.clear();
       
-  def handleEquipment(self):
+  def handleEquipment(self, combat_handler = None):
     while True:
       self.ui.clear();
       self.menu.showEquipmentMenu(self.player);
@@ -242,6 +283,7 @@ class Game:
       option = self.ui.getInput();
      
       if option == "close": return;
+      elif option == "gear": self.handleEquipment(combat_handler);
       elif self.player.itemExists(option): 
         self.handleItemDetail(option, combat_handler);
         continue;
@@ -312,6 +354,7 @@ class Game:
     """Initializes the game."""
  
     self.ui.clear();
+    self.audio_handler.play("start.wav");
     self.handleLoad();
     AREAS[self.player.location]["handler"](self).enter();
     
@@ -422,7 +465,7 @@ class Game:
       self.ui.animatedPrint(f"create {option}? (y/n)");
       if self.ui.getInput().lower() == "y":
         self.handleName(option);
-        Tutorial(self).start();
+        #Tutorial(self).startCombat();
         return;
       else:
         self.handleQuit();
@@ -457,7 +500,7 @@ class Game:
       
   def giveQuest(self, name):
     if self.player.giveQuest(name) != -1:
-      self.ui.panelPrint(f"[bold yellow]{name}[reset]\n{self.player.quests[name]["obj"].desc}", "center", title = "QUEST RECEIVED");
+      self.ui.panelPrint(f"[bold yellow]{name}[reset]\n{self.player.quests[name].desc}", "center", title = "QUEST RECEIVED");
     else: return -1;
     
   def givePlayerExp(self, exp):

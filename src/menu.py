@@ -16,7 +16,7 @@ class Menu():
     self.ui.animatedPrint(f"[blue]==QUESTS==[reset]");
     for quest_name in character.quests:
       quest = character.quests[quest_name];
-      self.ui.panelPrint(f"{quest["obj"].desc}", "center", f"{quest_name} ({quest["kills"]})");
+      self.ui.panelPrint(f"{quest.desc}", "center", f"{quest_name} ({quest.progress})");
  
   def showItemDetails(self, character, name):
     item = character.getItem(name);
@@ -30,11 +30,11 @@ class Menu():
     items = "";
     for name in character.inventory:
       items += f"> [yellow]{name}[reset] ([green]{character.getAmountOfItem(name)}[reset])\n";
-    items = items.rstrip("\n");
+    items = items.rstrip();
     self.ui.animatedPrint(f"[cyan]===INVENTORY===[reset]");
     self.ui.panelPrint(items, title = f"ITEMS ({character.getTotalItems()})");
     self.ui.normalPrint(f"[yellow]hint: select an item by typing its name or type close to exit[reset]\n");
-  
+    
   def showSkillDetails(self, character, name):
     skill = character.skills[name];
     if skill.passive is False: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([blue]{skill.energy}[reset] mp)\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nClass: {skill._class}", "center", "skill details");
@@ -94,7 +94,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.6.9[reset] ([bold red]DEBUG[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.0[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):

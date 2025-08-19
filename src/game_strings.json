@@ -154,22 +154,6 @@
     ]
   },
   "fatigue handler": {
-    "tired": [
-      "[yellow]{0}[reset] breathes deeply, fighting against the mounting fatigue.",
-      "[yellow]{0}[reset] wipes the sweat from their eyes, trying to regain their focus.",
-      "[yellow]{0}[reset] moves with effort, their energy slowly draining.",
-      "[yellow]{0}[reset] tries to shake off the exhaustion, determination flickering in their eyes.",
-      "[yellow]{0}[reset] is clearly tired, but refuses to give up."
-    ],
-
-    "fatigued": [
-      "[yellow]{0}[reset] can barely stand straight, each breath labored.",
-      "[yellow]{0}[reset] wobbles slightly, their legs struggling to support them.",
-      "[yellow]{0}[reset] clutches their side, fighting through the growing fatigue.",
-      "[yellow]{0}[reset] breathes raggedly, their chest heaving with exertion.",
-      "[yellow]{0}[reset] looks pale and weak, the strain of the battle evident."
-    ],
-
     "exhausted": [
       "[yellow]{0}[reset] stumbles and nearly collapses, strength drained to its limit.",
       "[yellow]{0}[reset] gasps desperately for air, their limbs trembling uncontrollably.",
@@ -180,20 +164,6 @@
   },
 
   "hunger handler": {
-    "slightly hungry": [
-      "[yellow]{0}[reset] feels a slight rumble in their stomach, a gentle reminder it's been a while since their last meal.",
-      "A faint grumble escapes [yellow]{0}[reset]'s stomach, hinting at an approaching hunger.",
-      "[yellow]{0}[reset]'s thoughts drift to food, a mild craving beginning to set in.",
-      "A subtle emptiness begins to niggle at [yellow]{0}[reset].",
-      "[yellow]{0}[reset] feels a minor pang, realizing they're not quite full anymore."
-    ],
-    "moderately hungry": [
-      "[yellow]{0}[reset]'s stomach growls insistently, a clear sign of growing hunger.",
-      "A noticeable hunger gnaws at [yellow]{0}[reset], making them feel a bit distracted.",
-      "[yellow]{0}[reset] feels their energy flagging slightly, a direct result of their empty stomach.",
-      "Food is definitely on [yellow]{0}[reset]'s mind; they're starting to feel quite hungry.",
-      "[yellow]{0}[reset] swallows hard, their stomach aching for something to eat."
-    ],
     "very hungry": [
       "[yellow]{0}[reset]'s stomach screams in protest, their hunger becoming a painful distraction.",
       "A wave of weakness washes over [yellow]{0}[reset], their body crying out for nourishment.",
@@ -286,6 +256,30 @@
       "[bold yellow]{0}[reset] was too slow to react, taking the full force of [bold yellow]{1}[reset]'s blow!", 
       "[bold yellow]{0}[reset] failed to block in time, leaving themselves open to [bold yellow]{1}[reset]'s attack!" 
     ] 
+  },
+  
+  "parry": {
+    "parrying": [
+      "[bold cyan]{0}[reset] steadied their stance, anticipating [bold red]{1}[reset]'s strike...",
+      "[bold cyan]{0}[reset] raised their weapon defensively, preparing to parry!",
+      "With sharp focus, [bold cyan]{0}[reset] awaited [bold red]{1}[reset]'s next move.",
+      "[bold cyan]{0}[reset]'s eyes narrowed, timing their guard for the perfect parry.",
+      "[bold cyan]{0}[reset] braced themselves, weapon poised to turn the attack aside!"
+    ],
+    "successful parry": [
+      "[bold cyan]{0}[reset] timed the parry perfectly, turning aside the attack from [bold red]{1}[reset]!",
+      "[bold cyan]{0}[reset] met [bold red]{1}[reset]'s strike with a sharp parry, leaving them open!",
+      "[bold cyan]{0}[reset]'s blade clashed against [bold red]{1}[reset]'s attack, deflecting it cleanly!",
+      "[bold cyan]{0}[reset] skillfully parried the blow, preventing any harm from [bold red]{1}[reset]!",
+      "[bold cyan]{0}[reset] twisted their weapon just right, redirecting [bold red]{1}[reset]'s assault!"
+    ],
+    "failed parry": [
+      "[bold cyan]{0}[reset] mistimed the parry and took a hit from [bold red]{1}[reset]!",
+      "[bold cyan]{0}[reset] tried to parry but [bold red]{1}[reset]'s attack broke through!",
+      "[bold cyan]{0}[reset] failed to block the strike, suffering damage from [bold red]{1}[reset]!",
+      "[bold cyan]{0}[reset]'s parry was too slow; [bold red]{1}[reset]'s blow landed clean!",
+      "[bold cyan]{0}[reset] misjudged the timing and was hit by [bold red]{1}[reset]'s attack!"
+    ]
   },
   
   "tips": {

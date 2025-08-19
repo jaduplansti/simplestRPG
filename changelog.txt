@@ -338,3 +338,25 @@
 • improved shop
 • item values, shop economy!
 • selling is now dynamic, dave can bargain (increase or reduce price) dont get scammed.
+
+[version 2.7.0]
+• refined parrying, parrying events
+• made hunger and fatigue logs less frequent
+• tweaked critical hits, iron reversal and hyper precision
+• removed limitless
+• you can now rob in the shop! (dont do that lol)
+• you can fight dave (shop), losing means banned from the shop
+• winning against dave gives a unique choice branch (kill, extort, take)
+• each time you rob the shop, the prices increase btw
+• the store can go bankrupt now
+• improved overall menus
+• added sound effects (partially)
+• cleaned up and fixed styles, (seperated from handlers.py now in style.py)
+• added animation
+• added attack bar
+• added perfect crits
+• added item exchange at dave's shop
+• moved gear menu to inventory menu, type gear in inventory (for convenience)
+• improved exploration
+• during exploration, narrations and events can happen.
+• dave will reject your items during selling when he fails to bargain with you.

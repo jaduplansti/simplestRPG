@@ -1,3 +1,5 @@
+import builtins;
+
 from rich import print, box
 from rich.align import Align;
 from os import system;
@@ -28,6 +30,8 @@ from inputimeout import inputimeout, TimeoutOccurred;
 from threading import Thread
 from player import Player;
 
+from animation import Animator;
+
 class UI:
   """
   This class handles User Interface, mainly serving as a wrapper for rich.
@@ -51,6 +55,11 @@ class UI:
     """clear duh"""
     system("clear");
   
+  def clearLine(self, n = 1):
+    """clears for n line using escape sequence"""
+    for _ in range(n):
+      builtins.print("\033[A\033[2K", end = "", flush = True);
+    
   def disableEcho(self):
     """a way to disable input echo, highly not compatible with other platforms."""
     if self.game.isTermux() is True: # temporary solution, hey it works!
@@ -115,11 +124,16 @@ class UI:
     self.newLine();
     self.enableEcho();
     
-  def panelPrint(self, s, alignment = None, title = "", color = "white"):
+  def panelPrint(self, s, alignment = None, title = "", color = "white", expand = True, centered = False, joint = False):
     """prints a panel."""
-    self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color));
-    self.newLine();
-  
+    if centered is True: self.normalPrint(Align.center(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand)));
+    else: self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand));
+    
+    if joint is True:
+      self.normalPrint(Align.center("||"));
+      self.normalPrint(Align.center("||"));
+    else: self.newLine();
+    
   def panelAnimatedPrint(self, text, title):
     """
     typewriter effect inside a panel.
@@ -193,7 +207,7 @@ class UI:
   def getKey(self, s = ""):
     self.normalPrint(s + "\n");
     return readkey();
-    
+  
   def awaitKey(self):
     self.getKey("([bold red]press anything to continue[reset])");
     
@@ -210,9 +224,15 @@ class UI:
   def getInputWithTimeout(self, msg, n):
     self.normalPrint(msg + "\n");
     try:
-      return inputimeout(prompt = f": ", timeout = n);
+      return inputimeout(prompt = ": ", timeout = n);
     except TimeoutOccurred:
       return "";
+  
+  def getEnterWithTimeout(self, msg, n):
+    try:
+      return inputimeout(prompt = msg, timeout = n);
+    except TimeoutOccurred:
+      return None;
       
   def showBar(self, n, total, bar_length, color):
     n = max(0, min(n, total))
@@ -282,3 +302,15 @@ class UI:
     centered_panel = Align.center(panel)
     print(centered_panel);
     self.newLine();
+  
+  def showDivider(self, s):
+    self.console.rule(s);
+  
+  def getSize(self):
+    dimension = shutil.get_terminal_size();
+    return [dimension.columns, dimension.lines];
+  
+  def randomColor(self):
+    return choices(["yellow", "green", "red", "cyan"])[0];
+    
+    

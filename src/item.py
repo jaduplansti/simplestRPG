@@ -152,8 +152,9 @@ class Item:
     elif self._type == "scroll": return 32;
     elif self._type == "chest armor": return 60;
     elif self._type == "potion": return 25;
-    elif self._type == "food": return 10;
-    else: return 1;
+    elif self._type == "food": return 4;
+    elif self._type == "chest": return 45;
+    else: return 10;
     
   def getValue(self):
     return (self.typeToVal() * self.rarityToVal()) * self.durabilityToVal();
@@ -216,6 +217,13 @@ def use_potion(item, game, combat_handler, user):
       game.handlePlayerLevelUp();
       game.ui.printDialogue(user.name, "im never doing that again.");
       user.giveDamage(round(user.stats["max health"] * 0.6))
+  
+  elif item.name == "grand exp potion":
+    exp_increased = round(user.exp * 100);
+    game.givePlayerExp(exp_increased);
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] gained [cyan]{exp_increased}[reset] exp!");
+    game.handlePlayerLevelUp();
+    game.ui.printDialogue(user.name, "The power is all mine..");
 
   elif item.name == "cleanse potion":
     for status in user.status:
@@ -372,96 +380,99 @@ def use_armor(item, game, combat_handler, user):
 
 ITEMS = {
   "wooden sword": {
-    "item": Item(name="wooden sword", max_durability = 150, durability = 150, rank="E", weight=3.5, bodypart="right arm", _type = "sword", desc="A basic, unrefined sword carved from wood. Good for training or fending off small creatures."),
+    "item": Item(name="wooden sword", max_durability=150, durability=150, rank="E", weight=3.5, bodypart="right arm", _type="sword", desc="A basic, unrefined sword carved from wood. Good for training or fending off small creatures."),
     "action": use_sword
   },
   "wooden dagger": {
-    "item": Item(name="wooden dagger", max_durability = 100, durability = 100, rank="E", weight=2.0, bodypart="right arm", _type = "dagger", desc="A small, crude dagger made from wood. Not very effective in combat, but better than nothing."),
+    "item": Item(name="wooden dagger", max_durability=100, durability=100, rank="E", weight=2.0, bodypart="right arm", _type="dagger", desc="A small, crude dagger made from wood. Not very effective in combat, but better than nothing."),
     "action": use_dagger
   },
   "peasant tunic": {
-    "item": Item(name="peasant tunic", max_durability = 100, durability = 100, rank="E", weight=4.0, bodypart="chest", _type = "chest armor", desc="A simple, cloth tunic worn by peasants. Offers very little protection."),
+    "item": Item(name="peasant tunic", max_durability=100, durability=100, rank="E", weight=4.0, bodypart="chest", _type="chest armor", desc="A simple, cloth tunic worn by peasants. Offers very little protection."),
     "action": use_armor,
   },
   "worn leather vest": {
-    "item": Item(name="worn leather vest", max_durability = 250, durability = 250, rank="E", weight=4.5, bodypart="chest", _type = "chest armor", desc="A vest made from old, worn leather. Provides more protection than a tunic, but is far from new."),
+    "item": Item(name="worn leather vest", max_durability=250, durability=250, rank="E", weight=4.5, bodypart="chest", _type="chest armor", desc="A vest made from old, worn leather. Provides more protection than a tunic, but is far from new."),
     "action": use_armor,
   },
   "wooden bow": {
-    "item": Item(name="wooden bow", max_durability = 100, durability = 100, rank = "E", weight = 3.5, bodypart = "right arm", _type = "bow", desc="A simple bow crafted from a single piece of wood. Suitable for target practice or hunting small game."),
+    "item": Item(name="wooden bow", max_durability=100, durability=100, rank="E", weight=3.5, bodypart="right arm", _type="bow", desc="A simple bow crafted from a single piece of wood. Suitable for target practice or hunting small game."),
     "action": use_bow
   },
   "steel sword": {
-    "item": Item(name="steel sword", max_durability = 400, durability = 400, rank="D+", weight = 14.5, bodypart= "right arm", _type = "sword", desc="A solid sword forged from steel. A reliable and sturdy weapon for the average adventurer."),
+    "item": Item(name="steel sword", max_durability=400, durability=400, rank="D+", weight=14.5, bodypart="right arm", _type="sword", desc="A solid sword forged from steel. A reliable and sturdy weapon for the average adventurer."),
     "action": use_sword
   },
   "ashrend sword": {
-    "item": Item(name="ashrend sword", max_durability = 800, durability = 800, rarity = "legendary", rank="A", weight = 18.5, bodypart= "right arm", _type = "sword",  desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
+    "item": Item(name="ashrend sword", max_durability=800, durability=800, rank="A", rarity="legendary", weight=18.5, bodypart="right arm", _type="sword", desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
     "action": use_sword
   },
   "kevins sword": {
-    "item": Item(name="kevins sword", max_durability = 1, durability = 1, rank="C", weight = 1.0, bodypart = "right arm", _type = "sword", desc="A seemingly ordinary sword with an incredibly low durability. Who is Kevin, and why is his sword so fragile?"),
+    "item": Item(name="kevins sword", max_durability=1, durability=1, rank="C", weight=1.0, bodypart="right arm", _type="sword", desc="A seemingly ordinary sword with an incredibly low durability. Who is Kevin, and why is his sword so fragile?"),
     "action": use_sword
   },
   "health potion": {
-    "item": Item(name="health potion", rank="E", weight=0.5, _type = "potion", desc="A small vial containing a crimson liquid. Consuming it restores a small amount of health."),
+    "item": Item(name="health potion", rank="E", weight=0.5, _type="potion", desc="A small vial containing a crimson liquid. Consuming it restores a small amount of health."),
     "action": use_potion
   },
   "energy potion": {
-    "item": Item(name="energy potion", rank="E", weight=0.5, _type = "potion", desc="A small vial containing a bright green liquid. It provides a quick burst of energy, perfect for replenishing stamina."),
+    "item": Item(name="energy potion", rank="E", weight=0.5, _type="potion", desc="A small vial containing a bright green liquid. It provides a quick burst of energy, perfect for replenishing stamina."),
     "action": use_potion
   },
   "scroll of instant death": {
-    "item": Item(name="scroll of instant death", rank="B", rarity="rare", weight=0.2, _type = "scroll", desc="A rare and powerful scroll. Once activated, it unleashes a curse that can instantly defeat a single target."),
+    "item": Item(name="scroll of instant death", rank="B", rarity="rare", weight=0.2, _type="scroll", desc="A rare and powerful scroll. Once activated, it unleashes a curse that can instantly defeat a single target."),
     "action": use_scroll
   },
   "scroll of repair": {
-    "item": Item(name="scroll of repair", rank="D", rarity="uncommon", weight=0.2, _type = "scroll", desc="A scroll with a magical inscription. It can be used to repair the durability of a single item."),
+    "item": Item(name="scroll of repair", rank="D", rarity="uncommon", weight=0.2, _type="scroll", desc="A scroll with a magical inscription. It can be used to repair the durability of a single item."),
     "action": use_scroll
   },
   "starter chest": {
-    "item": Item(name="starter chest", durability=1, rank="D", rarity="common", weight=20.0, _type = "chest", desc="A simple wooden chest containing basic items to help a new adventurer on their journey."),
+    "item": Item(name="starter chest", durability=1, rank="D", rarity="common", weight=20.0, _type="chest", desc="A simple wooden chest containing basic items to help a new adventurer on their journey."),
     "action": use_chest
   },
   "strength potion": {
-    "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.5, _type = "potion", desc="A potion that permanently boosts the drinker's physical strength."),
+    "item": Item(name="strength potion", rank="D", rarity="uncommon", weight=0.5, _type="potion", desc="A potion that permanently boosts the drinker's physical strength."),
     "action": use_potion
   },
   "cleanse potion": {
-    "item": Item(name="cleanse potion", rank="C", rarity="uncommon", weight=0.5, _type = "potion", desc="A potion that purges the body of minor ailments, curses, and poisons."),
+    "item": Item(name="cleanse potion", rank="C", rarity="uncommon", weight=0.5, _type="potion", desc="A potion that purges the body of minor ailments, curses, and poisons."),
     "action": use_potion
   },
   "scroll of teleport": {
-    "item": Item(name = "scroll of teleport", rank = "C", rarity = "rare", weight = 0.2, _type = "scroll", desc="A scroll that allows the user to instantly teleport to a known location."),
+    "item": Item(name="scroll of teleport", rank="C", rarity="rare", weight=0.2, _type="scroll", desc="A scroll that allows the user to instantly teleport to a known location."),
     "action": use_scroll,
   },
   "wooden arrow": {
-    "item": Item(name = "wooden arrow", rank = "D", rarity = "common", weight = 1.5, _type = "arrow", desc="A simple wooden arrow. The standard ammunition for most bows."),
+    "item": Item(name="wooden arrow", rank="D", rarity="common", weight=1.5, _type="arrow", desc="A simple wooden arrow. The standard ammunition for most bows."),
     "action": None,  
   },
   "bread": {
-    "item": Item(name = "bread", rank = "D", rarity = "common", weight = 0.8, _type = "food", desc="A loaf of fresh-baked bread. A basic food that restores a small amount of health and energy."),
+    "item": Item(name="bread", rank="D", rarity="common", weight=0.8, _type="food", desc="A loaf of fresh-baked bread. A basic food that restores a small amount of health and energy."),
     "action": use_food,  
   },
   "biscuit": {
-    "item": Item(name = "biscuit", rank = "D", rarity = "common", weight = 0.5, _type = "food", desc="A small, hard biscuit. While not the most appetizing, it provides a small bit of sustenance."),
+    "item": Item(name="biscuit", rank="D", rarity="common", weight=0.5, _type="food", desc="A small, hard biscuit. While not the most appetizing, it provides a small bit of sustenance."),
     "action": use_food,  
   },
   "apple": {
-    "item": Item(name = "apple", rank = "D", rarity = "common", weight = 0.5, _type = "food", desc="A crisp, red apple. It's a healthy and refreshing snack."),
+    "item": Item(name="apple", rank="D", rarity="common", weight=0.5, _type="food", desc="A crisp, red apple. It's a healthy and refreshing snack."),
     "action": use_food,  
   },
   "bible": {
-    "item": Item(name = "bible", rank = "???", rarity = "???", weight = 0.5, _type = "book", desc="An ancient book containing holy scripture. Its true power is a mystery."),
+    "item": Item(name="bible", rank="???", rarity="???", weight=0.5, _type="book", desc="An ancient book containing holy scripture. Its true power is a mystery."),
     "action": use_book,  
   },
   "skill book": {
-    "item": Item(name = "skill book", rank = "A", rarity = "epic", weight = 3.5, _type = "book", desc="A rare and valuable book that, when read, can teach the reader a new skill."),
+    "item": Item(name="skill book", rank="A", rarity="epic", weight=3.5, _type="book", desc="A rare and valuable book that, when read, can teach the reader a new skill."),
     "action": use_book,  
   },
   "exp potion": {
-    "item": Item(name = "exp potion", rank = "A", rarity = "rare", weight = 0.9, _type = "potion", desc="A potion of experience, gives 5x exp."),
+    "item": Item(name="exp potion", rank="A", rarity="rare", weight=0.9, _type="potion", desc="A potion of experience, gives 5x exp."),
+    "action": use_potion,  
+  },
+  "grand exp potion": {
+    "item": Item(name="grand exp potion", rank="S", rarity="epic", weight=0.9, _type="potion", desc="A potion of greater experience, gives 100x exp."),
     "action": use_potion,  
   }
-};
-
+}

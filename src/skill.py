@@ -60,18 +60,23 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
 
   elif skill.name == "trislash":
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
-    combat_handler.ui.printDialogue(attacker.name, "my blade, your death..");
+    combat_handler.ui.printDialogue(attacker.name, ["my blade, your death..", "taste my blade!", "thrice, thats your end."]);
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] drew their sword and slashed [yellow]{defender.name}[reset] 1x");
+    combat_handler.game.audio_handler.play("slash1.wav");
+   
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset]'s sword rotated and thrusted [yellow]{defender.name}[reset] 2x");
-    combat_handler.ui.printDialogue(attacker.name, "the finale!");
+    combat_handler.game.audio_handler.play("thrust2.wav");
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] put every ounce of strength and cut [yellow]{defender.name}[reset] 3x");
-    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, (attacker.stats["strength"] + randint(10, 20)) * 2.5);
-    combat_handler.ui.panelAnimatedPrint(f"{attacker.name} drew his blade and sliced [yellow]{defender.name}[reset] 3x, dealing [red]{dmg}[reset] damage!", skill.name);
+    combat_handler.game.audio_handler.play("slash2.wav");
+
+    dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, (attacker.stats["strength"] + randint(50, 60)) * 2.5);
+    combat_handler.ui.panelAnimatedPrint(f"{attacker.name} drew their blade and sliced [yellow]{defender.name}[reset] 3x, dealing [red]{dmg}[reset] damage!", skill.name);
     attacker.attackEnemy(dmg, combat_handler);
     combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.4);
   
 def action_normal_defense(skill, combat_handler, attacker, defender):
   if skill.name == "parry":
+    combat_handler.ui.panelAnimatedPrintFile("parry", "parrying", [attacker.name, defender.name], "parry");
     attacker.giveStatus("parrying", 5);
 
 def action_normal_recover(skill, combat_handler, attacker, defender):
@@ -142,7 +147,7 @@ def action_normal_misc(skill, combat_handler, attacker, defender):
     combat_handler.attack_handler.handleAttack(attacker, defender);
     
 def action_passive(skill, combat_handler, attacker, defender):
-  if skill.name == "hyper precision" and combat_handler.previous_action in ["attack", "atk"]:
+  if skill.name == "hyper precision" and combat_handler.previous_action in ["attack", "atk"] and defender.status["blocking"][0] is True:
     if randint(1, 2) == randint(1, 2):
       defender.status["blocking"] = [False, 0];
       combat_handler.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] focused into a hyper focus state, breaking {defender.name}'s block", title = skill.name);
@@ -155,11 +160,11 @@ def action_passive(skill, combat_handler, attacker, defender):
   elif skill.name == "arrow return" and combat_handler.previous_action in ["attack", "atk"]:
     if randint(1, 3) == randint(1, 3) and attacker.itemExists("wooden arrow"): combat_handler.game.givePlayerItem("wooden arrow", 1);
   
-  elif skill.name == "divine protection" and attacker.stats["health"] <= attacker.stats["max health"] * 0.3 and randint(1, 3) == randint(1, 3):
+  elif skill.name == "divine protection" and attacker.stats["health"] <= attacker.stats["max health"] * 0.3 and randint(1, 4) == randint(1, 4):
     attacker.status["bleeding"] = [False, 0];
     attacker.status["stunned"] = [False, 0];
-    attacker.stats["health"] = attacker.stats["max health"] * 0.7;
-    combat_handler.ui.panelAnimatedPrint(f"a divine light engulfed [yellow]{attacker.name}[reset]'s, healing them for (50%) and clearing all debuffs.", title = skill.name);
+    attacker.stats["health"] = attacker.stats["max health"] * 0.4;
+    combat_handler.ui.panelAnimatedPrint(f"a divine light engulfed [yellow]{attacker.name}[reset]'s, healing them for (40%) and clearing all debuffs.", title = skill.name);
     combat_handler.ui.panelPrint("[yellow]RECOVERY![reset]");
   
   elif skill.name == "limitless":
@@ -237,10 +242,6 @@ SKILLS = {
   },
   "divine protection" : {
     "skill" : Skill("divine protection", "as a follower of god, you are blessed by thy protecion.", 0, "B-", range = 0, passive = True, passive_type = "death", _class = "cleric"), 
-    "action" : action_passive
-  },
-  "limitless" : {
-    "skill" : Skill("limitless", "nothing, yet there is everything.", 0, "SS", range = 0, passive = True, passive_type = "damage"), 
     "action" : action_passive
   },
 }

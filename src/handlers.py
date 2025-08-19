@@ -104,26 +104,38 @@ class DefenseHandler:
   def giveParry(self, attacker):
     attacker.giveStatus("parrying", 2);
   
+  def parryEvent(self, attacker, defender):
+    if attacker.stats["health"] <= attacker.stats["max health"] * 0.3 and randint(1, 4) == 1:
+      self.ui.animatedPrint(f"{attacker.name} falters, caught by {defender.name}'s flawless parry!")
+      self.ui.printDialogue(defender.name, ["Gotcha!", "Surprise!", "Take this!"])
+      self.combat_handler.attack_handler.handleAttack(defender, attacker)
+
+    elif attacker.status["parrying"][0] is True:
+      self.ui.animatedPrint(f"{defender.name}'s parry sends a shockwave through {attacker.name}'s guard, breaking their stance!")
+      attacker.status["parrying"] = [False, 0]
+      
   def handleParry(self, attacker, defender):
-    if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"]:
+    if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"] and attacker.status["stunned"][0] is False:
       if self.combat_handler.attack_handler.handleRange(None, attacker, defender, 2) is False: return;
       elif defender.status["stunned"][0] is True: return;
       
       if not isinstance(defender, Player) and randint(1, 3) == randint(1, 3): pass;
-      elif isinstance(defender, Player) and self.ui.getInputWithTimeout("type (f) to quickly parry!", 1.5) == "f": pass;
+      elif isinstance(defender, Player) and self.ui.getEnterWithTimeout("(press [ENTER] to quickly parry!)", 1.5) == "": pass;
       else:
         self.ui.newLine();
-        self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] failed to parry!", "parry");
+        self.ui.panelAnimatedPrintFile("parry", "failed parry", [defender.name, attacker.name], "parry");
         self.ui.panelPrint("[bold red]PARRY FAILED (-10% energy)[reset]");
         defender.energy -= defender.energy * 0.1;
         return;
         
       self.ui.newLine();
-      self.ui.panelAnimatedPrint(f"[yellow]{defender.name}[reset] parried [green]{attacker.name}[reset] with precision!", "parry");
+      self.combat_handler.game.audio_handler.play("parry.wav");
+      self.ui.panelAnimatedPrintFile("parry", "successful parry", [defender.name, attacker.name], "parry");
       self.ui.panelPrint("[bold cyan]PARRIED[reset]");
       self.combat_handler.attack_handler.consumeEquipment(defender, ["left arm", "right arm"], defender.stats["strength"] * 0.1);
       self.combat_handler.attack_handler.status_handler.turn_passed = True;
-    
+      self.parryEvent(attacker, defender);
+      
   def handleDodge(self, attacker, defender):
     dodge_chance = min(defender.stats["dexterity"] * 0.1, 60); # capped at 60%
     if choices(["dodge", None], [dodge_chance, 100 - dodge_chance])[0] is None: return;
@@ -178,13 +190,31 @@ class DamageHandler:
   def reduceDamage(self, dmg, defender):
     return max(0, dmg - defender.stats.get("defense"));
   
+  def __getCritChance(self, attacker):
+    if getattr(attacker, "true_crit", False) is True:
+      attacker.true_crit = False;
+      return 1;
+    else: return min(attacker.stats["luck"], 0.7); # Ensure luck is max 0.7 (70%)
+  
+  def __getCritMultiplier(self, attacker):
+    if getattr(attacker, "next_crit_multiplier", 1) > 1:
+      return getattr(attacker, "next_crit_multiplier", 1);
+    else: return round(uniform(1.1, attacker.stats["luck"] * 10), 1); 
+  
+  def __handleCritMessage(self, crit_chance, multiplier):
+    if crit_chance == 1: self.ui.panelPrint(f"[bold cyan]PERFECT CRITICAL[reset] [green]({multiplier}x)[reset]");
+    else: self.ui.panelPrint(f"[bold red]CRITICAL HIT![reset] [green]({multiplier}x)[reset]");
+
   def attemptCritical(self, dmg, attacker):
-    if choices(["crit", None], [attacker.stats["luck"], 0.5])[0] == "crit":
-      multiplier = round(uniform(1.1, attacker.stats["luck"] * 10), 1);
-      self.ui.panelPrint(f"[bold red]CRITICAL HIT![reset] [green]({multiplier}x)[reset]");
-      return dmg * multiplier;
+    crit_chance = self.__getCritChance(attacker);
+    if choices(["crit", None], [crit_chance, 1 - crit_chance])[0] == "crit":
+        multiplier = self.__getCritMultiplier(attacker);
+        if multiplier > 2.0: self.game.audio_handler.play("critical_hit2.wav");
+        else: self.game.audio_handler.play("critical_hit1.wav");
+        self.__handleCritMessage(crit_chance, multiplier);
+        return dmg * multiplier;
     return dmg;
-     
+    
   def __calculate(self, damage, attacker, defender):
     total_damage = damage.get("dmg");
     for stat in damage.get("stats"):
@@ -247,6 +277,7 @@ class AttackHandler:
       return True;
 
     if defender.status["blocking"][0] is True:
+      self.combat_handler.game.audio_handler.play("blocked.wav");
       self.ui.panelAnimatedPrintFile("block", "successful block", [defender.name, attacker.name], "block");
       self.ui.panelPrint(f"[purple](DAMAGE BLOCKED)[reset]");
       defender.status["blocking"] = [False, 0];
@@ -259,171 +290,15 @@ class AttackHandler:
     self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] tried to hit [yellow]{defender.name}[reset] but missed!", "miss");
     self.ui.panelPrint(f"[yellow]MISSED[reset]");
     return False;
+  
+  def handleAttackBar(self, attacker):
+    result = self.combat_handler.game.animator.attackBar();
+    self.ui.clearLine(3);
+    if result is None: return;
+    elif result[1] == result[3]: attacker.true_crit = True;
       
-  def __basic_style(self, attacker, defender):
-    move = choices(["punch", "strong punch", "double punch", "slam"])[0];
-    if self.validateAttack(attacker, defender, move) != True: return;
-    
-    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    self.ui.panelAnimatedPrintFile("basic style", move, [attacker.name, defender.name, dmg], move);
-    attacker.attackEnemy(dmg, self.combat_handler);
-
-  def __sword_style(self, attacker, defender):
-    move = choices(["slash", "thrust", "iron reversal", "blade dance"])[0];
-    if self.validateAttack(attacker, defender, move) != True: return;
-
-    if self.__swordMiniGame(move, attacker, defender) is False: return;
-    if move == "iron reversal" : self.defense_handler.giveBlock(attacker, defender);
-    elif move == "blade dance": attacker.stats["defense"] += 0.5; # balance this lmao
-    
-    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    self.ui.panelAnimatedPrintFile("sword style", move, [attacker.name, defender.name, dmg], move);
-    attacker.attackEnemy(dmg, self.combat_handler);
-
-    self.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.1);
-    if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
-    
-    self.swordMechanic(attacker, defender);
-    
-  def __bow_style(self, attacker, defender):
-    if not attacker.itemExists("wooden arrow"):
-      self.ui.panelPrint("[bold red]NO ARROWS[reset]", "center", "bow");
-      return;
-    move = choices(["quick shot", "half draw", "arrow throw"])[0];
-    if self.validateAttack(attacker, defender, move) != True: return;
-
-    if self.__bowMiniGame(move, attacker, defender) is False: return;
-    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    self.ui.panelAnimatedPrintFile("bow style", move, [attacker.name, defender.name, dmg], move);
-    attacker.attackEnemy(dmg, self.combat_handler);
-
-    self.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.01);
-    attacker.usedItem("wooden arrow");
-    if randint(1, 2) == randint(1, 2): defender.giveStatus("bleeding", 2);
-    
-  def __dirty_style(self, attacker, defender):
-    move = choices(["push", "poke"])[0];
-    if self.validateAttack(attacker, defender, move) != True: return;
-
-    dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    self.ui.panelAnimatedPrintFile("dirty style", move, [attacker.name, defender.name, dmg], move);
-    attacker.attackEnemy(dmg, self.combat_handler);
-
-    if move == "push": defender.giveStatus("stunned", 3);
-    elif move == "poke": defender.giveStatus("bleeding", 3);
-  
-  def __cleric_style(self, attacker, defender):
-    if self.validateAttack(attacker, defender, "heal override") != True: return;
-    self.ui.printDialogue(attacker.name, "repent..");
-    dmg = self.damage_handler.calculateDamage("heal override", attacker, defender);
-    dmg = dmg * max(defender.status["karma"][1], 1);
-    
-    attacker.stats["health"] = min(attacker.stats["health"] + (dmg * 0.5), attacker.stats["max health"]);
-    defender.giveStatus("karma", 2);
-    self.ui.panelAnimatedPrintFile("cleric style", "heal override", [attacker.name, defender.name, dmg], "heal override");
-    attacker.attackEnemy(dmg, self.combat_handler);
-
-  def __thief_style(self, attacker, defender):
-    move = choices(["stab", "feint", "chain"])[0]; # todo back stab mechanic
-    if self.validateAttack(attacker, defender, move) != True: return;
-   
-    if hasattr(attacker, "shadow"): 
-      attacker.shadow += 5;
-      if attacker.shadow >= 20: self.ui.animatedPrint(f"[purple] yóu yóu yôuxh2vé s_hdów [reset]")
-      else: self.ui.animatedPrint(f"shadow gained!");
-      self.ui.panelPrint(self.ui.showBar(attacker.shadow, 25, 4, "purple"), "center");
-    else: attacker.shadow = 1;
-    
-    dmg = self.backstabMechanic(move, attacker, defender);
-    
-    self.ui.panelAnimatedPrintFile("thief style", move, [attacker.name, defender.name, round(dmg * (attacker.shadow * 0.1))], move);
-    attacker.attackEnemy(dmg * (attacker.shadow * 0.1), self.combat_handler);
-    self.consumeEquipment(attacker, ["left arm", "right arm"], (dmg * (attacker.shadow * 0.1)) * 0.05);
-
-    if move == "stab": defender.giveStatus("poisoned", 3);
-    elif move == "feint": attacker.giveStatus("parrying", 1);
-    elif move == "chain" and attacker.equipment["right arm"] != None: self.__thief_style(attacker, defender);
-    
-    if attacker.shadow >= 25: 
-      attacker.shadow = 1;
-      self.ui.printDialogue(attacker.name, "release!");
-      self.ui.animatedPrint(f"[purple]{attacker.name}'s shadow dissipates..[reset]")
-  
-  def backstabMechanic(self, move, attacker, defender):
-    dmg = 0;
-    if attacker.zone in [defender.zone - 1, defender.zone + 1]: 
-      dmg = self.damage_handler.calculateDamage(move, attacker, defender, ignore_defense = True);
-      self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] goes for a backstab!");
-    else: dmg = self.damage_handler.calculateDamage(move, attacker, defender);
-    return dmg;
-    
-  def swordMechanic(self, attacker, defender):
-    if self.combat_handler.getOpponentTurnOption(attacker) == "block" and defender.status["stunned"][0] is False:
-      self.ui.animatedPrint(f"[yellow]{defender.name}[reset] let their guard down!");
-      self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] grabs [yellow]{defender.name}[reset]!");
-      self.ui.printDialogue(defender.name, "augh..");
-      defender.giveStatus("stunned", 2);
-      
-    elif defender.status["bleeding"][1] > 3:
-      defender.status["bleeding"] = [False, 0];
-      dmg = round(defender.stats["max health"] * uniform(0.3, 0.6));
-      self.ui.printDialogue(attacker.name, "scatter!");
-      self.ui.panelAnimatedPrint(f"[yellow]{defender.name}'s[reset] injuries throb in pain, permanently dealing [red]{dmg}[reset] damage!", "injury");
-      attacker.attackEnemy(dmg);
-    
-  def __swordMiniGame(self, move, attacker, defender):
-    if not isinstance(attacker, Player): return True;
-    
-    if move == "blade dance":
-      keys = [choice(string.ascii_letters).lower(), choice(string.ascii_letters).lower(), choice(string.ascii_letters).lower()];
-      if self.ui.getInputWithTimeout(f"type ({keys[0]}) to quickly 1x", 1.4) != keys[0]: return False;
-      self.ui.newLine();
-      if self.ui.getInputWithTimeout(f"type ({keys[1]}) quickly 2x", 1.4) != keys[1]: return False;
-      self.ui.newLine();
-      if self.ui.getInputWithTimeout(f"type ({keys[2]}) quickly 3x", 1.4) != keys[2]: return False;
-      self.ui.newLine();
-      return True;
-    
-    elif move == "iron reversal":
-      correct_answer = defender.stats["strength"] - attacker.stats["defense"];
-      self.ui.animatedPrint(f"iron reversal, [bold green]{defender.stats["strength"]} - {attacker.stats["defense"]}[reset]?");
-      answer = self.ui.getInput();
-      try:
-        if float(answer) != correct_answer:
-          self.ui.panelPrint("[bold red]FAILED TO REVERSE[reset]");
-          return False;
-        return True;
-      except ValueError:
-        self.ui.panelPrint("[bold red]THATS NOT A NUMBER[reset]");
-        return False;
-    else: return True;
-    
-  def __bowMiniGame(self, move, attacker, defender):
-    if not isinstance(attacker, Player): return True;
-    
-    if move == "quick shot":
-      if self.ui.getInputWithTimeout("type (q) to quickly shoot a arrow", 1.4) == "q": 
-        self.ui.newLine();
-        return True;
-      else: self.ui.panelPrint("[red]QUICK SHOT FAILED[reset]");
-    
-    elif move == "half draw":
-      distance = randint(1, 9);
-      self.ui.animatedPrint(f"[yellow]draw half![reset], [cyan]divide {distance} by 2[reset]!");
-      try:
-        answer = self.ui.getInput();
-        if float(answer) == (distance / 2): return True;
-        else: self.ui.panelPrint("[red]WRONG, SKILL ISSUE[reset]");
-      except ValueError: self.ui.panelPrint("[red]MUST BE DECIMALS, (3.5)[reset]");
-    else: return True;
-    return False;
-  
   def handleAttack(self, attacker, defender):
     self.handlePassiveSkills("attack", attacker, defender);
-
-    if attacker.attack_style == "basic": self.__basic_style(attacker, defender);
-    elif attacker.attack_style == "swordsman": self.__sword_style(attacker, defender);
-    elif attacker.attack_style == "dirty": self.__dirty_style(attacker, defender);
-    elif attacker.attack_style == "archer": self.__bow_style(attacker, defender);
-    elif attacker.attack_style == "cleric": self.__cleric_style(attacker, defender);
-    elif attacker.attack_style == "thief": self.__thief_style(attacker, defender);
+    if self.combat_handler.game.isPlayer(attacker): self.handleAttackBar(attacker);
+    self.combat_handler.style_handler.styles[attacker.attack_style]["handler"](attacker, defender);
+    

@@ -1,9 +1,11 @@
 from submenu import SubMenu;
 from item import Item, getItem;
 from copy import deepcopy;
-from random import uniform;
+from random import uniform, choices, randint;
 from character import Character;
 from enemy import characterToEnemy;
+from combat import CombatHandler;
+import os;
 
 class Shop(SubMenu):
   def __init__(self, game):
@@ -11,6 +13,8 @@ class Shop(SubMenu):
     
     self.dave = Character("dave");
     self.dave.money = 100;
+    
+    self.sell_failed_items = [];
     
     self.items = {
       "health potion" : [getItem("health potion"), 50],
@@ -26,29 +30,33 @@ class Shop(SubMenu):
       "peasant tunic" : [getItem("peasant tunic"), 30],
       "worn leather vest" : [getItem("worn leather vest"), 30],
       "ashrend sword" : [getItem("ashrend sword"), 30],
+      "exp potion" : [getItem("exp potion"), 15],
+      "grand exp potion" : [getItem("grand exp potion"), 5],
     };
   
-  def showShopInfo(self):
-    self.ui.normalPrint(f"× [green]{self.game.player.name}[reset] has [yellow]{self.game.player.money} gold[reset]\n")
-    #if len(self.game.player.inventory) > 0: self.ui.normalPrint(f"× items in stock ({len(self.items)})");
-    #else: self.ui.normalPrint("× [underline red]no items to sell![reset]\n");
-    self.ui.normalPrint(f"× {len(self.items)} items in stock!\n");
-    
+  def setMoney(self, n):
+    self.dave.money = n;
+    self.game.player.area_data["shop"]["money"] = self.dave.money;
+ 
   def showShopMenu(self):
     self.ui.clear();
-    self.showShopInfo();
-    self.ui.showSeperator("=");
+    self.ui.panelPrint(f"[yellow]{self.game.player.money}g[reset] 💰\n\n([yellow]stock[reset] 💳) ↗ ([green]sell[reset] 💸) ↘ ([red]rob[reset] 🗡)\n([bold]exit[reset] 🚪)", "center", "Dave's Shop");
     
-    self.ui.normalPrint("≈ [yellow]buy[reset]");
-    self.ui.normalPrint("≈ [cyan]sell[reset]");
-    self.ui.normalPrint("≈ [red]exit[reset]\n");
-  
   def showItemDetail(self, name):
     item = self.items[name][0];
     self.ui.panelPrint(f"[yellow]{item.name}[reset] ({item.rarity})\n\n[underline]{item.desc}[reset]\n\nBase Price: [green]{item.getValue()}[reset]\nSelling Price: [cyan]{self.calculatePrice(item.name)}[reset]\nStock: [blue]{self.items[name][1]}[reset]", "center", name);
     self.ui.normalPrint("≈ [green]buy[reset]");
     self.ui.normalPrint("≈ [red]back[back]\n");
   
+  def showCloseItems(self, price):
+    close_items = self.findCloseItems(price);
+    formatted_items = "";
+    
+    for item in close_items:
+      formatted_items += f"[green]{item.name}[reset] > [yellow]{item.getValue()}[reset]g\n";
+    formatted_items = formatted_items.rstrip("\n");
+    self.ui.panelPrint(formatted_items, title = "exchange");
+    
   def listSellItems(self):
     items = "";
     for name in self.game.player.inventory:
@@ -66,10 +74,20 @@ class Shop(SubMenu):
       
     items = items.rstrip("\n");
     self.ui.panelPrint(f"(💼) [green]{self.game.player.getTotalItems()}[reset]\n(🪙) [yellow]{self.game.player.money}[reset]\n\n{items}", title = "stock");
+  
+  def findCloseItems(self, price, tolerance=0.2):
+    close_items = []
+    for item_info in self.items.values():
+      item = item_info[0];
+      item_value = item.getValue()
+      if price * (1 - tolerance) <= item_value <= price * (1 + tolerance):
+        close_items.append(item)
+    return close_items;
     
   def calculatePrice(self, name):
     item = self.items[name][0];
-    return round(item.getValue() + (item.getValue() * 0.1));
+    interest = 0.1 * (self.game.player.area_data["shop"]["stole count"] + 1) 
+    return round(item.getValue() + (item.getValue() * interest));
   
   def __consume_stock(self, name):
     if self.items[name][1] <= 0:
@@ -88,7 +106,7 @@ class Shop(SubMenu):
     bargain_price = uniform(0.75, 1.35);
     
     if tries == 0:
-      self.ui.printDialogue("dave", f"mate id buy that for [green]{round(item.getValue() * bargain_price)}g[reset]");
+      self.ui.printDialogue(self.dave.name, f"mate id buy that for [green]{round(item.getValue() * bargain_price)}g[reset]");
       self.ui.normalPrint("([yellow]yes[reset]) to agree, ([red]no[reset]) to decline\n");
       option = self.ui.getInput();
       if option == "yes": return round(price * bargain_price)
@@ -97,8 +115,8 @@ class Shop(SubMenu):
     else:
       if bargain_price > old_bargain:
         increased_price = round(price * bargain_price);
-        self.ui.printDialogue("dave", f"alright lad, ill raise it to [blue]{increased_price}g[reset]?");
-        self.ui.printDialogue("dave", f"im being really generous today, take it or leave it..");
+        self.ui.printDialogue(self.dave.name, f"alright lad, ill raise it to [blue]{increased_price}g[reset]?");
+        self.ui.printDialogue(self.dave.name, f"im being really generous today, take it or leave it..");
         self.ui.normalPrint("([yellow]yes[reset]) to agree, ([red]no[reset]) to decline\n");
         option = self.ui.getInput();
         if option == "yes": return increased_price;
@@ -107,9 +125,9 @@ class Shop(SubMenu):
       elif bargain_price < old_bargain:
         reduced_price = round(price * bargain_price);
         decreased_rate = round(abs(1 - bargain_price), 2) * 100;
-        self.ui.printDialogue("dave", f"alright lad, while we were talking, prices went down by [yellow]{decreased_rate}[reset]%");
-        self.ui.printDialogue("dave", f"that would be around [red]{reduced_price}[reset]g!");
-        self.ui.printDialogue("dave", f"so, what is it gonna be?");
+        self.ui.printDialogue(self.dave.name, f"alright lad, while we were talking, prices went down by [yellow]{decreased_rate}[reset]%");
+        self.ui.printDialogue(self.dave.name, f"that would be around [red]{reduced_price}[reset]g!");
+        self.ui.printDialogue(self.dave.name, f"so, what is it gonna be?");
         self.ui.normalPrint("([yellow]yes[reset]) to agree, ([red]no[reset]) to decline\n");
         option = self.ui.getInput();
         if option == "yes": return reduced_price;
@@ -117,40 +135,89 @@ class Shop(SubMenu):
 
       else:
         return False;
+  
+  def __sell_for_gold(self, item, name):
+    sold_price = self.attemptBargain(item, item.getValue(), 0, None);
+    if sold_price is False:
+      self.ui.printDialogue(self.dave.name, f"[red]fine then..[reset]!");
+      self.sell_failed_items.append(name);
+      return;
+    
+    self.game.player.money += sold_price;
+    self.setMoney(self.dave.money - sold_price);
+    self.__add_stock(name);
+    self.game.player.usedItem(name);
+    self.ui.printDialogue(self.dave.name, f"[bold]pleasure doing business lad[reset]!");
+    if item.durability < item.max_durability: self.ui.printDialogue(self.dave.name, f"[bold]this is gonna take a while to patch up.[reset]!");
+  
+  def __sell_for_item(self, item, name):
+    item_price = item.getValue();
+    close_items = [item.name for item in self.findCloseItems(item_price)];
+    self.showCloseItems(item_price);
+    picked_item = self.ui.getInput();
+    
+    if picked_item in close_items:
+      self.ui.printDialogue(self.dave.name, f"alright lad, your [yellow]{item.name}[reset] for my [yellow]{picked_item}[reset].");
+      
+      self.game.player.addItemToInventory(getItem(picked_item), 1);
+      self.game.player.usedItem(item.name);
+      self.__add_stock(item.name);
+      self.__consume_stock(picked_item);
+     
+      self.ui.printDialogue(self.dave.name, ["thanks mate." "pleasure.", "great.."]);
+    else:
+      self.ui.printDialogue(self.dave.name, f"changed your mind eh?");
+     
 
   def __sell(self, name):
     item = self.game.player.getItem(name);
     if self.dave.money < item.getValue():
-      self.ui.printDialogue("dave", "[red]i cant afford that..[reset]");
+      self.ui.printDialogue(self.dave.name, "[red]i cant afford that..[reset]");
       return;
     
-    sold_price = self.attemptBargain(item, item.getValue(), 0, None);
-    if sold_price is False:
-      self.ui.printDialogue("dave", f"[red]fine then..[reset]!");
+    if name in self.sell_failed_items:
+      self.ui.printDialogue(self.dave.name, "lad we werent able to strike a deal, lets try next time eh?");
       return;
-    
-    self.game.player.money += sold_price;
-    self.dave.money -= sold_price;
-    self.__add_stock(name);
-    self.game.player.usedItem(name);
-    self.ui.printDialogue("dave", f"[bold]pleasure doing business lad[reset]!");
-    if item.durability < item.max_durability: self.ui.printDialogue("dave", f"[bold]this is gonna take a while to patch up.[reset]!");
 
+    self.ui.printDialogue(self.dave.name, "what do you want for that mate?");
+    self.ui.printTreeMenu("", ["([yellow]gold[reset]) - receive money", f"([cyan]trade[reset]) - item exchange", "([red]back[reset]) - close the menu"]);
+    action = self.ui.getInput();
+    if action == "gold": self.__sell_for_gold(item, name);
+    elif action == "trade": self.__sell_for_item(item, name);
+    else: return;
+    
   def __buy(self, name):
-    if self.items[name][1] <= 0:
-      self.ui.printDialogue("dave", f"sorry lad.... no more [yellow]{name}[reset] on stock!");
-      return;
+    if self.game.player.area_data["shop"]["killed"] is True: # if dave recently was killed, free items
+      self.game.player.addItemToInventory(self.items[name][0], 1);
+      self.__consume_stock(name);
+      self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] took [yellow]{name}[reset]");
+      return; 
       
-    if self.game.player.money <= self.calculatePrice(name):
-      self.ui.printDialogue("dave", f"ya dont have enough money lad, you need [green]{round(abs(self.game.player.money - self.calculatePrice(name)))}[reset] more!");
+    if self.items[name][1] <= 0:
+      self.ui.printDialogue(self.dave.name, f"sorry lad.... no more [yellow]{name}[reset] on stock!");
       return;
     
+    if self.game.player.money < self.calculatePrice(name):
+      self.ui.printDialogue(self.dave.name, f"ya dont have enough money lad, you need [green]{round(abs(self.game.player.money - self.calculatePrice(name)))}[reset] more!");
+      return;
+    
+    price = self.handlePromo(name);  
+
     self.game.player.addItemToInventory(self.items[name][0], 1);
-    self.game.player.money -= self.calculatePrice(name);
-    self.dave.money += self.calculatePrice(name);
+    self.game.player.money -= price;
+    self.setMoney(self.dave.money + price);
     
     self.__consume_stock(name);
-    self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] bought [yellow]{name}[reset]");
+    self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] bought [yellow]{name}[reset] for [green]{price}[reset]g");
+    self.game.player.area_data["shop"]["buy count"] += 1;
+  
+  def handlePromo(self, name):
+    if (self.game.player.area_data["shop"]["buy count"] % 3 == 0):
+      discount = uniform(0.6, 0.85);
+      actual_discount = round((1 - discount) * 100);
+      self.ui.printDialogue(self.dave.name, [f"lad, ill give you this for [green]{actual_discount}%[reset] off.", f"lad, here ill give a discount of [green]{actual_discount}[reset]%."]);
+      return round(self.calculatePrice(name) * discount);
+    else: return self.calculatePrice(name);
     
   def buyDetails(self, name):
     while True:
@@ -168,10 +235,14 @@ class Shop(SubMenu):
       option = self.ui.getInput();
       if option == "close": return;
       elif option in list(self.items): self.buyDetails(option);
-      else: self.ui.printDialogue("dave", [f"mate, i dont sell no {option} here", f"whatchu mean by {option} mate?"]);
+      else: 
+        if self.game.player.area_data["shop"]["killed"] is False: self.ui.printDialogue(self.dave.name, [f"mate, i dont sell no {option} here", f"whatchu mean by {option} mate?"]);
       self.ui.awaitKey();
       
   def handleSell(self):
+    if self.game.player.area_data["shop"]["killed"] is True:
+      return;
+      
     while True:
       self.ui.clear();
       self.listSellItems();
@@ -182,17 +253,124 @@ class Shop(SubMenu):
       self.ui.awaitKey();
   
   def handleRob(self):
-    pass;
+    combat_handler = CombatHandler(self.game)
+    combat_handler.initiateFight(self.game.player, characterToEnemy(self.dave));
+    
+    self.ui.awaitKey();
+    self.ui.clear();
+    
+    if combat_handler.won == self.game.player.name:
+      self.ui.printDialogue(self.dave.name, "wait.. lad dont kill me!");
+      self.ui.printDialogue(self.dave.name, "ill do anything!");
+      self.__rob_success();
+    else:
+      self.ui.printDialogue(self.dave.name, "serves you right bastard!");
+      self.ui.printDialogue(self.dave.name, "from now on you are banned here!");
+
+  def __rob_success(self):
+    while True:
+      self.ui.animatedPrint(f"[yellow]{self.dave.name}[reset] is fearful..");
+      self.ui.normalPrint(f"([yellow]extort[reset]) - extort gold");
+      self.ui.normalPrint(f"([green]take[reset]) - take an item");
+      self.ui.normalPrint(f"([red]kill[reset]) - murder\n");
+      
+      action = self.ui.getInput();
+      
+      if action == "extort":
+        if self.dave.money <= 0:
+          self.ui.printDialogue(self.dave.name, "mate, i have any gold on me");
+          self.ui.printDialogue(self.dave.name, "sorry..");
+        else:
+          self.ui.printDialogue(self.dave.name, f"here take [yellow]{self.dave.money}[reset]g and dont come back!");
+          self.game.player.money += self.dave.money;
+          self.setMoney(0);
+        return;
+        
+      elif action == "take":
+        self.ui.printDialogue(self.dave.name, "an item huh...");
+        self.ui.showStatus("finding", 3);
+        item = choices(list(self.items))[0];
+        self.ui.printDialogue(self.dave.name, f"here take a {item}..");
+        self.game.player.addItemToInventory(getItem(item));
+        self.game.player.area_data["shop"]["stole count"] += 1;
+        return;
+        
+      elif action == "kill":
+        self.ui.printDialogue(self.dave.name, "wait mate reconsider this!");
+        self.ui.normalPrint("([red]do[reset]) to kill, ([blue]dont[reset]) to spare\n");
+        action = self.ui.getInput();
+        if action == "do":
+          self.ui.panelAnimatedPrintFile("basic style", "punch", [self.game.player.name, self.dave.name, self.game.player.stats["strength"]], "punch");
+          self.ui.animatedPrint(f"[yellow]{self.dave.name}[reset] was punched to death by [yellow]{self.game.player.name}[reset]");
+          self.game.givePlayerExp(self.dave.exp);
+          self.game.handlePlayerLevelUp();
+          self.game.player.area_data["shop"]["killed"] = True;
+        else:
+          self.ui.printDialogue(self.dave.name, "thank you lad..");
+        return;
+        
+    self.ui.awaitKey();
+    self.ui.clear();
     
   def handleShop(self):
     self.game.handleMenu(
       {
-        "buy" : self.handleBuy, 
+        "stock" : self.handleBuy, 
         "sell" : self.handleSell,
+        "rob" : self.handleRob,
         "exit" : self.game.exploration_handler.explore,
       }, 
       self.showShopMenu,
     );
+  
+  def handleEntryEvent(self):
+    if self.game.player.hasAreaData("shop", "killed") and self.game.player.area_data["shop"]["killed"] is True:
+      self.game.ui.printDialogue(self.game.player.name, ["huh", "hmm", "welp"]);
+      self.game.ui.animatedPrint(f"{self.game.player.name} spots a note posted outside the shop.");
+      self.game.ui.normalPrint(f"([green]read[reset]) the note?");
+      self.game.ui.normalPrint(f"([yellow]take[reset]) the note?");
+      self.game.ui.normalPrint(f"([red]remove[reset]) the note?\n");
+      
+      action = self.ui.getInput();
+      if action == "read":
+        self.ui.panelPrint(f"WARNING:\n\nthis area has been sealed by the [yellow underline]silverton inspection bureau[reset]\n\n[red]{self.game.player.name}[reset] was last seen at this location, if possible contact us via the [green]guild hall[reset], thanks", title = "NOTE");
+        self.game.ui.printDialogue(self.game.player.name, ["thats crazy, dave was an asshole", "it was justified self defense!", "imagine sending an entire squad for 1 guy"]);
+      else: self.game.ui.normalPrint(f"[yellow]{self.game.player.name}[reset] tried to [green]{action}[reset] the poster but it failed!");
+      self.ui.awaitKey();
+      self.game.exploration_handler.explore();
+      return -1;
     
+    elif self.dave.money <= 0:
+      if randint(1, 5) == 1:
+        self.setMoney(self.dave.money + 100)
+        return;
+      self.game.ui.printDialogue(self.game.player.name, ["closed?", "its locked..", "thats weird.."]);
+      self.game.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] takes a peek at the windows");
+      self.game.ui.printDialogue(self.game.player.name, ["its empty, where are the items?", "darn it, i cant shop now!"]);
+      self.game.ui.animatedPrint(f"[red]the store went backrupt[reset]");
+      self.ui.awaitKey();
+      self.game.exploration_handler.explore();
+  
+  def createData(self):
+    if "shop" not in self.game.player.area_data:
+      self.game.player.area_data.update({"shop" : {}});
+      self.game.player.area_data["shop"] = {
+        "killed" : False,
+        "stole count": 0,
+        "money": 100,
+        "buy count": 0,
+      }
+  
+  def loadData(self):
+    try:
+      data = self.game.player.area_data["shop"];
+      self.dave.money = data["money"];
+      self.loans = data["loans"];
+    except KeyError:
+      return -1;
+      
   def enter(self):
+    self.ui.clear();
+    if self.loadData() == -1: self.createData();
+    self.handleEntryEvent();
     self.handleShop();

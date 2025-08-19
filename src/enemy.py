@@ -32,10 +32,10 @@ class Enemy(Character):
   def statLevelUp(self):
     for stat in self.stats:
       if stat == "max health":
-        self.stats[stat] += 40;
+        self.stats[stat] += 30;
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck": self.stats[stat] += 0.001;
-      else: self.stats[stat] += 1;
+      else: self.stats[stat] += 0.5;
   
   def move(self, away = False):
     if not away:
@@ -50,11 +50,17 @@ class Enemy(Character):
         return choices(["move backward", None], [0.8, 0.2])[0]
     
     return choices(["move backward", "move forward", None], [0.4, 0.4, 0.2])[0]
+  
+  def shouldMove(self):
+    if (self.stats["health"] < self.enemy.stats["health"]) and (abs(self.zone - self.enemy.zone) < 2) and (randint(1, 3) == 1):
+      return self.move(True);
+    elif (abs(self.zone - self.enemy.zone) > 1) and randint(1, 2) == 1:
+      return self.move(False);
+    return None;
     
   def getAction(self, ui):
-    if randint(1, 3) == 1:
-      _move = self.move(choices([True, False])[0]);
-      if _move != None: return _move;
+    _move = self.shouldMove();
+    if _move != None: return _move;
      
     action = self.customAction(ui);
     if action != None: return action;
@@ -81,13 +87,15 @@ class Enemy(Character):
       elif randint(1, 4) == randint(1, 4) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
       elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
 
-def characterToEnemy(self, char):
-  enemy = createEnemy(char.name, char.level, None, char.attack_style, [0.3, 0.3, 0.3, 0.1], False);
+def characterToEnemy(char):
+  return createEnemy(char.name, char.level, [], char.attack_style, [0.3, 0.3, 0.3, 0.1], [], game = None);
   
 def createEnemy(name, level, stats : dict, attack_style : str, action_chances : list, loots : list, boss = False, game = None, items = None):
   enemy = Enemy(name);
   enemy.level = level;
-  
+  enemy.stats["max health"] = 50;
+  enemy.stats["health"] = 50;
+
   for stat in stats:
     enemy.stats[stat] = stats[stat];
  
@@ -179,7 +187,7 @@ def getEnemyByName(name, plr = None, game = None):
     );
   elif name == "priest":
     return createEnemy(
-      "priest", randint(30, 35), {"strength" : 50, "defense" : 200}, "cleric", [0.7, 0.3, 0.1, 0],
+      "priest", randint(30, 35), {"strength" : 50, "defense" : 10}, "cleric", [0.7, 0.3, 0.1, 0],
       [
         [getItem("bible"), 0.1]    
       ],

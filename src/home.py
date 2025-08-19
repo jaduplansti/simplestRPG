@@ -50,17 +50,20 @@ class Home(SubMenu):
     self.showCharacterThoughts();
     
     if self.page == 1:
-      self.ui.normalPrint("> [green]stats[reset] (📈)");
-      self.ui.normalPrint("> [cyan]items[reset] (💼)");
-      self.ui.normalPrint("> [purple]practice[reset] (🤺)");
-      self.ui.normalPrint("> [blue]gear[reset] (🪖)");
-      self.ui.normalPrint("> [yellow]next[reset] (↪)\n");
+      self.ui.panelPrint("[green]stats[reset] (📈)\n[cyan]items[reset] (💼)\n[purple]practice[reset] (🤺)\n[blue]gear[reset] (🪖)\n[yellow]next[reset] (↪)",
+      "center"
+      "commands",
+      expand = False,
+      centered = True,
+      );
+      
     else:
-      self.ui.normalPrint("> [magenta]go outside[reset] (🚪)");
-      self.ui.normalPrint("> [blue]sleep[reset] (🛌)");
-      self.ui.normalPrint("> [blue]quest[reset] (🗒)");
-      self.ui.normalPrint("> [green]settings[reset] (🔗)");
-      self.ui.normalPrint("> [yellow]back[reset] (↩)\n");
+      self.ui.panelPrint("[magenta]go outside[reset] (🚪)\n[blue]sleep[reset] (🛌)\n[blue]quest[reset] (🗒)\n[green]settings[reset] (🔗)\n[yellow]back[reset] (↩)",
+      "center"
+      "commands",
+      expand = False,
+      centered = True,
+      );
     
   def handleHome(self):
     self.game.handleMenu(

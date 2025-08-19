@@ -73,6 +73,7 @@ class Character:
       "points": self.points,
       "title": self.title,
       "magic": self.magic,
+      "area_data": self.area_data,
       "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
           name: {
@@ -98,6 +99,7 @@ class Character:
     char.guild_info = data["guild info"]
     char.points = data["points"]
     char.title = data["title"]
+    char.area_data = data["area_data"]
     char.equipment = {
       k: Equipment.from_dict(v) if v else None for k, v in data["equipment"].items()
     }
@@ -287,3 +289,10 @@ class Character:
       combat_handler.attack_handler.handlePassiveSkills("damage", self.enemy, self);
       if hasattr(self.enemy, "shadow"): self.enemy.shadow = 0;
     self.enemy.giveDamage(self.dmg);
+  
+  def hasAreaData(self, area, info):
+    try:
+      self.area_data[area][info];
+      return True;
+    except KeyError:
+      return False;
