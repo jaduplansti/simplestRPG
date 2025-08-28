@@ -73,9 +73,23 @@ class Enemy(Character):
 
   def customAction(self, ui):
     if self.name == "fallen knight":
+      if getattr(self.enemy, "prev_item", None) == "health potion" and randint(1, 2) == 1:
+        ui.printDialogue(self.name, ["trying to recover.. its futile", "keep recovering, nothing will save you.", "futile attempt."]);
+        self.enemy.prev_item = None;    
+      elif getattr(self.enemy, "prev_skill", None) == "trislash" and randint(1, 3) == 1:
+        ui.printDialogue(self.name, ["inferior swordsmanship, nothing changes", "full of flaws, disgrace."]);
+        self.enemy.prev_skill  = None;    
+        return "perform, trislash";
+      
+      if not self.itemExists("health potion") and self.enemy.itemExists("health potion") and randint(1, 4) == 1:
+        ui.printDialogue(self.name, "ill be taking this..");
+        ui.animatedPrint(f"[yellow]{self.name}[reset] stole [yellow]{self.enemy.name}[reset]'s [red]health potion[reset]!");
+        self.addItemToInventory(getItem("health potion"));
+        self.enemy.usedItem("health potion");
+
       if self.stats["health"] <= self.stats["max health"] * 0.2: 
         return choices(["use, health potion", "perform, parry"])[0];
-      else: return choices(["perform, trislash", None])[0];
+      else: return choices(["perform, trislash", None], [0.2, 0.8])[0];
       
     if self.name == "elf":
       if self.attack_style == "archer" and self.itemExists("wooden sword") and not self.itemExists("wooden arrow"): return "use, wooden sword";
@@ -86,7 +100,21 @@ class Enemy(Character):
       if self.stats["health"] <= self.stats["max health"] * 0.5 and randint(1, 4) == 1: return "perform, blunt recovery";
       elif randint(1, 4) == randint(1, 4) and self.enemy.stats["health"] >= self.enemy.stats["max health"] * 0.7: return "perform, divine restriction";
       elif randint(1, 3) == randint(1, 3) and self.enemy.status["blocking"][0] is True: return "perform, status wipe";
-
+    
+    if self.name == "cain":
+      if self.energy <= 50 and randint(1, 3) == 1:
+        return "use, energy potion";
+      elif self.hunger <= 50 and randint(1, 3) == 1:
+        return "use, bread";
+      
+      if self.enemy.stats["health"] <= self.enemy.stats["max health"] * 0.2 and randint(1, 3) == 1:
+        ui.printDialogue("cain", ["[bold red]DIE![reset]", "ITS OVER NOW!", "REPENT IN HELL"]);
+        return "perform, trislash";
+        
+      if self.stats["health"] <= self.stats["max health"] * 0.35: 
+        return choices(["use, health potion", "perform, parry"])[0];
+      else: return choices(["perform, trislash", None], [0.1, 0.9])[0];
+      
 def characterToEnemy(char):
   return createEnemy(char.name, char.level, [], char.attack_style, [0.3, 0.3, 0.3, 0.1], [], game = None);
   
@@ -193,6 +221,20 @@ def getEnemyByName(name, plr = None, game = None):
       ],
       True,
       game,
+    );
+  elif name == "cain":
+    return createEnemy(
+      "cain", randint(50, 60), {"strength" : 200, "max health": 5000}, "swordsman", [0.8, 0.1, 0, 0.1],
+      [
+        [getItem("starter chest"), 0.9]    
+      ],
+      True,
+      game,
+      items = [
+        ["health potion", 99],
+        ["energy potion", 99],
+        ["bread", 99],
+      ],
     );
     
 ENEMIES = [

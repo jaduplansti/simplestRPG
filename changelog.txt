@@ -360,3 +360,15 @@
 • improved exploration
 • during exploration, narrations and events can happen.
 • dave will reject your items during selling when he fails to bargain with you.
+
+[version 2.7.1]
+• added block breaks and block failure (blocking nerfed)
+• added cooking
+• added transition
+• added lottery
+• some enemies can react to your items
+• buffed fallen knight
+• improved stat menu
+• shop cycles items each visit (randomized)
+• players can now reserve items (next visit retains an chosen item with + 15% interest)
+• refactored components

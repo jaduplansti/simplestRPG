@@ -1,9 +1,9 @@
 from submenu import SubMenu;
-from item import Item, getItem;
+from item import Item, getItem, ITEMS;
 from copy import deepcopy;
 from random import uniform, choices, randint;
 from character import Character;
-from enemy import characterToEnemy;
+from npc import NPC;
 from combat import CombatHandler;
 import os;
 
@@ -15,38 +15,33 @@ class Shop(SubMenu):
     self.dave.money = 100;
     
     self.sell_failed_items = [];
-    
-    self.items = {
-      "health potion" : [getItem("health potion"), 50],
-      "wooden arrow" : [getItem("wooden arrow"), 9999],
-      "wooden sword" : [getItem("wooden sword"), 60],
-      "scroll of teleport" : [getItem("scroll of teleport"), 100],
-      "starter chest" : [getItem("starter chest"), 100],
-      "bread" : [getItem("bread"), 100],
-      "apple" : [getItem("apple"), 100],
-      "biscuit" : [getItem("biscuit"), 100],
-      "steel sword" : [getItem("steel sword"), 50],
-      "kevins sword" : [getItem("kevins sword"), 30],
-      "peasant tunic" : [getItem("peasant tunic"), 30],
-      "worn leather vest" : [getItem("worn leather vest"), 30],
-      "ashrend sword" : [getItem("ashrend sword"), 30],
-      "exp potion" : [getItem("exp potion"), 15],
-      "grand exp potion" : [getItem("grand exp potion"), 5],
-    };
+    self.items = {};
   
   def setMoney(self, n):
     self.dave.money = n;
     self.game.player.area_data["shop"]["money"] = self.dave.money;
  
+  def cycleItems(self):
+    number_of_items = randint(5, 8);
+    for n in range(number_of_items):
+      item_name = choices(list(ITEMS))[0];
+      amount = randint(1, 20);
+      for n in range(amount): self.__add_stock(item_name);
+    
+    if self.game.player.area_data["shop"]["reserved item"] != None and self.game.player.area_data["shop"]["reserved item"] not in self.items:
+      self.__add_stock(self.game.player.area_data["shop"]["reserved item"]);
+      
   def showShopMenu(self):
     self.ui.clear();
-    self.ui.panelPrint(f"[yellow]{self.game.player.money}g[reset] 💰\n\n([yellow]stock[reset] 💳) ↗ ([green]sell[reset] 💸) ↘ ([red]rob[reset] 🗡)\n([bold]exit[reset] 🚪)", "center", "Dave's Shop");
+    lottery_option = " -> [yellow](lottery)[reset]" if self.game.player.itemExists("dave ticket") else "";
+    self.ui.panelPrint(f"[yellow]{self.game.player.money}g[reset] 💰\n\n([yellow]stock[reset] 💳) ↗ ([green]sell[reset] 💸) ↘ ([red]rob[reset] 🗡)\n([bold]exit[reset] 🚪){lottery_option}", "center", "Dave's Shop");
     
   def showItemDetail(self, name):
     item = self.items[name][0];
     self.ui.panelPrint(f"[yellow]{item.name}[reset] ({item.rarity})\n\n[underline]{item.desc}[reset]\n\nBase Price: [green]{item.getValue()}[reset]\nSelling Price: [cyan]{self.calculatePrice(item.name)}[reset]\nStock: [blue]{self.items[name][1]}[reset]", "center", name);
     self.ui.normalPrint("≈ [green]buy[reset]");
-    self.ui.normalPrint("≈ [red]back[back]\n");
+    self.ui.normalPrint("≈ [cyan]reserve[reset]");
+    self.ui.normalPrint("≈ [red]back[reset]\n");
   
   def showCloseItems(self, price):
     close_items = self.findCloseItems(price);
@@ -69,7 +64,8 @@ class Shop(SubMenu):
   def listItems(self):
     items = "";
     for name in self.items:
-      if self.items[name][1] <= 0: items += f"(×) {name} (❌) - [yellow]{self.calculatePrice(name)}g[reset]\n";
+      if name == self.game.player.area_data["shop"]["reserved item"]: items += f"(^) {name} - [bold magenta]reserved[reset]\n";
+      elif self.items[name][1] <= 0: items += f"(×) {name} (❌) - [yellow]{self.calculatePrice(name)}g[reset]\n";
       else: items += f"(×) {name} - [yellow]{self.calculatePrice(name)}g[reset]\n";
       
     items = items.rstrip("\n");
@@ -83,10 +79,11 @@ class Shop(SubMenu):
       if price * (1 - tolerance) <= item_value <= price * (1 + tolerance):
         close_items.append(item)
     return close_items;
-    
+  
   def calculatePrice(self, name):
     item = self.items[name][0];
     interest = 0.1 * (self.game.player.area_data["shop"]["stole count"] + 1) 
+    if self.game.player.area_data["shop"]["reserved item"] == name: interest += 0.15;
     return round(item.getValue() + (item.getValue() * interest));
   
   def __consume_stock(self, name):
@@ -164,7 +161,7 @@ class Shop(SubMenu):
       self.__add_stock(item.name);
       self.__consume_stock(picked_item);
      
-      self.ui.printDialogue(self.dave.name, ["thanks mate." "pleasure.", "great.."]);
+      self.ui.printDialogue(self.dave.name, ["thanks mate.", "pleasure.", "great.."]);
     else:
       self.ui.printDialogue(self.dave.name, f"changed your mind eh?");
      
@@ -202,7 +199,7 @@ class Shop(SubMenu):
       return;
     
     price = self.handlePromo(name);  
-
+    
     self.game.player.addItemToInventory(self.items[name][0], 1);
     self.game.player.money -= price;
     self.setMoney(self.dave.money + price);
@@ -210,7 +207,13 @@ class Shop(SubMenu):
     self.__consume_stock(name);
     self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] bought [yellow]{name}[reset] for [green]{price}[reset]g");
     self.game.player.area_data["shop"]["buy count"] += 1;
-  
+    if self.game.player.area_data["shop"]["reserved item"] == name: self.game.player.area_data["shop"]["reserved item"] = None;
+    
+  def __reserve(self, name):
+    self.ui.printDialogue(self.dave.name, [f"ok mate, come back for your [yellow]{name}[reset] later!", f"lad, i reserved [yellow]{name}[reset] for you to buy soon.."]);
+    self.ui.animatedPrint("[cyan]you reserved an item![reset] ([bold green]+15% interest[reset])");
+    self.game.player.area_data["shop"]["reserved item"] = name;
+    
   def handlePromo(self, name):
     if (self.game.player.area_data["shop"]["buy count"] % 3 == 0):
       discount = uniform(0.6, 0.85);
@@ -218,6 +221,35 @@ class Shop(SubMenu):
       self.ui.printDialogue(self.dave.name, [f"lad, ill give you this for [green]{actual_discount}%[reset] off.", f"lad, here ill give a discount of [green]{actual_discount}[reset]%."]);
       return round(self.calculatePrice(name) * discount);
     else: return self.calculatePrice(name);
+  
+  def handleLotteryResult(self, lottery_result):
+    if lottery_result == "gold":
+      prize = randint(1000, 5000);
+      self.ui.printDialogue(self.dave.name, "Well, well, look at that! Seems like luck's on your side today…");
+      self.ui.printDialogue(self.dave.name, f"Take this [yellow]{prize}g[reset] and try not to spend it all at once, eh?");
+      self.game.player.money += prize;
+    elif lottery_result == "item":
+      prize = None;
+      for name in self.items:
+        if self.items[name].rarity in ["rare", "epic", "legendary"]: prize = name
+      self.ui.printDialogue(self.dave.name, "Ah, now this is more like it! I have just the thing for you…")
+      self.ui.printDialogue(self.dave.name, "Careful with this one, it’s rare… wouldn’t want you to break it, would we?")
+      self.game.givePlayerItem(prize);
+    else:  
+      self.ui.printDialogue(self.dave.name, "[red]Ah, bad luck, lad… nothing this time.[reset]")
+      self.ui.printDialogue(self.dave.name, "Don’t fret, maybe next time the fates will smile on you.")
+    
+  def handleLottery(self):
+    if not self.game.player.itemExists("dave ticket"):
+      return;
+    
+    self.ui.clear();
+    self.ui.printDialogue(self.dave.name, "mate, give me a sec, [yellow]ill try to see if its a hit[reset]");
+    self.ui.showStatus("searching", 2);
+    
+    lottery_result = choices([None, "item", "gold"], [0.7, 0.2, 0.1])[0];
+    self.handleLotteryResult(lottery_result);
+    self.game.player.usedItem("dave ticket");
     
   def buyDetails(self, name):
     while True:
@@ -225,6 +257,7 @@ class Shop(SubMenu):
       self.showItemDetail(name);
       option = self.ui.getInput();
       if option == "buy": self.__buy(name);
+      elif option == "reserve": self.__reserve(name);
       elif option == "back": return;
       self.ui.awaitKey();
   
@@ -318,6 +351,7 @@ class Shop(SubMenu):
         "stock" : self.handleBuy, 
         "sell" : self.handleSell,
         "rob" : self.handleRob,
+        "lottery" : self.handleLottery,
         "exit" : self.game.exploration_handler.explore,
       }, 
       self.showShopMenu,
@@ -335,7 +369,7 @@ class Shop(SubMenu):
       if action == "read":
         self.ui.panelPrint(f"WARNING:\n\nthis area has been sealed by the [yellow underline]silverton inspection bureau[reset]\n\n[red]{self.game.player.name}[reset] was last seen at this location, if possible contact us via the [green]guild hall[reset], thanks", title = "NOTE");
         self.game.ui.printDialogue(self.game.player.name, ["thats crazy, dave was an asshole", "it was justified self defense!", "imagine sending an entire squad for 1 guy"]);
-      else: self.game.ui.normalPrint(f"[yellow]{self.game.player.name}[reset] tried to [green]{action}[reset] the poster but it failed!");
+      else: self.game.ui.normalPrint(f"[yellow]{self.game.player.name}[reset] tried to [green]{action}[reset] the note but it failed!");
       self.ui.awaitKey();
       self.game.exploration_handler.explore();
       return -1;
@@ -359,6 +393,7 @@ class Shop(SubMenu):
         "stole count": 0,
         "money": 100,
         "buy count": 0,
+        "reserved item": None
       }
   
   def loadData(self):
@@ -373,4 +408,5 @@ class Shop(SubMenu):
     self.ui.clear();
     if self.loadData() == -1: self.createData();
     self.handleEntryEvent();
+    self.cycleItems();
     self.handleShop();

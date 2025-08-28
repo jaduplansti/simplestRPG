@@ -2,7 +2,7 @@ from random import randint, choices;
 from copy import deepcopy;
 
 class Skill:
-  def __init__(self, name, desc, energy, rank, range = 0, level = 0, passive = False, passive_type = None, _class = None):
+  def __init__(self, name, desc, energy, rank, range = 0, level = 0, passive = False, passive_type = None, _style = None):
     self.name = name;
     self.energy = energy;
     self.rank = rank
@@ -11,14 +11,19 @@ class Skill:
     self.range = range;
     self.passive = passive;
     self.passive_type = passive_type;
-    self._class = _class;
+    self._style = _style;
     
   def deductEnergy(self, character, n):
     character.energy = max(0, character.energy - n);
     
   def use(self, combat_handler = None, attacker = None, defender = None):
+    if (self._style != None) and (self._style != attacker.attack_style): 
+      combat_handler.ui.animatedPrint(f"you dont have the valid style for this skill, required '[yellow]{self._style}[reset]'");
+      return;
+      
     SKILLS[self.name]["action"](self, combat_handler, attacker, defender);
     self.deductEnergy(attacker, self.energy);
+    attacker.prev_skill = self.name;
     
   def to_dict(self):
     return {
@@ -30,7 +35,7 @@ class Skill:
       "range": self.range,
       "passive" : self.passive,
       "passive_type" : self.passive_type,
-      "_class" : self._class,
+      "_style" : self._style,
       };
 
   @classmethod
@@ -181,27 +186,27 @@ def getSkill(name):
     
 SKILLS = {
  "coin flip" : {
-    "skill" : Skill("coin flip", "heads or tails? 50% chance to increase or decrease a stat", 20, "C", range = 0, _class = "thief"), 
+    "skill" : Skill("coin flip", "heads or tails? 50% chance to increase or decrease a stat", 20, "C", range = 0, _style = "dagger1"), 
     "action" : action_normal_misc
   },
   "shadow burst" : {
-    "skill" : Skill("shadow burst", "increases shadow by 1.3x", 15, "C+", range = 0, _class = "thief"), 
+    "skill" : Skill("shadow burst", "increases shadow by 1.3x", 15, "C+", range = 0, _style = ""), 
     "action" : action_normal_misc
   },
   "shadow step" : {
-    "skill" : Skill("shadow step", "the shadows creeping, appear behind an enemy for a guranteed backstab", 20, "C+", range = 0, _class = "thief"), 
+    "skill" : Skill("shadow step", "the shadows creeping, appear behind an enemy for a guranteed backstab", 20, "C+", range = 0, _style = "dagger1"), 
     "action" : action_normal_misc
   },
   "arrow rain" : {
-    "skill" : Skill("arrow rain", "shoots a volley of arrows at the enemy, inflicting 5 stacks of bleeding.", 25, "C+", range = 6, _class = "archer"), 
+    "skill" : Skill("arrow rain", "shoots a volley of arrows at the enemy, inflicting 5 stacks of bleeding.", 25, "C+", range = 6, _style = "bow1"), 
     "action" : action_normal_damage
   },
   "bow bash" : {
-    "skill" : Skill("bow bash", "smash the bow into a enemy, dealing mediocre damage", 15, "D", range = 2, _class = "archer"), 
+    "skill" : Skill("bow bash", "smash the bow into a enemy, dealing mediocre damage", 15, "D", range = 2, _style = "bow1"), 
     "action" : action_normal_damage
   },
   "trislash" : {
-     "skill" : Skill("trislash", "triple the slash, triple the fun.", 30, "C+", range = 2, _class = "swordsman"), 
+     "skill" : Skill("trislash", "triple the slash, triple the fun.", 30, "C+", range = 2, _style = "sword1"), 
      "action" : action_normal_damage
   },
   "soul fracture" : {
@@ -221,27 +226,27 @@ SKILLS = {
     "action" : action_normal_misc,
   },
   "divine restriction" : {
-    "skill" : Skill("divine restriction", "chains of a sinner, restricting for 5 stacks..", 30, "C+", range = 3, _class = "cleric"), 
+    "skill" : Skill("divine restriction", "chains of a sinner, restricting for 5 stacks..", 30, "C+", range = 3, _style = "bible1"), 
     "action" : action_normal_recover
   },
   "status wipe" : {
-    "skill" : Skill("status wipe", "fear, clears status of the enemy including karma.", 10, "C+", range = 3, _class = "cleric"), 
+    "skill" : Skill("status wipe", "fear, clears status of the enemy including karma.", 10, "C+", range = 3, _style = "bible1"), 
     "action" : action_normal_recover
   },
   "hyper precision" : {
-    "skill" : Skill("hyper precision", "you see flaws in every stance, your attacks have a 50% to block break!", 0, "C+", range = 0, passive = True, passive_type = "attack", _class = "swordsman"), 
+    "skill" : Skill("hyper precision", "you see flaws in every stance, your attacks have a 50% to block break!", 0, "C+", range = 0, passive = True, passive_type = "attack", _style = "sword1"), 
     "action" : action_passive
   },
   "flowing blade" : {
-    "skill" : Skill("flowing blade", "the ultimate defense, when you are both blocking and parrying, you apply 2 stacks of stun and reset your stance.", 0, "C+", range = 0, passive = True, passive_type = "attack", _class = "swordsman"), 
+    "skill" : Skill("flowing blade", "the ultimate defense, when you are both blocking and parrying, you apply 2 stacks of stun and reset your stance.", 0, "C+", range = 0, passive = True, passive_type = "attack", _style = "sword1"), 
     "action" : action_passive
   },
   "arrow return" : {
-    "skill" : Skill("arrow return", "arrows shot have a 33% chance to return a arrow.", 0, "C-", range = 0, passive = True, passive_type = "attack", _class = "archer"), 
+    "skill" : Skill("arrow return", "arrows shot have a 33% chance to return a arrow.", 0, "C-", range = 0, passive = True, passive_type = "attack", _style = "bow1"), 
     "action" : action_passive
   },
   "divine protection" : {
-    "skill" : Skill("divine protection", "as a follower of god, you are blessed by thy protecion.", 0, "B-", range = 0, passive = True, passive_type = "death", _class = "cleric"), 
+    "skill" : Skill("divine protection", "as a follower of god, you are blessed by thy protecion.", 0, "B-", range = 0, passive = True, passive_type = "death", _style = "bible1"), 
     "action" : action_passive
   },
 }

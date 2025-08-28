@@ -1,7 +1,6 @@
-from enemy import Enemy, getEnemyByName;
+from npc import NPC, getNPC;
 from random import randint, choices;
 from handlers import AttackHandler;
-from style import StyleHandler;
 
 from time import time;
 
@@ -12,7 +11,6 @@ class CombatHandler:
     self.menu = self.game.menu;
     self.attack_handler = AttackHandler(self);
     
-    self.style_handler = StyleHandler(game, self);
     self.attacker = None;
     self.defender = None;
     self.enemy_option = ""; # temporary solution
@@ -22,27 +20,19 @@ class CombatHandler:
     self.won = None;
     
   def initiateFightNpc(self, character, name):
+    self.game.audio_handler.play("battle_start.wav");
     self.game.animator.transition();
-    enemy = getEnemyByName(name, character, self.game);
-    self.attacker = character
-    self.attacker.enemy = enemy;
     
-    self.defender = enemy;
+    npc = getNPC(name);
+    self.attacker = character;
+    self.attacker.enemy = npc;
+    
+    self.defender = npc;
     self.defender.enemy = self.attacker;
     self.attacker.clearStatus();
 
     self.game.handleCombatInitiateMenu(self);
   
-  def initiateFight(self, char1, char2):
-    self.attacker = char1;
-    self.defender = char2;
-    
-    self.attacker.enemy = char2;
-    self.defender.enemy = char1;
-
-    self.attacker.clearStatus();
-    self.game.handleCombatInitiateMenu(self);
-
   def __handleWin(self):
     if self.tryBerserkNpc(self.defender) is False:
       if self.defender.boss is True: self.ui.panelPrint("BOSS DEFEATED", "center", "combat");
@@ -182,10 +172,10 @@ class CombatHandler:
       self.game.handleUseItem(self);
     elif option == "skills":
       self.game.handleUseSkill(None, self, attacker, defender);
-    elif len(option.split(",")) > 1 and option.split(",")[0] == "use" and isinstance(attacker, Enemy):
+    elif len(option.split(",")) > 1 and option.split(",")[0] == "use" and isinstance(attacker, NPC):
       if attacker.itemExists(option.split(",")[1].lstrip()) is True: attacker.getItem(option.split(",")[1].lstrip()).use(self.game, attacker, self);
       else: self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] tried to use a item, but they dont have a {option.split(",")[1].lstrip()}", title = "item");
-    elif len(option.split(",")) > 1 and option.split(",")[0] == "perform" and isinstance(attacker, Enemy):
+    elif len(option.split(",")) > 1 and option.split(",")[0] == "perform" and isinstance(attacker, NPC):
       if attacker.skillExists(option.split(",")[1].lstrip()) is True: attacker.skills[option.split(",")[1].lstrip()].use(self, attacker, defender);
       else: self.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] tried to use a skill, but they haven't learned {option.split(",")[1].lstrip()}", title = "skill");
     elif len(option.split(" ")) > 1 and option.split(" ")[0] == "move":
@@ -227,7 +217,7 @@ class CombatHandler:
       if self.attack_handler.status_handler.turn_passed is False: ran = self.handleOption(self.enemy_option, self.defender, self.attacker);
       self.ui.showSeperator("*");
 
-      if isinstance(self.defender, Enemy):
+      if isinstance(self.defender, NPC):
         if self.defender.berserk is True: self.defender.giveDamage(self.defender.stats["max health"] * 0.2)
         
       if self.checkDeath() is True or (self.enemy_option == "flee" and self.defender.status["stunned"][0] is False): break;

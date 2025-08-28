@@ -2,6 +2,7 @@ from random import randint, uniform
 from item import Item, Equipment, getItem, itemToEquipment, equipmentToItem;
 from skill import Skill, getSkill;
 from copy import deepcopy;
+from character_class import Class;
 import json;
 
 class Character:
@@ -68,7 +69,7 @@ class Character:
       "stats": self.stats,
       "equipment": {k: v.to_dict() if v else None for k, v in self.equipment.items()},
       "attack_style": self.attack_style,
-      "_class": self._class,
+      "_class": self._class.to_dict(),
       "skills": self.skills,
       "points": self.points,
       "title": self.title,
@@ -107,10 +108,10 @@ class Character:
        k: Skill.from_dict(v) if v else None for k, v in data["skills"].items()
     }
     char.attack_style = data["attack_style"]
-    char._class = data["_class"]
+    char._class = Class.from_dict(data["_class"]);
     char.inventory = {
       name: {
-        "item": [Item.from_dict(item_dict) for item_dict in item_data["item"]], # Convert each dict to an Item object
+        "item": [Item.from_dict(item_dict) for item_dict in item_data["item"]], 
         "amount": item_data["amount"]
       } for name, item_data in data["inventory"].items()
     }
@@ -296,3 +297,9 @@ class Character:
       return True;
     except KeyError:
       return False;
+  
+  def hasItems(self, items):
+    for item_name in items:
+      if item_name not in self.inventory or self.inventory[item_name]["amount"] <= 0:
+        return False;
+    return True

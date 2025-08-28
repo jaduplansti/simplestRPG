@@ -37,7 +37,7 @@ class Menu():
     
   def showSkillDetails(self, character, name):
     skill = character.skills[name];
-    if skill.passive is False: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([blue]{skill.energy}[reset] mp)\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nClass: {skill._class}", "center", "skill details");
+    if skill.passive is False: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([blue]{skill.energy}[reset] mp)\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nStyle: {skill._style}", "center", "skill details");
     else: self.ui.panelPrint(f"[yellow]{skill.name}[reset] ([green]{skill.rank}[reset]) ([yellow]PASSIVE[reset])\n\n{skill.desc}\n\nRange: {skill.range} (↘↙↗↘)\nClass: {skill._class}", "center", "skill details");
 
     if skill.passive != True: self.ui.normalPrint("≈ [green]use[reset]");
@@ -94,7 +94,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.7.0[reset] ([bold blue]ALPHA[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.1[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -142,4 +142,6 @@ class Menu():
     self.ui.normalPrint(f"• [red]delete[reset]");
     self.ui.newLine();
   
-    
+  def showStatAllocateMenu(self, stat):
+    self.ui.panelPrint(f"{stat} ({self.game.player.stats[stat]})\npoints: {self.game.player.points}", "center");
+    self.ui.normalPrint("[yellow]press (w/s) to allocate or deallocate points, press (enter) to close[reset]\n");

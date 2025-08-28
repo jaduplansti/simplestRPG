@@ -46,7 +46,7 @@ class Equipment:
     return formatted_bonus;
     
   def removeEquipment(self, plr, game):
-    if any(name in self.name.lower() for name in ["sword", "dagger", "bow"]) : game.removeStyle(plr);
+    if any(name in self.name.lower() for name in ["sword", "dagger", "bow"]) : plr.attack_style = "basic";
     for stat in self.bonus["increase"]: plr.stats[stat] = max(0, plr.stats[stat] - self.bonus["increase"][stat]);
     for stat in self.bonus["decrease"]: plr.stats[stat] += self.bonus["decrease"][stat]
     plr.equipment[self.bodypart] = None;
@@ -96,6 +96,7 @@ class Item:
   bodypart = None,
   _type = None,
   desc = None,
+  _class = None,
   ):
     
     self.name = name;
@@ -107,14 +108,19 @@ class Item:
     self.bodypart = bodypart;
     self.desc = desc;
     self._type = _type;
+    self._class = _class;
     
   def use(self, game, user, combat_handler = None):
+    if (self._class != None) and (user._class.name != self._class): 
+      game.ui.animatedPrint(f"you need to have the class [bold green]{self._class}[reset] to use [yellow]{self.name}[reset]");
+      return;
     try:
       fn = ITEMS[self.name]["action"]
       if fn is None: 
         game.ui.animatedPrint("this item has no uses.");
         return;
       if fn(self, game, combat_handler, user) != -1: user.usedItem(self.name);
+      user.prev_item = self.name;
     except KeyError:
       game.ui.animatedPrint(f"[yellow]{user.name}[reset] cant use [green]{self.name}[reset], since it does not have any uses!");
   
@@ -127,6 +133,8 @@ class Item:
       "rank": self.rank,
       "desc" : self.desc,
       "bodypart": self.bodypart,
+      "weight": self.weight,
+      "_class": self._class,
       };
   
   def rarityToVal(self, weight = 3):
@@ -152,7 +160,7 @@ class Item:
     elif self._type == "scroll": return 32;
     elif self._type == "chest armor": return 60;
     elif self._type == "potion": return 25;
-    elif self._type == "food": return 4;
+    elif self._type in ["food", "ingredient"]: return 4;
     elif self._type == "chest": return 45;
     else: return 10;
     
@@ -173,7 +181,7 @@ def use_potion(item, game, combat_handler, user):
   event = choices(["poison", None], [0.1, 0.9])[0]
   
   if event == "poison":
-    game.giveStatus("poisoned", 1);
+    user.giveStatus("poisoned", 1)
     game.ui.animatedPrint(f"[cyan]{user.name}[reset] used a {item.name} but it was poisoned!");
     game.ui.printDialogue(user.name, "yuck..");
     return;
@@ -268,7 +276,7 @@ def use_sword(item, game, combat_handler, user):
 
   game.ui.animatedPrint(f"strength increased by [green]{strength_increased}[reset]!");
     
-  game.giveStyle(user, "swordsman");
+  user.attack_style = "sword1";
   user.stats["strength"] += strength_increased;
     
   user.equipment[item.bodypart].setBonus("increase", "strength", strength_increased);
@@ -285,7 +293,7 @@ def use_dagger(item, game, combat_handler, user):
   game.ui.animatedPrint(f"dexterity increased by [green]{dexterity_increased}[reset]!");
   game.ui.animatedPrint(f"defense decreased by [red]{defense_decreased}[reset]!");
 
-  game.giveStyle(user, "thief");
+  user.attack_style = "thief";
   user.stats["dexterity"] += dexterity_increased;
   user.stats["defense"] = max(0, user.stats["defense"] - defense_decreased);
 
@@ -293,11 +301,16 @@ def use_dagger(item, game, combat_handler, user):
   user.equipment[item.bodypart].setBonus("decrease", "defense", defense_decreased);
     
 def use_chest(item, game, combat_handler, user):
-  if item.name == "starter chest":
+  if item.name == "ingredient chest":
+    for name in ITEMS:
+      if ITEMS[name]["item"]._type == "ingredient":
+        game.givePlayerItem(name);
+        
+  elif item.name == "starter chest":
     possible_loot = [];
     for item in ITEMS: 
       if ITEMS[item]["item"].rarity in ["common", "uncommon"]: possible_loot.append(ITEMS[item]["item"]);
-    amount_loot = randint(0, len(possible_loot));
+    amount_loot = randint(0, 3); # temporary nerf
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opened up a [bold green]starter chest[reset]!");
     
     if amount_loot == 0:
@@ -323,29 +336,19 @@ def use_bow(item, game, combat_handler, user):
     user.equipment[item.bodypart].setBonus("increase", "strength", strength_increased);
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] equipped a [bold blue]wooden bow[reset]!");
     game.ui.animatedPrint(f"strength [green]+{strength_increased}[reset]!");
-    game.giveStyle(user, "archer");
+    user.attack_style = "archer"
     user.stats["strength"] += strength_increased;
 
 def use_food(item, game, combat_handler, user):
-  if item.name == "bread":
-    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate a loaf of [bold green]bread[reset]!");
-    game.ui.animatedPrint(f"hunger: {user.hunger + 20}");
-    user.hunger = min(100, user.hunger + 20);
-  
-  elif item.name == "biscuit":
-    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate crunchy [bold green]biscuits[reset]!");
-    game.ui.animatedPrint(f"hunger: {user.hunger + 10}");
-    user.hunger = min(100, user.hunger + 10);
-  
-  elif item.name == "apple":
-    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate a fresh [bold cyan]apple[reset]!");
-    game.ui.animatedPrint(f"hunger: {user.hunger + 15}");
-    user.hunger = min(100, user.hunger + 15);
-  
+    old_hunger = user.hunger;
+    game.ui.animatedPrint(f"[yellow]{user.name}[reset] ate [bold yellow]{item.name}[reset]!");
+    user.hunger = min(100, user.hunger + FOOD_HUNGER_VALUES[item.name]);
+    game.ui.normalPrint(f"hunger: [dim green]{old_hunger}[reset] -> [bold green]{user.hunger}[reset]\n");
+    
 def use_book(item, game, combat_handler, user):
   if item.name == "bible":
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opens up the [bold yellow]bible[reset]!");
-    game.giveStyle(user, "cleric");
+    user.attack_style = "cleric";
   
   elif item.name == "skill book":
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] opened a [bold cyan]skill book[reset]!");
@@ -378,13 +381,45 @@ def use_armor(item, game, combat_handler, user):
     game.ui.animatedPrint(f"defense [green]+{defense_increased}[reset]!");
     user.stats["defense"] += defense_increased;
 
+def use_artifact(item, game, combat_handler, user):
+  if item.name == "seal of origin":
+    game.ui.animatedPrint("[yellow]the seal of origin reacts..[reset]");
+    game.ui.animatedPrint("choose a class!");
+    game.ui.panelPrint("• [green]swordsman[reset]\n• [cyan]archer[reset]\n• [purple]thief[reset]\n• [yellow]cleric[reset]", title = "basic classes");
+    _class_picked = game.ui.getInput();
+    
+    if _class_picked in ["archer", "swordsman", "thief", "cleric"]:
+      game.giveClass(user, _class_picked, announce = True);
+      game.ui.animatedPrint("[dim purple]the seal of origin closes.[reset]");
+      return;
+    
+    game.ui.animatedPrint("[bold red]the seal of origin violently reacts![reset]");
+    game.ui.animatedPrint("[underline red]invalid class..[reset]");
+    game.ui.animatedPrint("[purple]the seal exploded and dealt ?¿?¿?¿¿? dmg?[reset]");
+    user.giveDamage(randint(1, 999));
+
 ITEMS = {
+  "seal of origin": {
+  "item": Item(
+    name="seal of origin",
+    rarity = "legendary",
+    rank = "S",
+    weight = 0.3,
+    _type="misc",
+    desc="An ancient seal that lets its bearer choose any basic class."
+  ),
+  "action": use_artifact
+  },
+  "dave ticket": {
+    "item": Item(name="dave ticket", _type="misc", desc="A ticket made by dave, allows adventurers to gain rewards!"),
+    "action": None
+  },
   "wooden sword": {
-    "item": Item(name="wooden sword", max_durability=150, durability=150, rank="E", weight=3.5, bodypart="right arm", _type="sword", desc="A basic, unrefined sword carved from wood. Good for training or fending off small creatures."),
+    "item": Item(name="wooden sword", max_durability=150, durability=150, rank="E", weight=3.5, bodypart="right arm", _type="sword", _class = "swordsman", desc="A basic, unrefined sword carved from wood. Good for training or fending off small creatures."),
     "action": use_sword
   },
   "wooden dagger": {
-    "item": Item(name="wooden dagger", max_durability=100, durability=100, rank="E", weight=2.0, bodypart="right arm", _type="dagger", desc="A small, crude dagger made from wood. Not very effective in combat, but better than nothing."),
+    "item": Item(name="wooden dagger", max_durability=100, durability=100, rank="E", weight=2.0, bodypart="right arm", _type="dagger", _class = "thief", desc="A small, crude dagger made from wood. Not very effective in combat, but better than nothing."),
     "action": use_dagger
   },
   "peasant tunic": {
@@ -396,19 +431,19 @@ ITEMS = {
     "action": use_armor,
   },
   "wooden bow": {
-    "item": Item(name="wooden bow", max_durability=100, durability=100, rank="E", weight=3.5, bodypart="right arm", _type="bow", desc="A simple bow crafted from a single piece of wood. Suitable for target practice or hunting small game."),
+    "item": Item(name="wooden bow", max_durability=100, durability=100, rank="E", weight=3.5, bodypart="right arm", _type="bow", _class = "archer", desc="A simple bow crafted from a single piece of wood. Suitable for target practice or hunting small game."),
     "action": use_bow
   },
   "steel sword": {
-    "item": Item(name="steel sword", max_durability=400, durability=400, rank="D+", weight=14.5, bodypart="right arm", _type="sword", desc="A solid sword forged from steel. A reliable and sturdy weapon for the average adventurer."),
+    "item": Item(name="steel sword", max_durability=400, durability=400, rank="D+", weight=14.5, bodypart="right arm", _type="sword", _class = "swordsman", desc="A solid sword forged from steel. A reliable and sturdy weapon for the average adventurer."),
     "action": use_sword
   },
   "ashrend sword": {
-    "item": Item(name="ashrend sword", max_durability=800, durability=800, rank="A", rarity="legendary", weight=18.5, bodypart="right arm", _type="sword", desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
+    "item": Item(name="ashrend sword", max_durability=800, durability=800, rank="A", rarity="legendary", weight=18.5, bodypart="right arm", _type="sword", _class = "swordsman", desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
     "action": use_sword
   },
   "kevins sword": {
-    "item": Item(name="kevins sword", max_durability=1, durability=1, rank="C", weight=1.0, bodypart="right arm", _type="sword", desc="A seemingly ordinary sword with an incredibly low durability. Who is Kevin, and why is his sword so fragile?"),
+    "item": Item(name="kevins sword", max_durability=1, durability=1, rank="C", weight=1.0, bodypart="right arm", _type="sword", _class = "swordsman", desc="A seemingly ordinary sword with an incredibly low durability. Who is Kevin, and why is his sword so fragile?"),
     "action": use_sword
   },
   "health potion": {
@@ -429,6 +464,10 @@ ITEMS = {
   },
   "starter chest": {
     "item": Item(name="starter chest", durability=1, rank="D", rarity="common", weight=20.0, _type="chest", desc="A simple wooden chest containing basic items to help a new adventurer on their journey."),
+    "action": use_chest
+  },
+  "ingredient chest": {
+    "item": Item(name="ingredient chest", durability=1, rank="D", rarity="common", weight=15.0, _type="chest", desc="A simple wooden chest containing ingredients to help a new adventurer cook!"),
     "action": use_chest
   },
   "strength potion": {
@@ -474,5 +513,97 @@ ITEMS = {
   "grand exp potion": {
     "item": Item(name="grand exp potion", rank="S", rarity="epic", weight=0.9, _type="potion", desc="A potion of greater experience, gives 100x exp."),
     "action": use_potion,  
-  }
+  },
+  "fruit basket": {
+    "item": Item(name="fruit basket", rank="F", rarity="common", weight=0.5, _type="food", desc="A colorful basket of fresh fruits. Wash them well before eating."),
+    "action": use_food,  
+  },
+  "salad": {
+    "item": Item(name="salad", rank="E", rarity="common", weight=0.7, _type="food", desc="A fresh salad with lettuce, tomato, and cucumber. Chop and wash carefully!"),
+    "action": use_food,  
+  },
+  "grilled fish": {
+    "item": Item(name="grilled fish", rank="D", rarity="uncommon", weight=1.2, _type="food", desc="A nicely grilled fish, washed and cooked to perfection."),
+    "action": use_food,  
+  },
+  "stir fry": {
+    "item": Item(name="stir fry", rank="C", rarity="uncommon", weight=1.5, _type="food", desc="A delicious stir fry with vegetables and chicken. Requires some skill to cook."),
+    "action": use_food,  
+  },
+  "smoothie": {
+    "item": Item(name="smoothie", rank="E", rarity="common", weight=0.8, _type="food", desc="A refreshing fruit smoothie. Wash and chop the fruits well before blending."),
+    "action": use_food,  
+  },
+  "omelette": {
+    "item": Item(name="omelette", rank="D", rarity="common", weight=1.0, _type="food", desc="A cheesy omelette. Chop the ingredients and heat carefully."),
+    "action": use_food,  
+  },
+  "banana": {
+    "item": Item(name="banana", rank="F", rarity="common", weight=0.25, _type="ingredient", desc="A ripe yellow banana."),
+    "action": None,
+  },
+  "orange": {
+    "item": Item(name="orange", rank="F", rarity="common", weight=0.3, _type="ingredient", desc="A juicy orange."),
+    "action": None,
+  },
+  "lettuce": {
+    "item": Item(name="lettuce", rank="F", rarity="common", weight=0.4, _type="ingredient", desc="A crisp head of lettuce."),
+    "action": None,
+  },
+  "tomato": {
+    "item": Item(name="tomato", rank="F", rarity="common", weight=0.25, _type="ingredient", desc="A ripe tomato."),
+    "action": None,
+  },
+  "cucumber": {
+    "item": Item(name="cucumber", rank="F", rarity="common", weight=0.3, _type="ingredient", desc="A fresh cucumber."),
+    "action": None,
+  },
+  "fish": {
+    "item": Item(name="fish", rank="E", rarity="common", weight=1.0, _type="ingredient", desc="A raw fish, ready to be cooked."),
+    "action": None,
+  },
+  "lemon": {
+    "item": Item(name="lemon", rank="F", rarity="common", weight=0.2, _type="ingredient", desc="A fresh lemon."),
+    "action": None,
+  },
+  "carrot": {
+    "item": Item(name="carrot", rank="F", rarity="common", weight=0.2, _type="ingredient", desc="A crunchy carrot."),
+    "action": None,
+  },
+  "broccoli": {
+    "item": Item(name="broccoli", rank="F", rarity="common", weight=0.5, _type="ingredient", desc="A fresh broccoli floret."),
+    "action": None,
+  },
+  "chicken": {
+    "item": Item(name="chicken", rank="E", rarity="common", weight=1.2, _type="ingredient", desc="Raw chicken meat."),
+    "action": None,
+  },
+  "strawberry": {
+    "item": Item(name="strawberry", rank="F", rarity="common", weight=0.05, _type="ingredient", desc="A small, sweet strawberry."),
+    "action": None,
+  },
+  "milk": {
+    "item": Item(name="milk", rank="F", rarity="common", weight=0.8, _type="ingredient", desc="Fresh milk in a bottle."),
+    "action": None,
+  },
+  "egg": {
+    "item": Item(name="egg", rank="F", rarity="common", weight=0.1, _type="ingredient", desc="A raw egg."),
+    "action": None,
+  },
+  "cheese": {
+    "item": Item(name="cheese", rank="F", rarity="common", weight=0.3, _type="ingredient", desc="A block of cheese."),
+    "action": None,
+  },
 }
+
+FOOD_HUNGER_VALUES = {
+  "bread": 50,
+  "biscuit": 15,
+  "apple": 10,
+  "fruit basket": 25,
+  "salad": 25,
+  "grilled fish": 60,
+  "stir fry": 50,
+  "smoothie": 40,
+  "omelette": 50,
+};

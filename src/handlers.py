@@ -1,6 +1,8 @@
 from random import randint, choice, choices, uniform;
 from player import Player;
-from enemy import Enemy;
+from npc import NPC;
+
+from style import getStyle;
 import string;
 
 class StatusEffectHandler:
@@ -182,6 +184,9 @@ class DamageHandler:
       **self.createDamage("stab", 10, ["strength", "dexterity"], _range = 1),
       **self.createDamage("feint", 5, ["dexterity"], _range = 1),
       **self.createDamage("chain", 15, ["strength"], _range = 1),
+      **self.createDamage("dark slash", 70, ["strength"], _range = 2),
+      **self.createDamage("thrustion", 80, ["strength", "defense"], _range = 3),
+      **self.createDamage("reversion", 50, ["strength"], _range = 2),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = [], _range = 1):
@@ -202,8 +207,8 @@ class DamageHandler:
     else: return round(uniform(1.1, attacker.stats["luck"] * 10), 1); 
   
   def __handleCritMessage(self, crit_chance, multiplier):
-    if crit_chance == 1: self.ui.panelPrint(f"[bold cyan]PERFECT CRITICAL[reset] [green]({multiplier}x)[reset]");
-    else: self.ui.panelPrint(f"[bold red]CRITICAL HIT![reset] [green]({multiplier}x)[reset]");
+    if crit_chance == 1: self.game.animator.animatePerfectCritical(multiplier);
+    else: self.game.animator.animateCritical(multiplier);
 
   def attemptCritical(self, dmg, attacker):
     crit_chance = self.__getCritChance(attacker);
@@ -269,14 +274,29 @@ class AttackHandler:
   def consumeEquipment(self, character, parts, dmg):
     for broken in character.useEquipment(parts, dmg, self.combat_handler.game):
       self.ui.animatedPrint(f"[red]{broken} was broken![reset]");
+  
+  def __blockBreak(self, attacker, defender):
+    if (defender.stats["health"] < defender.stats["max health"] * 0.35) and (randint(1, 2) == 1):
+      self.ui.panelAnimatedPrintFile("block", "failed block", [defender.name, attacker.name], "block");
+      self.ui.panelPrint(f"[red](BLOCK FAIL!)[reset]");
+      defender.status["blocking"] = [False, 0];
+      return True;
       
+    elif attacker.stats["strength"] > defender.stats["defense"]:
+      self.ui.panelAnimatedPrintFile("block", "block broken", [defender.name, attacker.name], "block");
+      self.ui.panelPrint(f"[red]BlOCK BREAK![reset]");
+      defender.status["blocking"] = [False, 0];
+      return True;
+    return False;
+    
   def handleBlock(self, attacker, defender): # move this to defense handler
     if attacker.status["blocking"][0] is True:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] dropped their block");
       attacker.status["blocking"] = [False, 0];
       return True;
-
+    
     if defender.status["blocking"][0] is True:
+      if self.__blockBreak(attacker, defender) is True: return False;
       self.combat_handler.game.audio_handler.play("blocked.wav");
       self.ui.panelAnimatedPrintFile("block", "successful block", [defender.name, attacker.name], "block");
       self.ui.panelPrint(f"[purple](DAMAGE BLOCKED)[reset]");
@@ -292,7 +312,7 @@ class AttackHandler:
     return False;
   
   def handleAttackBar(self, attacker):
-    result = self.combat_handler.game.animator.attackBar();
+    result = self.combat_handler.game.animator.attackBar(pointer = "+");
     self.ui.clearLine(3);
     if result is None: return;
     elif result[1] == result[3]: attacker.true_crit = True;
@@ -300,5 +320,4 @@ class AttackHandler:
   def handleAttack(self, attacker, defender):
     self.handlePassiveSkills("attack", attacker, defender);
     if self.combat_handler.game.isPlayer(attacker): self.handleAttackBar(attacker);
-    self.combat_handler.style_handler.styles[attacker.attack_style]["handler"](attacker, defender);
-    
+    getStyle(attacker.attack_style).attack(attacker, defender, self.combat_handler.game, self.combat_handler);

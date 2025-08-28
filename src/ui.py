@@ -4,7 +4,7 @@ from rich import print, box
 from rich.align import Align;
 from os import system;
 
-from random import choices, uniform;
+from random import choices, uniform, choice;
 from rich.prompt import Prompt;
 from rich.text import Text;
 
@@ -31,6 +31,7 @@ from threading import Thread
 from player import Player;
 
 from animation import Animator;
+import string;
 
 class UI:
   """
@@ -49,7 +50,8 @@ class UI:
     self.game = game;
     self.console = Console();
     self.strings = {};
-    self.loadStrings();
+    self.dialogues = {};
+    self.loadJson();
   
   def clear(self):
     """clear duh"""
@@ -75,11 +77,13 @@ class UI:
     while select.select([sys.stdin], [], [], 0.1)[0]:
       sys.stdin.read(1);
   
-  def loadStrings(self):
-    """loads game_strings.json into self.strings, note: rewrite this."""
+  def loadJson(self):
+    """loads json files into their corresponding attribute"""
     with open(sys.path[0] + "/game_strings.json", "r") as file:
       self.strings = json.load(file);
-  
+    with open(sys.path[0] + "/dialogues.json", "r") as file:
+      self.dialogues = json.load(file);
+    
   def getString(self, key, n):
     """
     used to get a certain string in self.strings
@@ -98,6 +102,9 @@ class UI:
     if isinstance(self.strings[key][n], list):
       return choices(self.strings[key][n])[0];
     return self.strings[key][n];
+  
+  def getDialogue(self, key, subkey, n):
+    return self.dialogues[key][subkey][n];
     
   def normalPrint(self, s):
     """ print. """
@@ -186,7 +193,11 @@ class UI:
   def printDialogue(self, name, s):
     if not isinstance(s, list): self.animatedPrint(f"{name}: {s}", punc = True);
     else: self.animatedPrint(f"{name}: {choices(s)[0]}", punc = True);
-
+  
+  def printDialogueFile(self, name, key, subkey, n, args):
+    formatted_s = self.getString(key, subkey, n).format(*args);
+    self.printDialogue(name, formatted_s);
+    
   def printTreeMenu(self, title, options): 
     tree = Tree(title);
     for option in options:
@@ -204,8 +215,8 @@ class UI:
   def newLine(self):
     print("");
   
-  def getKey(self, s = ""):
-    self.normalPrint(s + "\n");
+  def getKey(self, s = "", end = "\n"):
+    self.normalPrint(s + end);
     return readkey();
   
   def awaitKey(self):
@@ -312,5 +323,16 @@ class UI:
   
   def randomColor(self):
     return choices(["yellow", "green", "red", "cyan"])[0];
+  
+  def getRandomKeys(self, n):
+    keys = [];
+    for _ in range(n):
+      keys.append(choice(string.ascii_letters).lower());
+    return keys;
+  
+  def moveCursorUp(self, n=1):
+    # ANSI escape code to move cursor up by n lines
+    builtins.print(f"\033[{n}A", end="");
     
-    
+  def flush(self):
+    sys.stdout.flush();

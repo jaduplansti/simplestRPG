@@ -34,7 +34,7 @@
     ]
   },
   
-  "sword style" : {
+  "sword1 style" : {
     "slash": [
       "[bold yellow]{0}[reset] slashed at [bold yellow]{1}[reset] with a swift strike, dealing [bold red]{2}[reset] damage!",
       "[bold yellow]{0}[reset] swung their blade cleanly across [bold yellow]{1}[reset], inflicting [bold red]{2}[reset] damage!",
@@ -71,7 +71,43 @@
     "[bold yellow]{0}[reset] performs a swift blade dance, their movements granting them a moment of heightened defensive focus against [bold yellow]{1}[reset]'s attack! They deal [bold red]{2}[reset] damage!"
     ]
   },
+  "csword style" : {
+    "dark slash": [
+      "[bold yellow]{0}[reset] channeled a sinister force into their blade, unleashing a [purple]dark slash[reset] on [bold yellow]{1}[reset], dealing [bold red]{2}[reset] damage!",
+      "A shadow trailed behind [bold yellow]{0}[reset]'s blade as they struck [bold yellow]{1}[reset] with a [purple]dark slash[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] carved a path of darkness across [bold yellow]{1}[reset], their [purple]dark slash[reset] dealing [bold red]{2}[reset] damage!",
+      "With a surge of corrupted energy, [bold yellow]{0}[reset] struck [bold yellow]{1}[reset] using a [purple]dark slash[reset], landing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]'s blade shimmered with shadow, cutting into [bold yellow]{1}[reset] with a [purple]dark slash[reset] for [bold red]{2}[reset] damage!",
+      "The air trembled as [bold yellow]{0}[reset] delivered a [purple]dark slash[reset], leaving [bold yellow]{1}[reset] reeling with [bold red]{2}[reset] damage!"
+    ],
   
+    "thrustion": [
+      "[bold yellow]{0}[reset] lunged with explosive force, executing [cyan]Thrustion[reset] into [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] drove their sword forward with overwhelming speed, piercing [bold yellow]{1}[reset] through [cyan]Thrustion[reset] for [bold red]{2}[reset] damage!",
+      "With a sudden burst, [bold yellow]{0}[reset] unleashed [cyan]Thrustion[reset], striking [bold yellow]{1}[reset] and inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]’s sword erupted forward like a cannon shot—[cyan]Thrustion[reset] pierced [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "A lightning-fast [cyan]Thrustion[reset] from [bold yellow]{0}[reset] impaled [bold yellow]{1}[reset], causing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] broke through [bold yellow]{1}[reset]'s defenses with [cyan]Thrustion[reset], dealing [bold red]{2}[reset] damage!"
+    ],
+  
+    "reversion": [
+      "[bold yellow]{0}[reset] struck [bold yellow]{1}[reset] with [green]Reversion[reset], turning their blade into a swift parry that redirected the attack, dealing [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] lashed out with [green]Reversion[reset], punishing [bold yellow]{1}[reset] while deflecting their offense, causing [bold red]{2}[reset] damage!",
+      "Steel rang as [bold yellow]{0}[reset] cut into [bold yellow]{1}[reset] with [green]Reversion[reset], smoothly parrying their strike, inflicting [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] attacked in a blur, then reversed their blade into a parry—[green]Reversion[reset] struck [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "A precise [green]Reversion[reset] from [bold yellow]{0}[reset] hit [bold yellow]{1}[reset], turning their momentum against them for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]’s blade flowed like water—[green]Reversion[reset] struck [bold yellow]{1}[reset] while parrying their advance, dealing [bold red]{2}[reset] damage!"
+    ],
+  
+    "blade dance": [
+      "[bold yellow]{0}[reset] spun into a deadly [orange1]Blade Dance[reset], slashing [bold yellow]{1}[reset] multiple times for [bold red]{2}[reset] damage!",
+      "A flurry of strikes from [bold yellow]{0}[reset]'s [orange1]Blade Dance[reset] overwhelmed [bold yellow]{1}[reset], leaving them reeling with [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] moved like a storm of steel—[orange1]Blade Dance[reset] cut into [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset] wove a mesmerizing pattern with their sword, [orange1]Blade Dance[reset] shredding [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "The battlefield echoed as [bold yellow]{0}[reset] unleashed [orange1]Blade Dance[reset], carving into [bold yellow]{1}[reset] for [bold red]{2}[reset] damage!",
+      "[bold yellow]{0}[reset]’s blade whirled in a furious [orange1]Blade Dance[reset], cutting [bold yellow]{1}[reset] down for [bold red]{2}[reset] damage!"
+    ]
+  },
   "dirty style": {
     "push": [
       "[bold yellow]{0}[reset] lunges forward, shoving [bold yellow]{1}[reset] with surprising force, disrupting their stance and dealing [bold red]{2}[reset] damage!",
@@ -242,6 +278,16 @@
       "[bold yellow]{0}[reset] managed to block the incoming blow from [bold yellow]{1}[reset], taking no damage!", 
       "[bold yellow]{0}[reset] stood firm and shielded against the strike, halting [bold yellow]{1}[reset]'s assault!" 
     ], 
+    "block broken": [
+      "[bold yellow]{1}[reset]'s overwhelming strength broke through [bold yellow]{0}[reset]'s guard!",
+      "[bold yellow]{0}[reset]'s defense faltered — [bold yellow]{1}[reset] was simply too strong!",
+      "With raw power, [bold yellow]{1}[reset] shattered [bold yellow]{0}[reset]'s stance!",
+      "[bold yellow]{0}[reset] tried to hold the block, but [bold yellow]{1}[reset]'s strength crushed it!",
+      "The guard of [bold yellow]{0}[reset] collapsed under [bold yellow]{1}[reset]'s sheer might!",
+      "[bold yellow]{1}[reset]'s power forced past [bold yellow]{0}[reset]'s defense — their block was broken!",
+      "No guard could withstand such strength — [bold yellow]{0}[reset]'s block failed against [bold yellow]{1}[reset]!",
+      "The stance of [bold yellow]{0}[reset] cracked and gave way before [bold yellow]{1}[reset]'s power!"
+    ],    
     "blocking": [ 
       "[bold yellow]{0}[reset] quickly raised their guard, preparing to block the attack from [bold yellow]{1}[reset]!", 
       "[bold yellow]{0}[reset] moved into a defensive stance, anticipating the incoming blow from [bold yellow]{1}[reset]!", 
@@ -250,12 +296,12 @@
       "[bold yellow]{0}[reset] prepared to shield themselves, reacting swiftly to [bold yellow]{1}[reset]'s assault!" 
     ], 
     "failed block": [ 
-      "[bold yellow]{0}[reset] misjudged the attack, failing to block as [bold yellow]{1}[reset] landed a clean hit!", 
-      "[bold yellow]{0}[reset] raised their guard too late, and [bold yellow]{1}[reset] struck directly!", 
-      "[bold yellow]{0}[reset] tried to block, but [bold yellow]{1}[reset]'s attack slipped past effortlessly!", 
+      "[bold yellow]{0}[reset] misjudged the strike, failing to block as [bold yellow]{1}[reset] landed a clean hit!", 
+      "[bold yellow]{0}[reset] raised their guard too late, letting [bold yellow]{1}[reset] strike directly!", 
+      "Weakened and sluggish, [bold yellow]{0}[reset] couldn’t keep up — [bold yellow]{1}[reset] slipped past effortlessly!", 
       "[bold yellow]{0}[reset] was too slow to react, taking the full force of [bold yellow]{1}[reset]'s blow!", 
-      "[bold yellow]{0}[reset] failed to block in time, leaving themselves open to [bold yellow]{1}[reset]'s attack!" 
-    ] 
+      "Exhaustion dulled [bold yellow]{0}[reset]’s reflexes, leaving them open to [bold yellow]{1}[reset]’s attack!" 
+    ]
   },
   
   "parry": {
