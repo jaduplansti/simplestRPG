@@ -372,3 +372,25 @@
 • shop cycles items each visit (randomized)
 • players can now reserve items (next visit retains an chosen item with + 15% interest)
 • refactored components
+• added auto completion
+• added classes and revamped styles
+• refined and removed some skills.
+
+[version 2.7.2]
+• scrapped enemy class to NPC class
+• sleeping now does not restore health
+• scrapped dungeons
+• character weight affects combat.
+• redesigned positions into a map during combat
+• added durability warnings
+• movement changed to advance, retreat and dash.
+• reworked dodging, added perfect dodge
+• sword1 style now consumes 12% sword durability, (30% -> 12%)
+• added shop negotiations
+• added farming
+• added bulk selling
+• added debts, loaning.
+• made movement easier, advance to get closer and retreat to fall back.
+• blocking does not expire after being hit anymore.
+• added countering, block then attack.
+• cleaned up folder structure
