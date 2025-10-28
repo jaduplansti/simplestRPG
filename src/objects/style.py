@@ -2,6 +2,7 @@ import string;
 from objects.player import Player;
 from random import randint, choice, choices, uniform;
 from enum import Enum;
+from objects.style_mechanics import handleBasicMechanic;
 
 class SfxMode(Enum):
   SEQUENCE = 1;
@@ -9,14 +10,13 @@ class SfxMode(Enum):
   RANDOM_SEQUENCE = 3;
   
 class Style:
-  def __init__(self, name, moves, sfx = {}, checks = [], equipmentUsed = [], mechanics = [], move_mechanics = {}):
+  def __init__(self, name, moves, sfx = {}, checks = [], equipmentUsed = [], mechanic = None):
     self.name = name;
     self.moves = moves;
     self.sfx = sfx;
     self.equipmentUsed = equipmentUsed;
-    self.mechanics = mechanics;
-    self.move_mechanics = move_mechanics;
-   
+    self.mechanic = mechanic;
+    
   def playSfx(self, move, audio_handler):
     if move not in self.sfx:
       return;
@@ -45,14 +45,6 @@ class Style:
     if len(self.equipmentUsed) == 0: return;
     attack_handler.consumeEquipment(attacker, self.equipmentUsed[0], dmg * self.equipmentUsed[1]);
   
-  def handleMechanic(self, n, attacker, defender, game, combat_handler):
-    if n < len(self.mechanics):
-      return self.mechanics[n](attacker, defender, game, combat_handler);
-  
-  def handleMoveMechanic(self, move, attacker, defender, game, combat_handler):
-    if move in self.move_mechanics:
-      self.move_mechanics[move](attacker, defender, game, combat_handler);
-      
   def attack(self, attacker, defender, game, combat_handler):
     attack_handler = combat_handler.attack_handler;
     ui = game.ui;
@@ -60,16 +52,15 @@ class Style:
     
     if attack_handler.validateAttack(attacker, defender, move) != True: return;
     self.playSfx(move, game.audio_handler);
-    self.handleMoveMechanic(move, attacker, defender, game, combat_handler);
     
-    self.handleMechanic(0, attacker, defender, game, combat_handler);
     dmg = attack_handler.damage_handler.calculateDamage(move, attacker, defender);
     ui.panelAnimatedPrintFile(f"{self.name} style", move, [attacker.name, defender.name, dmg], move);
     
     attacker.attackEnemy(dmg, combat_handler);
+    combat_handler.attack_handler.gore_handler.injure(dmg, defender);
     self.damageEquipment(attacker, attack_handler, dmg);
-    self.handleMechanic(1, attacker, defender, game, combat_handler);
-
+    if self.mechanic != None: self.mechanic(attacker, defender, self, move, combat_handler, dmg);
+    
 class StyleGiver:
   def __init__(self, game):
     self.game = game;
@@ -95,7 +86,7 @@ class StyleGiver:
   
 def getStyle(name):
   return STYLES[name];
-  
+ 
 STYLES = {
   "basic": Style(
     name = "basic",
@@ -105,6 +96,7 @@ STYLES = {
       "strong punch" : {"mode" : SfxMode.SEQUENCE, "sounds" : "strong_punch.wav"},
       "double punch" : {"mode" : SfxMode.RANDOM_SEQUENCE, "sounds" : [["punch1.wav", "punch2.wav"], ["punch1.wav", "punch2.wav"]]},
     },
+    mechanic = handleBasicMechanic,
   ),
   
  "basic2": Style(

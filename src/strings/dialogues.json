@@ -1,3 +1,13 @@
 {
-  
+  "dave": {
+    "welcome": [
+      "Welcome lad, take a look around.",
+      "Fresh stock just came in!",
+      "Don’t waste me time, what do ya want?",
+      "Got some real treasures today.",
+      "Looking to buy, sell, or… cause trouble?",
+      "Careful, some of this stuff bites back.",
+      "Aye, I knew you’d be back."    
+    ]
+  }
 }

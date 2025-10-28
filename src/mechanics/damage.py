@@ -40,7 +40,9 @@ class DamageHandler:
   
   def __getCritMultiplier(self, attacker):
     if getattr(attacker, "next_crit_multiplier", 1) > 1:
-      return getattr(attacker, "next_crit_multiplier", 1);
+      crit = getattr(attacker, "next_crit_multiplier", 1);
+      attacker.next_crit_multiplier = 0;
+      return crit;
     else: return round(uniform(1.1, attacker.stats["luck"] * 10), 1); 
   
   def __handleCritMessage(self, crit_chance, multiplier):
@@ -67,7 +69,7 @@ class DamageHandler:
     return self.attemptCritical(total_damage * damage.get("multiplier"), attacker) * attacker.getFatigueMultiplier();
   
   def __calculateDmg(self, dmg, attacker):
-    return self.attemptCritical(dmg, attacker) * attacker.getFatigueMultiplier();
+    return (self.attemptCritical(dmg, attacker) * self.combat_handler.attack_handler.gore_handler.getMultiplier()) * attacker.getFatigueMultiplier();
   
   def calculateDamage(self, name, attacker, defender, dmg = 0, ignore_defense = False):
     total_damage = 0;

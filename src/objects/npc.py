@@ -1,5 +1,5 @@
 from objects.character import Character;
-from random import randint, choices;
+from random import randint, choices, choice;
 from copy import deepcopy;
 from objects.item import getItem, ITEMS;
 
@@ -39,7 +39,7 @@ class NPC(Character):
         self.stats[stat] += 30;
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck": self.stats[stat] += 0.001;
-      else: self.stats[stat] += 0.5;
+      else: self.stats[stat] += 3;
   
   def shouldMove(self):
     if (self.stats["health"] < self.enemy.stats["health"]) and (abs(self.zone - self.enemy.zone) < 2) and (randint(1, 3) == 1):
@@ -47,13 +47,18 @@ class NPC(Character):
     elif (abs(self.zone - self.enemy.zone) > 1) and randint(1, 2) == 1:
       return "advance";
     return None;
- 
+  
+  def targetPart(self):
+    active_parts = [part for part, is_ok in self.bodyparts.items() if is_ok];
+    return f"target {choice(active_parts)}";
+
   def getAction(self, ui):
     _move = self.shouldMove();
     if _move != None: return _move;
     #action = self.customAction(ui);
     #if action != None: return action;
-    
+    if randint(1, 4) == 1: return self.targetPart();
+
     if self.status["blocking"][0] is True:
       return choices(["taunt", ""])[0];
     elif self.stats["health"] <= self.stats["max health"] * 0.20:

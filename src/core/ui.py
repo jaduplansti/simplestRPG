@@ -34,6 +34,28 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import string;
 
+from interface.art import ARTS;
+import termios;
+
+class InputController:
+  def __init__(self):
+    self._fd = sys.stdin.fileno()
+    self._orig_attrs = termios.tcgetattr(self._fd)
+    self._erase_char = self._orig_attrs[6][termios.VERASE]
+
+  def disableInput(self):
+    new_attrs = termios.tcgetattr(self._fd)
+    new_attrs[3] &= ~(termios.ECHO | termios.ICANON)
+    termios.tcsetattr(self._fd, termios.TCSADRAIN, new_attrs)
+
+  def enableInput(self):
+    # flush any buffered keystrokes before restoring
+    termios.tcflush(self._fd, termios.TCIFLUSH)
+    restored = termios.tcgetattr(self._fd)
+    restored[3] |= (termios.ECHO | termios.ICANON)
+    restored[6][termios.VERASE] = self._erase_char
+    termios.tcsetattr(self._fd, termios.TCSADRAIN, restored)
+
 class UI:
   """
   This class handles User Interface, mainly serving as a wrapper for rich.
@@ -50,6 +72,7 @@ class UI:
   def __init__(self, game):
     self.game = game;
     self.console = Console();
+    self.input_handler = InputController();
     self.strings = {};
     self.dialogues = {};
     self.loadJson();
@@ -104,8 +127,11 @@ class UI:
       return choices(self.strings[key][n])[0];
     return self.strings[key][n];
   
-  def getDialogue(self, key, subkey, n):
-    return self.dialogues[key][subkey][n];
+  def getDialogue(self, key, subkey, n, rand = False):
+    if n is None: dialogues = self.dialogues[key][subkey];
+    else: dialogues = self.dialogues[key][subkey][n];
+    if rand is True and isinstance(dialogues, list): return choice(dialogues);
+    else: return dialogues;
     
   def normalPrint(self, s):
     """ print. """
@@ -153,8 +179,11 @@ class UI:
     Usage:
     ui.panelAnimatedPrint("help me!", "error")
     """
-    
-    self.disableEcho();
+    if self.game.player.bodyparts["head"] is False:
+      text = "[bold red]you cant see.[reset]";
+      title = "";
+
+    self.input_handler.disableInput();
     current_text = ""
     formatted_text = Text.from_markup(text)
     panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0])
@@ -165,9 +194,8 @@ class UI:
         sleep(self.game.settings["type speed"]);
     self.newLine();
     sleep(self.game.settings["delay speed"]);
-    self.enableEcho();
-    self.clearStdinBuffer();
-    
+    self.input_handler.enableInput();
+
   def animatedPrintFile(self, key, n, args):
 	  formatted_s = self.getString(key, n).format(*args);
 	  self.animatedPrint(formatted_s);
@@ -177,7 +205,7 @@ class UI:
 	  self.panelAnimatedPrint(formatted_s, title);
   
   def animatedPrint(self, s, punc = False):
-    self.disableEcho();
+    self.input_handler.disableInput();
     parsed_s = Text.from_markup(s)
     print("× ", end = "");
     for ch in parsed_s:
@@ -188,15 +216,14 @@ class UI:
     self.newLine();
     self.newLine();
     sleep(self.game.settings["delay speed"]);
-    self.enableEcho();
-    self.clearStdinBuffer();
-  
+    self.input_handler.enableInput();
+
   def printDialogue(self, name, s):
     if not isinstance(s, list): self.animatedPrint(f"{name}: {s}", punc = True);
     else: self.animatedPrint(f"{name}: {choices(s)[0]}", punc = True);
   
-  def printDialogueFile(self, name, key, subkey, n, args):
-    formatted_s = self.getString(key, subkey, n).format(*args);
+  def printDialogueFile(self, name, key, subkey, n, rand, args):
+    formatted_s = self.getDialogue(key, subkey, n, rand).format(*args);
     self.printDialogue(name, formatted_s);
     
   def printTreeMenu(self, title, options): 
@@ -226,11 +253,12 @@ class UI:
   def getInput(self, completer = None, num = False):
     if completer is None: _input = Prompt.ask(f"[yellow](enter command)[reset] ⤵\n\n");
     else: 
-      if randint(1, 3) == 1: self.normalPrint("[bold yellow]hint: when (⚠) is besides the input prompt that means pressing the (TAB) or (⇆) key autocompletes.[reset]\n");
+      #if randint(1, 3) == 1: self.normalPrint("[bold yellow]hint: when (⚠) is besides the input prompt that means pressing the (TAB) or (⇆) key autocompletes.[reset]\n");
       _input = prompt("(⚠) (enter command) ↙\n\n: ", completer = WordCompleter(completer), complete_while_typing = False);
     self.newLine();
     if num is True and _input.isdigit() is False: return -1;
     elif num is True: return int(_input);
+    self.clearStdinBuffer();
     return _input;
   
   def dialogueAsk(self, s):
@@ -302,16 +330,18 @@ class UI:
     self.randomizeColorPrint(seperator + "\n");
   
   def showStatus(self, msg, n, spinner = "dots"):
+    self.input_handler.disableInput();
     with self.console.status(msg, spinner = spinner) as status:
       sleep(n);
-  
+    self.input_handler.enableInput();
+
   def showQuest(self, name):
     quest = self.game.player.quests[name]["obj"];
     self.panelPrint(quest.desc, "center", quest.name);
   
   def printArtPanel(self, art):
     panel = Panel(
-      Text(art.strip("\n"), justify="center"),
+      Text(ARTS[art].strip("\n"), justify="center"),
       padding=(1, 4),
       expand=False,
       box=box.DOUBLE

@@ -4,6 +4,8 @@ from objects.npc import NPC;
 
 from objects.style import getStyle;
 from mechanics.damage import DamageHandler;
+from mechanics.gore import GoreHandler;
+
 import string;
 
 class StatusEffectHandler:
@@ -168,6 +170,7 @@ class DefenseHandler:
       return True;
   
   def handleCounter(self, attacker, defender):
+    if self.combat_handler.attack_handler.handleRange(None, attacker, defender, 2) is False: return False;
     self.ui.panelPrint("[bold red]ATTACK INCOMING[reset]!", "center", "COUNTER!");
     self.ui.panelAnimatedPrintFile("counter", "successful counter", [defender.name, attacker.name], "countered");
     self.combat_handler.attack_handler.handleAttack(defender, attacker);
@@ -195,6 +198,8 @@ class AttackHandler:
     self.taunt_handler = TauntHandler(combat_handler);
     self.defense_handler = DefenseHandler(combat_handler);
     self.status_handler = StatusEffectHandler(combat_handler);
+    self.gore_handler = GoreHandler(combat_handler);
+
     self.ui = self.combat_handler.ui;
     
   def handlePassiveSkills(self, _type, attacker, defender):
@@ -223,6 +228,7 @@ class AttackHandler:
       self.ui.panelAnimatedPrintFile("block", "block broken", [defender.name, attacker.name], "block");
       self.ui.panelPrint(f"[red]BlOCK BREAK![reset]");
       defender.status["blocking"] = [False, 0];
+      defender.giveStatus("stunned", 2);
       return True;
     return False;
     
@@ -249,16 +255,19 @@ class AttackHandler:
     return False;
   
   def handleAttackBar(self, attacker):
-    result = self.combat_handler.game.animator.attackBar(pointer = "+");
+    if attacker.attack_style == "basic": result = self.combat_handler.game.animator.punchAttackBar();
+    elif attacker.attack_style == "sword1": result = self.combat_handler.game.animator.swordAttackBar();
+
     self.ui.clearLine(3);
-    if result is None: 
+    
+    if result is None or result[0] is False: 
       self.ui.panelPrint("[bold red]ATTACK FAILED[reset]");
       return -1;
-    elif result[1] == result[3]: attacker.true_crit = True;
-      
+  
   def handleAttack(self, attacker, defender): # refactor pls
     self.handlePassiveSkills("attack", attacker, defender);
     if self.combat_handler.game.isPlayer(attacker): 
       if self.handleAttackBar(attacker) == -1: return;
     getStyle(attacker.attack_style).attack(attacker, defender, self.combat_handler.game, self.combat_handler);
     self.combat_handler.notifyDurability(attacker, ["right arm", "left arm"]);
+  

@@ -92,16 +92,16 @@ class Menu():
   def showMainMenu(self):
     self.ui.clear();
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
-    self.ui.normalPrint("≈ [bold cyan]simplestRpg[reset] ≈");
+    self.ui.normalPrint("≈ [bold red]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.7.2[reset] ([bold blue]ALPHA[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.3[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
     self.ui.clear();
     try:
-      self.ui.printArtPanel(ARTS[self.game.player.enemy.name]);
+      self.ui.printArtPanel(self.game.player.enemy.name);
     except KeyError:
       pass;
       
@@ -116,15 +116,15 @@ class Menu():
     
     self.ui.showSeperator("+");
     
-    self.ui.normalPrint("≈ [yellow]attack[reset] (🗡)");
-    self.ui.normalPrint("≈ [cyan]block[reset] (🛑)");
-    self.ui.normalPrint("≈ [blue]taunt[reset] (🖕)");
-    self.ui.normalPrint("≈ [green]items[reset] (💼)");
-    self.ui.normalPrint("≈ [magenta]skills[reset] (💥)");
+    self.ui.normalPrint("≈ [yellow]attack[reset] (🗡)   [cyan]block[reset] (🛑)");
+    self.ui.normalPrint("≈ [blue]taunt[reset] (🖕)   [bold]say[reset] (📣)");
+    self.ui.normalPrint("≈ [green]items[reset] (💼)   [magenta]skills[reset] (💥)");
+    self.ui.normalPrint("≈ target (👁)");
     
     if character.stats["health"] <= character.stats["max health"] * 0.25:
       self.ui.normalPrint("≈ [red]flee[reset]");
     self.ui.newLine();
+    self.showLimbMenu(character);
     self.showZoneBar(character);
     self.ui.showCombatBar(character);
     self.ui.showCombatBar(character.enemy);
@@ -155,3 +155,11 @@ class Menu():
   def showStatAllocateMenu(self, stat):
     self.ui.panelPrint(f"{stat} ({self.game.player.stats[stat]})\npoints: {self.game.player.points}", "center");
     self.ui.normalPrint("[yellow]press (w/s) to allocate or deallocate points, press (enter) to close[reset]\n");
+  
+  def showLimbMenu(self, character):
+    s = "";
+    for limb in character.bodyparts:
+      s += f"[{'green' if character.bodyparts[limb] is True else 'red'}]{limb}[reset] {'✔' if character.bodyparts[limb] is True else '✖'}\n";
+    self.ui.showSeperator("-");
+    self.ui.normalPrint(f"{s}[underline yellow]target: {getattr(character, "target_part", "None")}[reset]\n");
+ 

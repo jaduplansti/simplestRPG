@@ -1,4 +1,4 @@
-[version 1.1]
+[version 1.1] (removed)
 • added basic combat system
 • added critical hits
 • added blocking
@@ -7,7 +7,7 @@
 • added bakery
 • added item class
 
-[version 1.2] 
+[version 1.2] (removed)
 • fixed and improved stats menu
 • added bakery interactions
 • added more baker dialogues, specically in buying foods, sold out and listing foods
@@ -26,7 +26,7 @@
 • added auto feature (auto combat)
 • added better emphasis in critical hits
 
-[version 1.3]
+[version 1.3] (removed)
 • added item uses
 • improved inventory
 • added items bread, apple pie and health potion
@@ -41,17 +41,17 @@
 • adjusted type speed to 0.008 and delay speed to 0.7
 • temporarily removed slips
 
-[version 1.4]
+[version 1.4] (removed)
 • changed lucky hit chance 0.5 -> 0.1
 • improved combat logs
 • multiple bug fixes (health exceeding 0)
 • added new attack style (swordsman) obtainable by equiping swords
 
-[version 1.5]
+[version 1.5] (removed)
 • deleted game, ui, combat and exploration
 • changed ui into textual
 
-[version 1.6]
+[version 1.6] (removed)
 • scratched existing exploration, ui and combat systems
 • reverted ui back to rich
 • ui revamp (took an entire day)
@@ -64,8 +64,8 @@
 • added a fatigue/energy system, (75%, 50% and 20%)
 • players and npcs can now pass out
 • now specifies what each dialogue does 
-• added a stat comparison table 
-• stats menu is now seperated into 3 categories (stat, evaluation and rank)
+• added a stat comparison table (removed)
+• stats menu is now seperated into 3 categories (stat, evaluation and rank) (removed)
 • planning to add multiplayer
 • added a taunt system 
 
@@ -77,10 +77,9 @@
 • seperated stat query and misc to YOU menu
 
 [version 1.9]
-• added simple local multiplayer, experimental
+• added simple local multiplayer, experimental (removed)
 • improved combat logs
 • added a basic block system
-• tried to port to web (failed attempt no. 21) this is satire..
 
 [version 2.0]
 • added a new move for basic style 
@@ -91,7 +90,7 @@
 • added combo system experimental
 • made the ui more readable
 • enemies now have a chance to go berserk
-• added a simple tutorial
+• added a simple tutorial (removed)
 • started to implement classes
 
 [version 2.1]
@@ -99,8 +98,8 @@
 • added a basic combat tutorial
 • improved attack, taunt and blocking handling
 • added a new basic style move, slam (deals defenders stat defense + luck)
-• added 2 debug bosses, clone and exodus the god of death
-• new debug style mainly for testing (deals inf damage)
+• added 2 debug bosses, clone and exodus the god of death (removed)
+• new debug style mainly for testing (deals inf damage) (removed)
 • taunts now reduce stats by 5%
 • reimplemented items and inventory
 • improved ui and combat logs
@@ -147,15 +146,15 @@
 • added critical hits
 • improved combat menu
 • fixed more bugs
-• potions have a 10℅ chance to be expired upon use
+• potions have a 10℅ chance to be expired upon use (removed)
 • sleeping now restores max health
 • you can now sleep regardless of your energy
 
 [version 2.5]
-• added simple audio (termux only)
-• added simple exploration
-• added home and forest
-• you can now cut trees to get wood in forest
+• added simple audio (termux only) (refactored)
+• added simple exploration (removed)
+• added home and forest (removed)
+• you can now cut trees to get wood in forest (removed)
 • added parrying system
 • added damage rating system, IMPRESSIVE, GREAT, FANTASTIC, BRILLIANT and TRANSCENDENT
 
@@ -168,7 +167,7 @@
 • fixed a bug where audio still plays upon exit / interrupt.
 • fixed a bug where the game disables echo upon exit.
 
-[version 2.5.3]
+[version 2.5.3] (removed)
 • added screen configuration
 • improved ui
 • skills can now be blocked
@@ -178,7 +177,7 @@
 • improved saving and loading, (you can now save a bunch of character files)
 • fixed issue #1 
 
-[version 2.5.5]
+[version 2.5.5] (removed)
 • added a time limit during choosing an action during combat.
 • added starter chest
 • added strength potion
@@ -193,7 +192,7 @@
 • improved ui
 • improved saving
 • improved shop and its menu
-• adjusted time limit to 15 seconds
+• adjusted time limit to 15 seconds (removed)
 
 [version 2.5.7]
 • fixed loading bug
@@ -211,15 +210,15 @@
 • fixed issue where allocating points to luck gives insane dmg
 • fixed loading
 • made scroll of repair, repair with max durability
-• big update coming next
+• big update coming next (it wasnt, im from the future)
 
 [version 2.6.0]
 • fixed skill duplication
-• added skill soul shatter
+• added skill soul shatter (removed)
 • added command aliases
 • dungeon soon!
 
-[version 2.6.1]
+[version 2.6.1] (removed)
 • nerfed parrying hit frame (1.5 seconds) 
 • increased parrying energy consumption, 5 -> 12
 • parrying consumes weapon durability (20%)
@@ -238,7 +237,7 @@
 • energy can be increased! (1 energy every 5 levels)
 • all potions can accidentally inflict poison! (replacing expiry)
 
-[version 2.6.3]
+[version 2.6.3] (minigames removed)
 • fixed scroll of repair bug.
 • archer attack style requires wooden arrow.
 • added items to shop.
@@ -394,3 +393,23 @@
 • blocking does not expire after being hit anymore.
 • added countering, block then attack.
 • cleaned up folder structure
+
+[version 2.7.3]
+• old styles were removed
+• removed debts, loaning, robbing and shop events (for refactoring)
+• added style mechanics again
+• added countering
+• fixed input bugs.
+• added say command
+• added different attack bars.
+• improved durability notification
+• added flow meter mechanic to basic style.
+• increased hunger consumption from 2 -> 5.
+• buffed enemies.
+• added growth potion (recovers from fatal injuries)
+• enemies and you can now target limbs.
+• added a limb system, limbs can break.
+• added growth potion
+• each limb has its multiplier, resistance and scales with level.
+• increased energy consumption from 5 -> 10.
+• targetting a limb costs 20 energy.

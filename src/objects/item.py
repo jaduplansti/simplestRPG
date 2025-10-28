@@ -191,7 +191,7 @@ def use_potion(item, game, combat_handler, user):
     health_restored = user.stats.get("max health") / 2;
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] used a health potion and recovered [green]{health_restored} health[reset]!")
     user.healPlayer(health_restored);
-     
+  
   elif item.name == "energy potion":
     energy_restored = round(user.energy / 2);
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] used a energy potion and recovered [green]{energy_restored} energy[reset]!")
@@ -239,6 +239,12 @@ def use_potion(item, game, combat_handler, user):
       user.status[status][1] = 0;
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] used a cleanse potion, removing [green]status effects[reset]!");
   
+  elif item.name == "growth potion":
+    health_restored = user.stats.get("max health") / 4;
+    user.healPlayer(health_restored);
+    user.fixParts();
+    game.ui.animatedPrint(f"[magenta]{user.name} drinks the Growth Potion, crimson light flows through their body, knitting wounds and restoring [green]{health_restored} health[reset]!");
+
 def use_scroll(item, game, combat_handler, user):
   if item.name == "scroll of instant death" and combat_handler != None:
     combat_handler.defender.stats["health"] = 0;
@@ -448,6 +454,10 @@ ITEMS = {
   },
   "health potion": {
     "item": Item(name="health potion", rank="E", weight=0.5, _type="potion", desc="A small vial containing a crimson liquid. Consuming it restores a small amount of health."),
+    "action": use_potion
+  },
+  "growth potion": {
+    "item": Item(name="growth potion", rank="D", rarity = "uncommon", weight=0.7, _type="potion", desc="A crimson vial that mends damaged limbs and restores a bit of health."),
     "action": use_potion
   },
   "energy potion": {

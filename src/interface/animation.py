@@ -155,4 +155,71 @@ class Animator:
     self.ui.clearLine(3);
     return key_count;
   
-        
+  def __render_charge_bar(self, bar_length, pos, target_zone, pointer, title="Punch", released=False):
+    bar = ["-"] * bar_length;
+    start, end = target_zone;
+    for i in range(start, end):
+      bar[i] = "|";
+    if pos < bar_length: bar[pos] = pointer if not released else "X";
+    complete_bar = Text().from_markup("".join(bar), justify="center");
+    return Panel(Align.center(f"{complete_bar}"), title=title, border_style="red");
+  
+  def punchAttackBar(self, speed=0.05, bar_length=30, target_size=4, pointer="•", title="Attack"):
+    pos = 0;
+    released = False;
+    target_start = (bar_length // 2) - (target_size // 2);
+    target_end = target_start + target_size;
+    direction = 1;
+    
+    with Input(keynames="curses") as input_generator:
+      with Live(self.__render_charge_bar(bar_length, pos, (target_start, target_end), pointer, title), refresh_per_second=60, console=self.ui.console) as live:
+        while True:
+          live.update(self.__render_charge_bar(bar_length, pos, (target_start, target_end), pointer, title, released));
+          key = input_generator.send(0.01);
+          if key == "\n":
+            if target_start <= pos <= target_end: result = released = True;
+            live.update(self.__render_charge_bar(bar_length, pos, (target_start, target_end), pointer, title, released));
+            sleep(0.8);
+            return [released, pos, bar_length, (target_start, target_end)];
+          pos += direction;
+          if pos >= bar_length - 1 or pos <= 0: direction *= -1;
+          sleep(speed);
+    return None;
+    
+  def __render_sword_bar(self, bar_length, targets, pos, pointer, title, hit_targets):
+    bar = ["-"] * bar_length;
+    for i, t in enumerate(targets):
+      for idx in t:
+        if 0 <= idx < bar_length:
+          bar[idx] = "X" if hit_targets[i] else "|";
+    if pos < bar_length:
+      bar[pos] = pointer;
+    text = "".join(bar);
+    return Panel(Text(text, justify="center"), title=title, border_style="yellow");
+  
+  def swordAttackBar(self, speed=0.1, bar_length=30, target_size=3, pointer="†", title="Attack"):
+    pos = 0;
+    targets = [];
+    num_targets = 3;
+    gap = bar_length // (num_targets + 1);
+    for i in range(num_targets):
+      start = (i + 1) * gap - target_size // 2;
+      targets.append(list(range(start, start + target_size)));
+    
+    hit_targets = [False] * num_targets;
+    
+    with Input(keynames="curses") as input_generator:
+      with Live(self.__render_sword_bar(bar_length, targets, pos, pointer, title, hit_targets), refresh_per_second=30, console=self.ui.console) as live:
+        while pos < bar_length:
+          live.update(self.__render_sword_bar(bar_length, targets, pos, pointer, title, hit_targets));
+          key = input_generator.send(0.01);
+          if key == "\n":
+            for i, t in enumerate(targets):
+              if pos in t:
+                hit_targets[i] = True;
+          if all(hit_targets):
+            live.update(self.__render_sword_bar(bar_length, targets, pos, pointer, title, hit_targets));
+            return [True, pos, bar_length, targets, hit_targets];
+          pos += 1;
+          sleep(speed);
+    return [False, pos, bar_length, targets, hit_targets];

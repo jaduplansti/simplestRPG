@@ -19,7 +19,7 @@ class Character:
     
     self.berserk = False;
     self.zone = 5;
-    self.direction = None;
+    self.direction = "forward";
     
     self.points = 20;
     self.title = "unawakened";
@@ -43,6 +43,8 @@ class Character:
     }
     
     self.equipment = {"head": None, "chest": None, "left arm": None, "right arm": None, "boots": None}
+    self.bodyparts = {"head" : True, "arms" : True, "legs": True};
+    
     
     self.attack_style = "basic"
     self._class = Class("Classless");
@@ -260,7 +262,7 @@ class Character:
     return 1;
       
   def deductEnergy(self):
-    self.energy = max(0, self.energy - 5);
+    self.energy = max(0, self.energy - 10);
 
   def giveStatus(self, status, n):
     try:
@@ -313,3 +315,7 @@ class Character:
     for slot in self.equipment:
       if self.equipment[slot] != None: weight += getItem(self.equipment[slot].name).weight;
     return round(weight);
+  
+  def fixParts(self):
+    for bodypart in self.bodyparts:
+      self.bodyparts[bodypart] = True;

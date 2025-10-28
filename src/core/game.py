@@ -68,7 +68,7 @@ class Game:
     
     return self.areas.get(name, None);
     
-  def handleMenu(self, options : dict, showFun = None):
+  def handleMenu(self, options : dict, showFun = None, default = None, back = False):
     """
     Creates a generic menu to display.
      
@@ -83,7 +83,9 @@ class Game:
       
       if option == "help": self.menu.showTip();
       elif option == "quit": self.handleQuit();
-      elif option in options.keys(): options[option]();
+      elif options != None and option in options.keys(): options[option]();
+      elif back is True and option == "back": return;
+      elif default != None: default(option);
       self.ui.awaitKey();
   
   def handleQuit(self):

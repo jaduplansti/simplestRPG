@@ -67,16 +67,34 @@ class CombatHandler:
   def notifyDurability(self, attacker, parts):
     if not self.game.isPlayer(attacker):
       return;
-       
+    
+    if not hasattr(attacker, "_durability_notified"):
+      attacker._durability_notified = {};
+    
     for part in parts:
-      item = attacker.equipment[part];
+      item = attacker.equipment.get(part);
       if item is None: continue;
+      
+      last_level = attacker._durability_notified.get(item, 0);
       durability_ratio = item.durability / item.max_durability;
+      new_level = 0;
 
-      if durability_ratio <= 0.1: self.ui.animatedPrint(f"[bold]{item.name}[reset] is on the verge of {choices(["[yellow]cracking[reset]", "[magenta]shattering[reset]", "[cyan]breaking[reset]"])[0]}!");
-      elif durability_ratio <= 0.4: self.ui.animatedPrint(f"[bold]{item.name}[reset] is close to {choices(["[yellow]cracking[reset]", "[magenta]shattering[reset]", "[cyan]breaking[reset]"])[0]}!");
-      elif durability_ratio <= 0.6: self.ui.animatedPrint(f"[bold]{item.name}[reset] appears to have small {choices(["[yellow]dents[reset]", "[magenta]cracks[reset]", "[cyan]damaged materials[reset]"])[0]}!");
+      if durability_ratio <= 0.1:
+        new_level = 3;
+        message = f"[bold]{item.name}[reset] is on the verge of {choices(['[yellow]cracking[reset]', '[magenta]shattering[reset]', '[cyan]breaking[reset]'])[0]}!";
+      elif durability_ratio <= 0.4:
+        new_level = 2;
+        message = f"[bold]{item.name}[reset] is close to {choices(['[yellow]cracking[reset]', '[magenta]shattering[reset]', '[cyan]breaking[reset]'])[0]}!";
+      elif durability_ratio <= 0.6:
+        new_level = 1;
+        message = f"[bold]{item.name}[reset] shows slight {choices(['[yellow]dents[reset]', '[magenta]cracks[reset]', '[cyan]scratches[reset]'])[0]}!";
+      else:
+        new_level = 0;
 
+      if new_level > last_level:
+        attacker._durability_notified[item] = new_level;
+        self.ui.animatedPrint(message);
+  
   def handleFatigue(self, attacker):
     if attacker.energy <= 10:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhaustion.[reset]", "fatigue");
@@ -100,8 +118,8 @@ class CombatHandler:
   def useHunger(self, attacker):
     if attacker.hunger > 10 and attacker.berserk != True:
       attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (attacker.hunger * 0.2));
-      attacker.energy = min(100, attacker.energy + (attacker.hunger * 0.2));
-      attacker.hunger = max(0, attacker.hunger - 2);
+      attacker.energy = min(100, attacker.energy + 5);
+      attacker.hunger = max(0, attacker.hunger - 5);
     else:
       attacker.stats["health"] -= round(attacker.stats["health"] * 0.02);
       attacker.energy -= round(attacker.energy * 0.02);
@@ -166,6 +184,10 @@ class CombatHandler:
     elif direction == "forward" and attacker.zone - offset < 10 : attacker.zone += offset;
   
   def handleCombatOption(self, option, attacker, defender):
+    if attacker.bodyparts["arms"] is False:
+      self.ui.panelAnimatedPrint(f"[red]{attacker.name}'s arms are useless — they cannot attack, block, or taunt.[reset]", "arms");
+      return;
+      
     if option in ["attack", "atk"]:
       self.attack_handler.handleAttack(attacker, defender);
     elif option in ["block", "blk"]:
@@ -173,14 +195,26 @@ class CombatHandler:
       self.ui.panelAnimatedPrintFile("block", "blocking", [attacker.name, defender.name], "block");
     elif option == "taunt":
       self.attack_handler.taunt_handler.handleTaunt(attacker, defender);
+    elif option.startswith("say"):
+      text = option.split(" ");
+      if len(text) < 2: return;
+      self.ui.printDialogue(attacker.name, ' '.join(text[1:]));
     else: return -1;
   
   def handleInteractOption(self, option, attacker, defender):
+    if attacker.bodyparts["arms"] is False:
+      self.ui.panelAnimatedPrint(f"[red]{attacker.name}'s arms are broken — they can’t use any skills or items.[reset]", "arms");
+      return;
+      
     if option == "items": self.game.handleUseItem(self);
     elif option == "skills": self.game.handleUseSkill(None, self, attacker, defender);
     else: return -1;
     
   def handleMovementOption(self, option, attacker, defender):
+    if attacker.bodyparts["legs"] is False:
+      self.ui.panelAnimatedPrint(f"[red]{attacker.name}'s legs are shattered, leaving them unable to move.[reset]", "legs");    
+      return;
+      
     if option == "advance":
       self.move(1, attacker.direction, attacker);
       self.ui.panelAnimatedPrintFile("movement", "advance", [attacker.name], f"([yellow]{attacker.zone}[reset])");
@@ -191,8 +225,18 @@ class CombatHandler:
       self.move(2, attacker.direction, attacker);
       self.game.animator.animateDash();
       self.ui.panelAnimatedPrintFile("movement", "dash", [attacker.name], ">>");
-      
     else: return -1;
+  
+  def handleTargetOption(self, option, attacker, defender):
+    if option.startswith("target") != True: return -1;
+    bodypart = option.split(" ");
+    if len(bodypart) < 2: return;
+    elif bodypart[1] not in defender.bodyparts: 
+      self.ui.animatedPrint("you cant target that bodypart, try aiming for arms, legs or head.");
+      return;
+    setattr(attacker, "target_part", bodypart[1]);
+    self.ui.panelAnimatedPrint(f"[magenta]{attacker.name} narrows their eyes and locks onto[reset] [yellow]{defender.name}'s[reset] [green]{bodypart[1]}[reset].", "target");
+    attacker.energy -= 20;
     
   def handleOption(self, option, attacker, defender):
     self.ui.showStatus("processing move", 1, "clock");
@@ -204,6 +248,7 @@ class CombatHandler:
     if self.handleCombatOption(option, attacker, defender) != -1: return;
     elif self.handleInteractOption(option, attacker, defender) != -1: return;
     elif self.handleMovementOption(option, attacker, defender) != -1: return;
+    elif self.handleTargetOption(option, attacker, defender) != -1: return;
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
       self.setCurrentTurnOption(attacker, "");
@@ -243,7 +288,7 @@ class CombatHandler:
       if self.checkDeath() is True or (self.enemy_option == "flee" and self.defender.status["stunned"][0] is False): break;
       self.ui.showSeperator("-");
       self.ui.awaitKey();
- 
+  
   def handleSpare(self, won, lost):
     self.ui.animatedPrint(f"[yellow]{lost.name}[reset] is asking for mercy!");
     self.ui.printDialogue(lost.name, "...");

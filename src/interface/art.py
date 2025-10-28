@@ -128,6 +128,21 @@ SKELETON = r"""
          :GB5 7BG!       
          .!!:  :~:       
  """
+ 
+DAVE_SHOP = """
+    ZVVXWWWWWVTY    
+   VYWXWXSXVXYWZV   
+ ZXZYX S S  X XYZWZ 
+ VZZU YY S  T  VZZV 
+ WPWVPUTRVTPOVTXSTY 
+ XPX            TRZ 
+ ZUY            UX  
+ ZUY            UX  
+ YRRQQQSRPOPORSSSSY 
+ ZVXXXXXXXXXXXXXXWZ 
+ ZSSSTTTTTTTTTTTTTZ 
+ ZTUUVVVVVVVUUUUTUZ """
+
 ARTS = {
   "goblin" : GOBLIN,
   "slime" : SLIME,
@@ -137,4 +152,5 @@ ARTS = {
   "fallen knight": FALLEN_KNIGHT,
   "priest" : PRIEST,
   "skeleton": SKELETON,
+  "dave shop": DAVE_SHOP,
 }

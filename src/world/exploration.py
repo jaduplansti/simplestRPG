@@ -4,11 +4,7 @@ from random import randint, choices;
 from mechanics.combat import CombatHandler;
 
 from world.home import Home;
-from world.forest import Forest;
 from world.shop import Shop;
-
-from world.dungeon import Dungeon;
-from world.guild_hall import GuildHall;
 
 def createArea(name, handler, _next = [], prev = [], enemies = None, position = 0):
   return {name : {
@@ -20,7 +16,7 @@ def createArea(name, handler, _next = [], prev = [], enemies = None, position = 
   }};
 
 AREAS = {
-  **createArea("home", Home, _next = ["shop", "guild hall", "dungeon"], position = 0),
+  **createArea("home", Home, _next = ["shop"], position = 0),
   #**createArea("forest", Forest, prev = ["home"], _next = ["dungeon"], position = 10),
   #**createArea("guild hall", GuildHall, prev = ["home"], position = 50),
   **createArea("shop", Shop, prev = ["home"], position = 30),
@@ -147,7 +143,7 @@ class Exploration:
         destination_name = self.ui.getInput();
         if destination_name == "close": return -1;
         return [AREAS[destination_name], destination_name];
-      except KeyError:
+      except KeyError as e:
         self.ui.normalPrint("not a valid destination");
         self.ui.awaitKey();
         
@@ -158,6 +154,7 @@ class Exploration:
     self.ui.clear();
     self.steps = 0;
     with Status(self.getWalkingBar(destination), spinner = "runner") as status:
+      self.ui.input_handler.disableInput();
       while self.game.player.position != destination["position"]:
         if self.game.player.position < destination["position"]: self.game.player.position += 1;
         elif self.game.player.position > destination["position"]: self.game.player.position -= 1;
@@ -165,7 +162,8 @@ class Exploration:
         status.update(self.getWalkingBar(destination));
         self.steps += 1;
         self.event_handler.getNarration(self.steps, destination_name, destination);
-        
+      self.ui.input_handler.enableInput();
+
   def move(self, loc):
     if loc in AREAS:
       self.game.player.location = loc;

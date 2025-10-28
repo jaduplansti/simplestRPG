@@ -421,5 +421,29 @@
       "[bold yellow]{0}[reset] turned the defense into offense, landing a counter on [bold yellow]{1}[reset]!",
       "[bold yellow]{0}[reset] shut down the attack and struck back, leaving [bold yellow]{1}[reset] reeling!"
     ]
+  },
+  
+  "gore": {
+    "head": [
+      "[bold red]{0}'s skull cracked open with a sickening crunch!",
+      "[bold red]{0}'s head split under the impact, blood pouring down their face!",
+      "[bold red]{0}'s cranium shattered — their vision fades into darkness!",
+      "[bold red]{0}'s skull bursts apart, leaving them staggering and blind!",
+      "[bold red]{0}'s head caved in with a brutal blow, sight slipping away!"
+    ],
+    "arms": [
+      "[bold red]{0}'s arm snapped with a sharp crack, hanging uselessly!",
+      "[bold red]{0}'s limb twisted out of shape — bones jutting through flesh!",
+      "[bold red]{0}'s arm broke clean at the joint, blood spraying with each movement!",
+      "[bold red]{0}'s forearm shattered — the weapon slips from their grasp!",
+      "[bold red]{0}'s arm is crushed beyond use, leaving them unable to fight back!"
+    ],
+    "legs": [
+      "[bold red]{0}'s leg broke under the weight, bone splintering through skin!",
+      "[bold red]{0}'s knee shattered with a pop, sending them collapsing to the ground!",
+      "[bold red]{0}'s leg twisted grotesquely — they can no longer stand!",
+      "[bold red]{0}'s femur cracked apart, blood pooling beneath them!",
+      "[bold red]{0}'s leg snapped violently, movement now impossible!"
+    ]
   }
 }
