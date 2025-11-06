@@ -95,7 +95,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold red]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.7.3[reset] ([bold blue]ALPHA[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.4[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -114,15 +114,16 @@ class Menu():
     self.ui.clear();
     self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
     
-    self.ui.showSeperator("+");
+    self.ui.showSeperator("+", "commands");
     
     self.ui.normalPrint("≈ [yellow]attack[reset] (🗡)   [cyan]block[reset] (🛑)");
     self.ui.normalPrint("≈ [blue]taunt[reset] (🖕)   [bold]say[reset] (📣)");
     self.ui.normalPrint("≈ [green]items[reset] (💼)   [magenta]skills[reset] (💥)");
-    self.ui.normalPrint("≈ target (👁)");
+    self.ui.normalPrint(f"≈ target (👁) {"\n" if len(character.commonly_used_skills) != 0 else ""}");
     
-    if character.stats["health"] <= character.stats["max health"] * 0.25:
-      self.ui.normalPrint("≈ [red]flee[reset]");
+    for index, skill in enumerate(character.commonly_used_skills):
+      self.ui.normalPrint(f"{index + 1}. {skill}");
+      
     self.ui.newLine();
     self.showLimbMenu(character);
     self.showZoneBar(character);
@@ -137,9 +138,9 @@ class Menu():
       elif character.enemy.zone == n: bar += "([bold red]E[reset])";
       else: bar += "()";
       
-    self.ui.showSeperator("-");
+    self.ui.showSeperator("-", "map");
     self.ui.panelPrint(bar, "center", "MAP");
-    self.ui.showSeperator("-");
+    self.ui.showSeperator("-", "status");
 
   def showTip(self):
     self.ui.panelAnimatedPrintFile("tips", "tips", [], "tips");
@@ -160,6 +161,42 @@ class Menu():
     s = "";
     for limb in character.bodyparts:
       s += f"[{'green' if character.bodyparts[limb] is True else 'red'}]{limb}[reset] {'✔' if character.bodyparts[limb] is True else '✖'}\n";
-    self.ui.showSeperator("-");
+    self.ui.showSeperator("-", "limbs");
     self.ui.normalPrint(f"{s}[underline yellow]target: {getattr(character, "target_part", "None")}[reset]\n");
- 
+  
+  def showSkillTreeMenu(self, character):
+    self.ui.clear();
+    self.ui.showHeader("Your Skills", "@");
+    self.ui.printTreeMenu("Active", [skill.name for skill in character.skills.values() if skill.passive != True]);
+    self.ui.printTreeMenu("Passive", [skill.name for skill in character.skills.values() if skill.passive == True]);
+    self.ui.normalPrint("[yellow]type in the name of the skill you wish to view.[reset]\n");
+    self.ui.normalPrint("[yellow]type 'close' to exit.[reset]\n");
+
+  def showSkillTreeDetailsMenu(self, character, skill_name):
+    if skill_name not in character.skills: return -1;
+
+    skill = character.skills[skill_name];
+
+    self.ui.clear();
+    self.ui.panelPrint(f"💠 [bold yellow]{skill.name}[reset] ([green]{skill.rank}[reset])", "center");
+    self.ui.showSeperator("-", "details");
+
+    info = "";
+    info += f"[blue]type:[reset] {'[green]Passive[reset]' if skill.passive else '[cyan]Active[reset]'}\n";
+    if skill.passive: info += f"[magenta]passive type:[reset] {skill.passive_type or 'None'}\n";
+    info += f"[cyan]energy:[reset] {skill.energy} mp\n";
+    info += f"[purple]range:[reset] {skill.range}\n";
+    info += f"[green]style:[reset] {skill._style}\n";
+    info += f"[yellow]level:[reset] {skill.level}/{skill.max_level or 1}\n";
+    info += f"[white]exp:[reset] {skill.exp}/{150 * skill.level}\n";
+
+    self.ui.panelPrint(info, "center", "skill stats");
+    self.ui.panelPrint(f"[italic]{skill.desc}[reset]", "center", "description");
+    
+    if skill.max_level and skill.max_level > 1:
+      percent = (skill.exp / (150 * skill.level)) * 100 if skill.level else 0;
+      bar_count = int(percent // 20);
+      bar = "■" * bar_count + "□" * (5 - bar_count);
+      self.ui.panelPrint(f"[green]{bar}[reset] ({round(percent, 1)}%)", "center", "mastery");
+      
+    self.ui.normalPrint("≈ [cyan]back[reset]\n");

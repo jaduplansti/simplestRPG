@@ -88,7 +88,7 @@ class Farm:
     while True:
       self.ui.clear();
       self.showCrops();
-      self.ui.normalPrint("hint: press w/s to pick, press (enter) to select, press (q) to quit\n");
+      self.ui.normalPrint("hint: press w/s to pick, press (enter) to select, press (q) to quit");
       key = self.handleKey();
       if key == "\n": self.handleSelect();
       elif key == "q":

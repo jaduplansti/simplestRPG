@@ -413,3 +413,19 @@
 • each limb has its multiplier, resistance and scales with level.
 • increased energy consumption from 5 -> 10.
 • targetting a limb costs 20 energy.
+
+[version 2.7.4]
+• added a weakness system for sword1.
+• added story
+• added day and night cycle (5 minutes)
+• day and night affects the world.
+• made npcs feel more alive by adding dialogues (1/3 chance)
+• added new enemies rat, skeleton, bat, bandit
+• berserk dialogues
+• added skill quick keybinds.
+• added uppercut skill.
+• sleeping now recovers health.
+• fixed a couple of bugs.
+• added a skill encyclopedia, access it by typing skills at home.
+• added basic skill levels.
+• dave aka the shop can now heal and fix your limbs in emergencies, just go to his shop.

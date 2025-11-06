@@ -22,42 +22,22 @@ SLIME = r"""
 """
 
 BANDIT = r"""
-           :77.          
-           ~YP~          
-        ..^?5PG7         
-       ^~7Y5PGBB5:       
-      !?7PGPGBBBYJ.      
-      ~?5GGGBBBPYYJ      
-      ^??~GBBGGP557      
-      .7YJGGGBGGPJ:      
-     .^!5GGPPGBPB?:      
-       .?YJ55PBPGY       
-       .~7Y5!7PYYJ       
-       :?5G? !J?Y~       
-       ^JP7  !Y5~::.     
-       !P?   ^5P. .::.   
-      :?5.   :JPY!:  .   
-      :JP.     .^^.      
-       :~.               
+      :!!:          
+      YB5P.         
+    ^JBGG#P~        
+   7PPPYY5GB!       
+  7YGBPY77YGG?.     
+ .YP77G5~^57!?P!    
+ .5J YBGGPP5~.Y?    
+  7?.55PPG5G5!.     
+   ::J55YBBP?       
+  .:::PGPG#BY^      
+      7BGB#5~.      
+       7PBP.        
+        YBP:        
+        ~J!         
 """
 
-ELF = r"""
-     _,.
-   ,` -.)
-  ( _/-\\-._
- /,|`--._,-^|            ,
-\_| |`-._/||          ,'|
-  |  `-, / |         /  /
-  |     || |        /  /
-   `r-._||/   __   /  /
-__,-<_     )`-/  `./  /
-'  \   `---'   \   /  /
-    |           |./  /
-    /           //  /
-\_/  \         |/  /
- |    |   _,^-'/  /
- |    , ``  (\/  /_
-"""
 
 ORC = r"""
     YY.:GY~         
@@ -75,61 +55,50 @@ ORC = r"""
   .~PPP5J7^:^PBB5!. 
 """
 
-FALLEN_KNIGHT = r"""
-       !PP?         
-     .7B##B!.       
-    ~PGBGGGG5:      
-   .5BBGGGBB#?      
-   ^GPB#BBBP5G?     
-  .PPYBBBGGGPGP.    
-  Y?~BB#BBBPGGG7    
-  :^PB#####BGGB!    
-   ?BB#BGPP#BP#P^   
-   5#B5GPJYB#YYP5^  
-   P&#JG5BBG&G:^JJ. 
-   ?#Y~5~?J^GG   .. 
-  .7G7      !G:     
-  :~:.      :?^
-"""
-
-PRIEST = r""" 
-        .^.      
-        7J?!        
-        7Y?!        
-        ^7J~        
-      .~7Y55:       
-      !7?7~77.      
-     ^7!7!~~!~.  .^~
-    .77!!!!!J?!~7J~ 
-    .??7!~~7JJ7YB7  
-     .JJ?!7YPYJPP.  
-     :YJ?J5P5Y!~^   
-     !J7!YY7!?~     
-     ??7??!~~7!     
-    ^YJ?~77~~?7.    
-    ?Y7~!??~~7J^    
-  ^?Y7!!7J?~~!Y!    
-:!^7?7!!JY7~~~Y?    
-:..J?7!JYY!~~~YY^   
-  7J??JYJJ????YY7   
- !J????!~!~^^~~~!:  
-"""
- 
 SKELETON = r"""
-           ::..          
-          ??!J~:         
-        :.~?7J7.         
-    .:^?7:~5YJYY~:.      
-    :Y5Y!!~PP5PP~^7~     
-     ...:. ^JJJ7. 7?     
-          ^!~7!!~~!^     
-         ^J~    77.      
-         .JY? !5Y^       
-         :GB5 7BG!       
-         .!!:  :~:       
- """
- 
-DAVE_SHOP = """
+          ~7^: .....     
+       .:.?G57.:^^!~:    
+      .YGGBBGJ?~^:^~:    
+     .Y5?GBGPP55?~.^^.   
+     !J. JPGG5Y~~7?~:.   
+    ^Y.  ~7PB!~.^?J^     
+   ~5J^:^YPBBBP~..       
+    ....:JYPB#B!.        
+         .7?P#Y:.        
+         .JYPB!..        
+          !B5J:          
+           ?J            
+           .5~           
+            ??.          
+            ..."""
+            
+WOLF = r"""
+         .:^.       
+       ^YPPGGP?.    
+  ^?J?JGGGGGGB#5.   
+ !BGBBBBGBBB#BB#J   
+ ^PBB#BBGB#B#&#B^   
+  ^BG7.J#B5PBP#B.   
+ .PJ:  J#Y .: !G7   
+ :7.   ~7G!    ^P?. 
+         ::      .  """
+
+RAT = r""" 
+      .^:               
+  .^~?JGGPJ~.            
+  .JJYB#&&&BPJ~:.        
+    :!??G&##BGGPPY~      
+        .GPY5PPGB&#J.    
+        ^PYYGPG#&#&#?    
+      ^7JYY####GPG#&P.   
+       ^!  5&PJJ5PB&P.   
+          :#PYPGB#&#J    
+        ^^:JPGB###P???:  
+     .::!JJ?!7YJ^:   J7  
+   .^^:::^!7!!~^^^^~!~.  
+              ..::..     """  
+              
+DAVE_SHOP = r"""
     ZVVXWWWWWVTY    
    VYWXWXSXVXYWZV   
  ZXZYX S S  X XYZWZ 
@@ -143,14 +112,13 @@ DAVE_SHOP = """
  ZSSSTTTTTTTTTTTTTZ 
  ZTUUVVVVVVVUUUUTUZ """
 
+
 ARTS = {
   "goblin" : GOBLIN,
   "slime" : SLIME,
   "bandit" : BANDIT,
-  "elf": ELF,
-  "orc": ORC,
-  "fallen knight": FALLEN_KNIGHT,
-  "priest" : PRIEST,
+  "wolf": WOLF,
+  "rat": RAT,
   "skeleton": SKELETON,
   "dave shop": DAVE_SHOP,
 }

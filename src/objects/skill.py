@@ -2,7 +2,7 @@ from random import randint, choices;
 from copy import deepcopy;
 
 class Skill:
-  def __init__(self, name, desc, energy, rank, range = 0, level = 0, passive = False, passive_type = None, _style = None):
+  def __init__(self, name, desc, energy, rank, range = 0, level = 1, passive = False, passive_type = None, _style = None, max_level = 0, exp = 0):
     self.name = name;
     self.energy = energy;
     self.rank = rank
@@ -13,17 +13,34 @@ class Skill:
     self.passive_type = passive_type;
     self._style = _style;
     
+    self.max_level = max_level;
+    self.exp = exp;
+    
   def deductEnergy(self, character, n):
     character.energy = max(0, character.energy - n);
+  
+  def levelUp(self):
+    if self.exp >= self.level * 150 and self.level < self.max_level:
+      self.exp -= self.level * 150;
+      self.level += 1;
+      return True;
+      
+  def giveExp(self, limit):
+    self.exp += 2 * randint(1, limit);
+    return self.levelUp();
     
   def use(self, combat_handler = None, attacker = None, defender = None):
     if (self._style != None) and (self._style != attacker.attack_style): 
       if self.passive != True: combat_handler.ui.animatedPrint(f"you dont have the valid style for this skill, required '[yellow]{self._style}[reset]'");
       return;
+   
+    if attacker.energy < self.energy: return -1;
       
     SKILLS[self.name]["action"](self, combat_handler, attacker, defender);
     self.deductEnergy(attacker, self.energy);
     attacker.prev_skill = self.name;
+    if self.passive != True: attacker.addCommonSkill(self.name);
+    if self.giveExp(attacker.level): combat_handler.ui.animatedPrint(f"skill [yellow]'{self.name}'[reset] has leveled up!");
     
   def to_dict(self):
     return {
@@ -36,6 +53,8 @@ class Skill:
       "passive" : self.passive,
       "passive_type" : self.passive_type,
       "_style" : self._style,
+      "exp": self.exp,
+      "max_level": self.max_level,
       };
 
   @classmethod
@@ -47,7 +66,14 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
     combat_handler.ui.printDialogue(attacker.name, "futile..");
     combat_handler.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] reaches out their hand, grasping [yellow]{defender.name}'s[reset] soul", "soul fracture");
     for stat in defender.stats: defender.stats[stat] *= 0.01;
- 
+  
+  elif skill.name == "uppercut":
+    if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
+    for _ in range(skill.level):
+      dmg = attacker.stats["strength"] * getattr(attacker, "flow_meter", 1);
+      combat_handler.ui.panelAnimatedPrint(f"{attacker.name} launched an [yellow]uppercut[reset], striking [green]{defender.name}[reset] for [red]{dmg}[reset] damage!", skill.name);
+      attacker.attackEnemy(dmg, combat_handler);
+
   elif skill.name == "trislash":
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
     combat_handler.ui.printDialogue(attacker.name, ["my blade, your death..", "taste my blade!", "thrice, thats your end."]);
@@ -66,7 +92,7 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
   
   elif skill.name == "blade blink":
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
-    combat_handler.ui.printDialogue(attacker.name, ["dont blink..", "flick."]);
+    combat_handler.ui.printDialogue(attacker.name, ["dont blink..", "watch me!"]);
     combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] draws their blade!");
     combat_handler.game.audio_handler.play("blade_blink.wav");
     combat_handler.ui.showStatus("slashing", 3);
@@ -182,13 +208,18 @@ SKILLS = {
   },
   
   # attack skills
+  "uppercut" : {
+    "skill" : Skill("uppercut", "a rising punch that can stagger enemies.", 15, "C", range = 1, _style = "basic", max_level = 3), 
+    "action" : action_normal_damage
+  },  
+  
   "trislash" : {
-     "skill" : Skill("trislash", "triple the slash, triple the fun.", 30, "C+", range = 2, _style = "sword1"), 
-     "action" : action_normal_damage
+    "skill" : Skill("trislash", "triple the slash, triple the fun.", 25, "C+", range = 2, _style = "sword1"), 
+    "action" : action_normal_damage
   },
   "blade blink" : {
-     "skill" : Skill("blade blink", "dont blink.. flick.", 65, "B", range = 3, _style = "sword1"),
-     "action" : action_normal_damage,
+    "skill" : Skill("blade blink", "dont blink.. flick.", 35, "B", range = 3, _style = "sword1"),
+    "action" : action_normal_damage,
   },  
   # defense skills
   "parry" : {

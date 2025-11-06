@@ -20,6 +20,9 @@ import sys;
 from copy import deepcopy;
 from interface.animation import Animator;
 from objects.character_class import getClass, CLASSES;
+from world.story import Story;
+ 
+from mechanics.clock import Clock;
 
 class Game:
   """ 
@@ -47,7 +50,8 @@ class Game:
     self.exploration_handler = Exploration(self);
     self.audio_handler = AudioHandler(self);
     self.animator = Animator(self);
-    
+    self.story_handler = Story(self);
+    self.clock = Clock(self);
     self.areas = {};
     
     self.settings = { 
@@ -92,6 +96,7 @@ class Game:
     """Handles quitting, stops audio player and enables echoing."""
     self.ui.enableEcho();
     self.audio_handler.popTracks();
+    self.clock.stopClock();
     os._exit(0);
   
   def handleQuest(self):
@@ -113,8 +118,7 @@ class Game:
   
   def initiateFight(self):
     """Initiates a fight using CombatHandler, see combat.py."""
-    npc = choices(["ñayéroÀ", "exodus", "slime", "goblin"])[0];
-    if self.player.level in range(1, 6): npc = choices(["slime", "goblin"])[0];
+    npc = choices(list(NPCS))[0];
     #elif self.player.level in range(6, 9): enemy = choices(["orc", "skeleton"])[0];
     #elif self.player.level in range(9, 13): enemy = choices(["elf", "bandit"])[0];
     #else: enemy = choices(["fallen knight", "priest"])[0];
@@ -159,6 +163,10 @@ class Game:
   def givePlayerExp(self, exp):
     self.player.exp += exp;
   
+  def givePlayerMoney(self, n):
+    self.ui.animatedPrint(f"[yellow]you[reset] earned [green]{n}[reset] gold!");
+    self.player.money += n;
+    
   def handlePlayerLevelUp(self):
     old_level = self.player.level;
     if self.player.tryLevelUp() is True:
@@ -276,7 +284,7 @@ class Game:
     try:
       self.ui.showStatus("loading", 2);
       self.player = player_data[option]
-      
+      self.story_handler.progress = self.player.story_progress;
     except KeyError:
       self.handleLoad();
         
@@ -292,6 +300,7 @@ class Game:
         return;
     
     self.ui.showStatus("saving", 2);
+    self.player.story_progress = self.story_handler.progress;
     self.player.save();
   
   def handleEquipmentDetail(self, part):
@@ -372,10 +381,8 @@ class Game:
       option = self.ui.getInput();
       
       if option == "use" and attacker.skills[skill].passive != True:
-        if attacker.energy >= attacker.skills[skill].energy: 
-          attacker.skills[skill].use(combat_handler, attacker, defender);
-          return;
-        else: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
+        if attacker.skills[skill].use(combat_handler, attacker, defender) == -1: self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy to use [green]{skill}[reset]!");
+        return;
       elif option == "back":
         return -1;
         
@@ -398,10 +405,25 @@ class Game:
       skill = self.ui.getInput(list(attacker.skills));
       
     if attacker.skillExists(skill) is True:
-       if self.handleSkillDetail(skill, combat_handler, attacker, defender) == -1: return self.handleUseSkill(None, combat_handler, attacker, defender);
+      if self.handleSkillDetail(skill, combat_handler, attacker, defender) == -1: return self.handleUseSkill(None, combat_handler, attacker, defender);
     else:
       pass;
-      
+  
+  def handleSkillTree(self):
+    while True:
+      self.menu.showSkillTreeMenu(self.player);
+      _option = self.ui.getInput(list(self.player.skills));
+      if _option == "close": return;
+      elif _option in self.player.skills: self.handleSkillTreeDetails(_option);
+      else: self.ui.normalPrint(f"you do not have [yellow]'{_option}'[reset]\n");
+      self.ui.awaitKey();
+  
+  def handleSkillTreeDetails(self, skill_name):
+    while True:
+      self.menu.showSkillTreeDetailsMenu(self.player, skill_name);
+      _option = self.ui.getInput(list(self.player.skills));
+      if _option == "back": return;
+     
   def handleSleep(self):
     """Handles Sleep, increases Player Health and Player Energy and then Saves."""
     
@@ -409,10 +431,10 @@ class Game:
     self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] sees their bed and gets ready to sleep.");
     self.ui.barPrint("[blue]Energy[reset]", self.player.energy, 100, speed = 0.1);
     self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
-    self.ui.panelPrint(f"[bold blue]ENERGY[reset] RESTORED");
+    self.ui.panelPrint(f"[bold blue]ENERGY and HP[reset] RESTORED");
 
     self.player.energy = 100;
-    
+    self.player.stats["health"] = self.player.stats["max health"];
     self.handleSave();
     
   def handleName(self, name = None):
@@ -424,6 +446,7 @@ class Game:
     else:
       self.player.name = name;
     self.giveClass(self.player, "peasant");
+    self.story_handler.scene1();
     
   def handleSettings(self):
     """Handles game settings, see self.settings."""
@@ -455,4 +478,3 @@ class Game:
       self.handleQuit();
     except FileNotFoundError:
       self.ui.panelPrint("FAILED TO DELETE", "center", "settings");
-      

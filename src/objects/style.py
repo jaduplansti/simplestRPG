@@ -2,7 +2,7 @@ import string;
 from objects.player import Player;
 from random import randint, choice, choices, uniform;
 from enum import Enum;
-from objects.style_mechanics import handleBasicMechanic;
+from objects.style_mechanics import *;
 
 class SfxMode(Enum):
   SEQUENCE = 1;
@@ -99,16 +99,6 @@ STYLES = {
     mechanic = handleBasicMechanic,
   ),
   
- "basic2": Style(
-    name = "basic2",
-    moves = ["kick", "tackle", "leg kick"],
-    #sfx = {
-      #"punch" : {"mode" : SfxMode.RANDOM, "sounds" : ["punch1.wav", "punch2.wav"]},
-      #"strong punch" : {"mode" : SfxMode.SEQUENCE, "sounds" : "strong_punch.wav"},
-      #"double punch" : {"mode" : SfxMode.RANDOM_SEQUENCE, "sounds" : [["punch1.wav", "punch2.wav"], ["punch1.wav", "punch2.wav"]]},
-    #},
-  ),
-  
   "sword1": Style(
     name = "sword1",
     moves = ["slash", "thrust", "iron reversal", "blade dance"],
@@ -118,6 +108,8 @@ STYLES = {
       "iron reversal" : {"mode" : SfxMode.SEQUENCE, "sounds" : "iron_reversal.wav"},
       "blade dance" : {"mode" : SfxMode.RANDOM_SEQUENCE, "sounds" : [["slash1.wav", "slash2.wav"], ["slash1.wav", "slash2.wav"], ["thrust1.wav", "thrust2.wav"]]},
     },
-    equipmentUsed = [["right arm"], 0.12]
+    equipmentUsed = [["right arm"], 0.12],
+    mechanic = handleSword1Mechanic,
   ),
+ 
 }

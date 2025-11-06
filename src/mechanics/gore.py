@@ -34,7 +34,7 @@ class GoreHandler:
     defender.bodyparts[bodypart] = False;
     defender.enemy.target_part = None;
     
-  def getMultiplier(self):
+  def getMultiplier(self, defender):
     bodypart = getattr(defender.enemy, "target_part", None);
     if bodypart is None: return 1;
     

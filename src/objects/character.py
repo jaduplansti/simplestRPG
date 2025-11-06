@@ -55,6 +55,9 @@ class Character:
     
     self.guild_info = {};
     self.area_data = {};
+    self.commonly_used_skills = [];
+    
+    self.story_progress = 0;
     
   def to_dict(self):
     return {
@@ -78,6 +81,8 @@ class Character:
       "title": self.title,
       "magic": self.magic,
       "area_data": self.area_data,
+      "story_progress": self.story_progress,
+      "bodyparts": self.bodyparts,
       "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
           name: {
@@ -120,6 +125,8 @@ class Character:
     }
 
     char.magic = data["magic"]
+    char.story_progress = data["story_progress"]
+    char.bodyparts = data["bodyparts"];
     return char;
 
   def save(self):
@@ -288,13 +295,23 @@ class Character:
     
   def attackEnemy(self, dmg, combat_handler = None):
     self.dmg = dmg;
-    if combat_handler != None: 
+    if combat_handler != None: # clean this up. 
       combat_handler.attack_handler.consumeEquipment(self.enemy, ["chest"], dmg * 0.8);
       combat_handler.attack_handler.handlePassiveSkills("damage", self.enemy, self);
       combat_handler.notifyDurability(self.enemy, ["chest"]);
       if hasattr(self.enemy, "shadow"): self.enemy.shadow = 0;
+    
     self.enemy.giveDamage(self.dmg);
-  
+    
+    try:
+      if combat_handler != None and combat_handler.game.isPlayer(self.enemy) != True and randint(1, 2) == 1: 
+        if self.enemy.stats["health"] <= 0 and getattr(self.enemy, "announce_death", False) is False: 
+          setattr(self.enemy, "announce_death", True);
+          combat_handler.ui.printDialogueFile(self.enemy.name, self.enemy.name, "death", None, True);
+        else: combat_handler.ui.printDialogueFile(self.enemy.name, self.enemy.name, "hurt", None, True);
+    except KeyError:
+      pass;
+      
   def hasAreaData(self, area, info):
     try:
       self.area_data[area][info];
@@ -319,3 +336,8 @@ class Character:
   def fixParts(self):
     for bodypart in self.bodyparts:
       self.bodyparts[bodypart] = True;
+  
+  def addCommonSkill(self, skill_name):
+    if skill_name in self.commonly_used_skills: return;
+    if len(self.commonly_used_skills) >= 3: self.commonly_used_skills.pop(0);
+    self.commonly_used_skills.append(skill_name);

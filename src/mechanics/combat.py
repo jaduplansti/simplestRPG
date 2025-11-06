@@ -116,9 +116,9 @@ class CombatHandler:
       return False;
   
   def useHunger(self, attacker):
-    if attacker.hunger > 10 and attacker.berserk != True:
+    if attacker.hunger > 10 and attacker.berserk != True and attacker.energy < 80:
       attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (attacker.hunger * 0.2));
-      attacker.energy = min(100, attacker.energy + 5);
+      attacker.energy = min(100, attacker.energy + 20);
       attacker.hunger = max(0, attacker.hunger - 5);
     else:
       attacker.stats["health"] -= round(attacker.stats["health"] * 0.02);
@@ -130,13 +130,13 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{npc.name}[reset] goes [red]Berserk[reset]!");
       self.ui.panelPrint("[blue]ALL STATS[reset] [green](1.5x)[reset]");
       npc.goBerserk();
+      self.ui.printDialogueFile(npc.name, npc.name, "berserk", None, True);
       return True;
     return False;
   
   def checkDeath(self):
     self.attack_handler.handlePassiveSkills("death", self.attacker, self.defender);
     self.attack_handler.handlePassiveSkills("death", self.defender, self.attacker);
-    self.game.player.trackQuest(self.game, self);
     if self.attacker.stats["health"] <= 0:
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
       self.won = self.defender.name;
@@ -144,6 +144,7 @@ class CombatHandler:
       self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
       won = self.__handleWin();
       if won is False: return False;
+      self.game.player.trackQuest(self.game, self);
     else:
       return False;
     return True;
@@ -214,7 +215,7 @@ class CombatHandler:
     if attacker.bodyparts["legs"] is False:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name}'s legs are shattered, leaving them unable to move.[reset]", "legs");    
       return;
-      
+    
     if option == "advance":
       self.move(1, attacker.direction, attacker);
       self.ui.panelAnimatedPrintFile("movement", "advance", [attacker.name], f"([yellow]{attacker.zone}[reset])");
@@ -237,25 +238,37 @@ class CombatHandler:
     setattr(attacker, "target_part", bodypart[1]);
     self.ui.panelAnimatedPrint(f"[magenta]{attacker.name} narrows their eyes and locks onto[reset] [yellow]{defender.name}'s[reset] [green]{bodypart[1]}[reset].", "target");
     attacker.energy -= 20;
-    
+  
+  def handleSkillKeybind(self, option, attacker, defender):
+    if option.isdigit() != True: return -1;
+    try: # replace this try and except
+      skill_name = attacker.commonly_used_skills[int(option) - 1];
+      if attacker.skillExists(skill_name) != True: return -1;
+      if attacker.skills[skill_name].use(self, attacker, defender) == -1:
+        self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] does not have enough energy.");
+        return -1;
+    except IndexError:
+      return -1;
+      
   def handleOption(self, option, attacker, defender):
     self.ui.showStatus("processing move", 1, "clock");
     self.handleHunger(attacker);
     
     if self.handleFatigue(attacker) == "passed out":
       return "passed out";
-      
+    
+    attacker.deductEnergy();
+    self.useHunger(attacker);
+
     if self.handleCombatOption(option, attacker, defender) != -1: return;
     elif self.handleInteractOption(option, attacker, defender) != -1: return;
     elif self.handleMovementOption(option, attacker, defender) != -1: return;
     elif self.handleTargetOption(option, attacker, defender) != -1: return;
+    elif self.handleSkillKeybind(option, attacker, defender) != -1: return;
     else:
       self.ui.animatedPrint(f"[yellow]{attacker.name}[reset] did nothing.");
       self.setCurrentTurnOption(attacker, "");
       
-    self.useHunger(attacker);
-    attacker.deductEnergy();
-  
   def handleCombatNpc(self, auto = False):
     while True:
       self.menu.showCombatMenu(self, self.attacker);

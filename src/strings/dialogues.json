@@ -9,5 +9,328 @@
       "Careful, some of this stuff bites back.",
       "Aye, I knew you’d be back."    
     ]
+  },
+  
+
+  "slime": {
+    "hurt": [
+      "[red]Gloooorp! Blblbl![reset]",
+      "[red]Splat! Glrrrk![reset]",
+      "[red]Bloop… brrrgh…[reset]"
+    ],
+    "attack": [
+      "[green]Glop! Glurp! Blop![reset]",
+      "[green]Sssquish! Bloop! Glrrk![reset]",
+      "[green]Bloop! I’ll… blblbl… stick![reset]"
+    ],
+    "attack fail": [
+      "[green]Glrr… miss… blop…[reset]",
+      "[green]Slipped… can’t… grab![reset]"
+    ],
+    "block": [
+      "[yellow]Ssshhk… deflect… blob![reset]",
+      "[yellow]Blblbl… stop… there![reset]"
+    ],
+    "block fail": [
+      "[yellow]Blop! Too strong![reset]",
+      "[yellow]Splaaat… ouch…[reset]"
+    ],
+    "berserk": [
+      "[red]Blblbl!! GLOP GLOP GLOP!![reset]",
+      "[red]Slime… angry!! Bloop bloop!![reset]"
+    ],
+    "death": [
+      "[red]Blblbl… melting… away…[reset]",
+      "[red]Bloop… end…[reset]"
+    ],
+    "flee": [
+      "[cyan]Glrrr… too… bloop![reset]",
+      "[cyan]Blblbl! Need… slip…[reset]"
+    ],
+    "taunt": [
+      "[magenta]Blop blop blop! Glrrr![reset]",
+      "[magenta]Gloop gloop… weaky…[reset]"
+    ],
+    "idle": [
+      "[blue]Bloop… glrr…[reset]",
+      "[blue]Glop… glop…[reset]",
+      "[blue]Blbl… hmm…[reset]"
+    ]
+  },
+
+  "goblin": {
+    "hurt": [
+      "[red]Gyaa! You hit Gob! You hit Gob![reset]",
+      "[red]Eeeek! Pain! Nasty pain![reset]",
+      "[red]Grrr! That stings, stings bad![reset]"
+    ],
+    "attack": [
+      "[green]Hehehe! Gob smash! Smash good![reset]",
+      "[green]Take that, soft meat! Heheheh![reset]",
+      "[green]Gotcha! Gob’s fists strong![reset]"
+    ],
+    "attack fail": [
+      "[green]Missed?! How?![reset]",
+      "[green]Grrr! You too slippery![reset]"
+    ],
+    "block": [
+      "[yellow]Heh! Gob block you good![reset]",
+      "[yellow]Clang! Too weak, puny thing![reset]"
+    ],
+    "block fail": [
+      "[yellow]Ow! Ow! Gob’s arms hurt![reset]",
+      "[yellow]Too fast! Couldn’t stop it![reset]"
+    ],
+    "berserk": [
+      "[red]RAAA! GOB ANGRY NOW![reset]",
+      "[red]Blood! Gob want blood![reset]"
+    ],
+    "death": [
+      "[red]Nooo… Gob… still had shinies…[reset]",
+      "[red]Heh… you strong… too strong…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Gob run![reset]",
+      "[cyan]No fair fight! Gob go![reset]"
+    ],
+    "taunt": [
+      "[magenta]Heheheh! Come closer, meat![reset]",
+      "[magenta]You slow! Gob faster![reset]"
+    ],
+    "idle": [
+      "[blue]*sniff sniff* where shiny thing…[reset]",
+      "[blue]Heh… Gob wait… Gob bite later…[reset]",
+      "[blue]*scratches head* bored… hungry…[reset]"
+    ]
+  },
+  
+  "rat": {
+    "hurt": [
+      "[red]Squeak! Ouch, tiny teeth![reset]",
+      "[red]Eeek! That hurts, stop it![reset]",
+      "[red]Squeee! I’m bleeding…[reset]"
+    ],
+    "attack": [
+      "[green]Bite bite! Take this![reset]",
+      "[green]Squeak! Tiny teeth attack![reset]",
+      "[green]Nibble nibble! Heh![reset]"
+    ],
+    "attack fail": [
+      "[green]Missed?! Rats too fast![reset]",
+      "[green]Squeak! You dodge too well![reset]"
+    ],
+    "block": [
+      "[yellow]*tail twitches* boutta block![reset]",
+      "[yellow]*tiny paws up* get ready![reset]"
+    ],
+    "block fail": [
+      "[yellow]*squeak!* Ouch, missed my block![reset]",
+      "[yellow]*flails* Tail didn’t save me![reset]"
+    ],
+    "berserk": [
+      "[red]RAAA! Tiny rat angry![reset]",
+      "[red]Squeak squeak! Bite all![reset]"
+    ],
+    "death": [
+      "[red]Squeak… no more cheese…[reset]",
+      "[red]Tiny rat… falls…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Rat run![reset]",
+      "[cyan]Squeak! Can’t fight! Run![reset]"
+    ],
+    "taunt": [
+      "[magenta]Squeak! Come closer, slowpoke![reset]",
+      "[magenta]Nibble nibble! You scared?[reset]"
+    ],
+    "idle": [
+      "[blue]*sniffs around* cheese… maybe…[reset]",
+      "[blue]*scurries* bored… hungry…[reset]",
+      "[blue]*nibbles tail* nothing here…[reset]"
+    ]
+  },
+  
+  "wolf": {
+    "hurt": [
+      "[red]Grrr! You scratch me![reset]",
+      "[red]Snarl! That bites![reset]",
+      "[red]Argh! Sharp claws…[reset]"
+    ],
+    "attack": [
+      "[green]Bite! Snarl![reset]",
+      "[green]Claw swipe! Gotcha![reset]",
+      "[green]Grrr! You too slow![reset]"
+    ],
+    "attack fail": [
+      "[green]Snarl! Missed?![reset]",
+      "[green]Grrr! Too fast![reset]"
+    ],
+    "block": [
+      "[yellow]*fur bristles* boutta block![reset]",
+      "[yellow]*low growl* get ready![reset]"
+    ],
+    "block fail": [
+      "[yellow]*whine!* That cut through my guard![reset]",
+      "[yellow]*yips* Too fast, couldn’t defend![reset]"
+    ],
+    "berserk": [
+      "[red]RAAARR! Wolf hunt![reset]",
+      "[red]Blood! Must… hunt…[reset]"
+    ],
+    "death": [
+      "[red]Grr… fallen… pack…[reset]",
+      "[red]Snarl fades…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Wolf run![reset]",
+      "[cyan]Snarl! Retreat![reset]"
+    ],
+    "taunt": [
+      "[magenta]Grrr! Come closer, weakling![reset]",
+      "[magenta]You slow! I’m fast![reset]"
+    ],
+    "idle": [
+      "[blue]*sniffs air* prey nearby…[reset]",
+      "[blue]*paces* nothing… boredom…[reset]",
+      "[blue]*tilts head* listening…[reset]"
+    ]
+  },
+  
+  "skeleton": {
+    "hurt": [
+      "[red]Clack! Bones cracked![reset]",
+      "[red]Rattle! You broke me![reset]",
+      "[red]Argh! Fragile bones![reset]"
+    ],
+    "attack": [
+      "[green]Clack! Bite with skull![reset]",
+      "[green]Slash! Bones sharp![reset]",
+      "[green]Rattle rattle! Attack![reset]"
+    ],
+    "attack fail": [
+      "[green]Missed?! Bones too brittle?[reset]",
+      "[green]Rattle… fail…[reset]"
+    ],
+    "block": [
+      "[yellow]*bones shift* boutta block![reset]",
+      "[yellow]*rattling sound* get ready![reset]"
+    ],
+    "block fail": [
+      "[yellow]*crack!* Too hard![reset]",
+      "[yellow]*rattle* Bones shiver from the strike![reset]"
+    ],
+    "berserk": [
+      "[red]RAAARR! Undead wrath![reset]",
+      "[red]Bone frenzy![reset]"
+    ],
+    "death": [
+      "[red]Clatter… skeleton falls…[reset]",
+      "[red]Rattle fades…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Bones retreat![reset]",
+      "[cyan]Rattle! Skeleton gone![reset]"
+    ],
+    "taunt": [
+      "[magenta]You’ll join me… soon![reset]",
+      "[magenta]Bones faster than you![reset]"
+    ],
+    "idle": [
+      "[blue]*rattles fingers* nothing…[reset]",
+      "[blue]*tilts skull* silent…[reset]",
+      "[blue]*shuffles bones* waiting…[reset]"
+    ]
+  },
+  
+  "bandit": {
+    "hurt": [
+      "[red]Argh! You hit me![reset]",
+      "[red]Damn! That stings![reset]",
+      "[red]Ugh! You’ll pay![reset]"
+    ],
+    "attack": [
+      "[green]Take this, fool![reset]",
+      "[green]Slice and dice! Haha![reset]",
+      "[green]You won’t get away![reset]"
+    ],
+    "attack fail": [
+      "[green]Missed?! Impossible![reset]",
+      "[green]Argh! Too fast![reset]"
+    ],
+    "block": [
+      "[yellow]*eyes narrow* boutta block![reset]",
+      "[yellow]*stance shifts* get ready![reset]"
+    ],
+    "block fail": [
+      "[yellow]*grrr!* That broke through![reset]",
+      "[yellow]*argh!* No luck this time![reset]"
+    ],
+    "berserk": [
+      "[red]RAAAGH! Bandit fury![reset]",
+      "[red]I’ll tear you apart![reset]"
+    ],
+    "death": [
+      "[red]No… my loot… gone…[reset]",
+      "[red]Argh… beaten…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Bandit run![reset]",
+      "[cyan]This ain’t over! Retreat![reset]"
+    ],
+    "taunt": [
+      "[magenta]Come on! Fight like a man![reset]",
+      "[magenta]You slow! I strike first![reset]"
+    ],
+    "idle": [
+      "[blue]*checks stance* waiting…[reset]",
+      "[blue]*whistles* nothing yet…[reset]",
+      "[blue]*shifts around* careful…[reset]"
+    ]
+  },
+  
+  "bat": {
+    "hurt": [
+      "[red]Screech! That stings![reset]",
+      "[red]Argh! Tiny wings hurt![reset]",
+      "[red]Eeeek! Stop![reset]"
+    ],
+    "attack": [
+      "[green]Screech attack! Take this![reset]",
+      "[green]Bite! Wings flail![reset]",
+      "[green]Flap! Hit with claws![reset]"
+    ],
+    "attack fail": [
+      "[green]Missed?! Too fast?![reset]",
+      "[green]Screech! Evaded![reset]"
+    ],
+    "block": [
+      "[yellow]*wings flap* boutta block![reset]",
+      "[yellow]*squeak!* get ready![reset]"
+    ],
+    "block fail": [
+      "[yellow]*screech!* Hit me anyway![reset]",
+      "[yellow]*flap!* Wings failed me![reset]"
+    ],
+    "berserk": [
+      "[red]SQUEE! Tiny fury![reset]",
+      "[red]Attack all! Flap flap![reset]"
+    ],
+    "death": [
+      "[red]Screech… fallen…[reset]",
+      "[red]Tiny bat… gone…[reset]"
+    ],
+    "flee": [
+      "[cyan]Too strong! Bat fly![reset]",
+      "[cyan]Screech! Retreat![reset]"
+    ],
+    "taunt": [
+      "[magenta]Flap closer, weakling![reset]",
+      "[magenta]You slow! I strike from above![reset]"
+    ],
+    "idle": [
+      "[blue]*hangs upside down* waiting…[reset]",
+      "[blue]*flaps wings* nothing yet…[reset]",
+      "[blue]*squeaks softly* bored…[reset]"
+    ]
   }
 }

@@ -44,9 +44,12 @@ def completeQuest(quest, character, game):
   game.ui.panelPrint(f"[bold yellow]You have compeleted {quest.name}![reset]");
   
   if quest.name == "pest control":
+    if game.story_handler.progress == 5.5:
+      game.story_handler.slime_cleaned = True;
+      game.story_handler.progress += 0.5;
     game.ui.animatedPrint("you gain [yellow]3000[reset] exp!");
     game.givePlayerExp(3000);
-  
+    
   elif quest.name == "goblin cleanup":
     game.ui.animatedPrint("you gain [yellow]5000[reset] exp!");
     game.givePlayerExp(5000);

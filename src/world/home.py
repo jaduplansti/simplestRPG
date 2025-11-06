@@ -13,7 +13,9 @@ class Home(SubMenu):
     self.farm = Farm(self.game);
     
   def showHouseMenu(self):
+    self.game.story_handler.handleStory();
     self.ui.clear();
+
     self.ui.showSeperator("-");
     self.game.menu.showPlayerMenu();
     self.ui.showSeperator("-");
@@ -23,6 +25,7 @@ class Home(SubMenu):
     self.ui.normalPrint("•••••••••••••\n");
     
     self.ui.normalPrint(f"(page {self.page})\n");
+    self.ui.normalPrint(f"its currently {"day" if self.game.clock.isDay() else "night"} time.\n");
     
     if self.page == 1:
       self.ui.panelPrint("[green]stats[reset] (📈)\n[cyan]items[reset] (💼)\n[purple]spar[reset] (🤺)\n[blue]gear[reset] (🪖)\n[yellow]next[reset] (↪)",
@@ -41,13 +44,13 @@ class Home(SubMenu):
       );
     
     else:
-      self.ui.panelPrint("[cyan]cook[reset] (🍳)\n[yellow]farm[reset] (🌾)\n[yellow]back[reset] (↩)",
+      self.ui.panelPrint("[cyan]cook[reset] (🍳)\n[yellow]farm[reset] (🌾)\n[blue]skills[reset] (✨)\n[yellow]back[reset] (↩)",
       "center"
       "commands",
       expand = False,
       centered = True,
       );
-      
+    
   def handleHome(self):
     self.game.handleMenu(
       {
@@ -61,6 +64,7 @@ class Home(SubMenu):
         "quest" : self.game.handleQuest,
         "travel" : self.game.exploration_handler.explore,
         "farm": self.farm.handleFarm,
+        "skills": self.game.handleSkillTree,
         "next": self.nextPage,
         "back": self.prevPage,
       }, 

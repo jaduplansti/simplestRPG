@@ -332,9 +332,41 @@ class Shop(SubMenu):
       self.player_debt = data["player_debt"];
     except KeyError:
       return -1;
-      
+  
+  def handleNight(self): # TODO: implement this method
+    if self.game.clock.isDay(): return;
+    self.ui.animatedPrint("the shop is currently closed.");
+    self.ui.animatedPrint(self.game.player.name, "damn it!");
+    self.ui.printTreeMenu("", ["knock", "exit"]);
+    action = self.ui.getInput();
+    if action == "knock": pass;
+    self.game.exploration_handler.explore();
+  
+  def handleStoryEvents(self):
+    if self.game.story_handler.progress == 7: self.game.story_handler.scene7(self.dave);
+    elif self.game.story_handler.progress == 8: self.game.story_handler.scene8(self.dave);
+  
+  def handlePlayerEvent(self):
+    if not all(self.game.player.bodyparts.values()):
+      cost = self.game.player.level * 20;
+      self.ui.printDialogue(self.dave.name, "ouch, seems like your fatally injured mate!");
+      self.ui.printDialogue(self.game.player.name, "yeah..");
+      self.ui.printDialogue(self.dave.name, f"i can patch you up, but it costs [yellow]{cost}g[reset].");
+      self.ui.normalPrint("([yellow]yes[reset]) to agree, ([red]no[reset]) to decline\n");
+      option = self.ui.getInput();
+      if option == "yes":
+        if self.game.player.money < cost: self.ui.printDialogue(self.dave.name, f"you dont have enough money.. but this one's on the house.");
+        self.game.player.fixParts();
+        self.game.player.stats["health"] = self.game.player.stats["max health"];
+        self.ui.printDialogue(self.dave.name, f"all good! lets get back to business.");
+      else: self.ui.printDialogue(self.dave.name, "alrighty then.");
+    self.ui.awaitKey();
+    
   def enter(self):
     self.ui.clear();
     if self.loadData() == -1: self.createData();
+    self.handlePlayerEvent();
+    self.handleStoryEvents();
+    #self.handleNight();
     self.cycleItems();
     self.handleShop();

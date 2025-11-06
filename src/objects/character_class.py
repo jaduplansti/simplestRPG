@@ -29,7 +29,7 @@ CLASSES = {
       "increase" : [],
       "decrease" : [],
     },
-    [],
+    ["uppercut"],
   ),
   "swordsman": Class(
     "swordsman", 

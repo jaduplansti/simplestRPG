@@ -222,11 +222,13 @@ class UI:
     if not isinstance(s, list): self.animatedPrint(f"{name}: {s}", punc = True);
     else: self.animatedPrint(f"{name}: {choices(s)[0]}", punc = True);
   
-  def printDialogueFile(self, name, key, subkey, n, rand, args):
+  def printDialogueFile(self, name, key, subkey, n = None, rand = False, args = []):
     formatted_s = self.getDialogue(key, subkey, n, rand).format(*args);
     self.printDialogue(name, formatted_s);
     
   def printTreeMenu(self, title, options): 
+    if len(options) == 0: return;
+    
     tree = Tree(title);
     for option in options:
       tree.add(option);
@@ -249,6 +251,10 @@ class UI:
   
   def awaitKey(self):
     self.getKey("([bold red]press anything to continue[reset])");
+  
+  def input(self, s = ""):
+    _input = input(s + " > ");
+    return _input;
     
   def getInput(self, completer = None, num = False):
     if completer is None: _input = Prompt.ask(f"[yellow](enter command)[reset] ⤵\n\n");
@@ -323,12 +329,18 @@ class UI:
       header += ch;
     self.randomizeColorPrint(f"{header}\n{title}\n{header}\n");
   
-  def showSeperator(self, ch):
-    seperator = "";
-    for _ in range(shutil.get_terminal_size().columns):
-      seperator += ch;
-    self.randomizeColorPrint(seperator + "\n");
-  
+  def showSeperator(self, ch, title=None):
+    width, _ = self.getSize();
+    
+    if title:
+      title = f" {title} ";
+      if len(title) >= width: title = title[:width - 4] + "...";
+      side = (width - len(title)) // 2;
+      line = ch * side + title + ch * (width - side - len(title));
+    else:
+      line = ch * width;
+    self.randomizeColorPrint(line + "\n");
+    
   def showStatus(self, msg, n, spinner = "dots"):
     self.input_handler.disableInput();
     with self.console.status(msg, spinner = spinner) as status:

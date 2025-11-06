@@ -7,23 +7,17 @@ class DamageHandler:
     self.game = self.combat_handler.game;
     
     self.attack_damages = {
+      # basic moves
       **self.createDamage("punch", 10, ["strength"], _range = 1),
       **self.createDamage("strong punch", 20, ["strength"], _range = 1),
       **self.createDamage("double punch", 10, ["strength"], _range = 1),
       **self.createDamage("slam", 0, ["defense", "strength"], _range = 1),
+      
+      # sword1 moves
       **self.createDamage("slash", 30, ["strength"], _range = 2),
       **self.createDamage("thrust", 25, ["strength", "defense"], _range = 3),
       **self.createDamage("iron reversal", 30, ["strength"], _range = 1),
       **self.createDamage("blade dance", 40, ["strength"], _range = 2),
-      **self.createDamage("push", 5, ["defense"], _range = 1, origin = "defender"),
-      **self.createDamage("poke", 10, ["strength"], _range = 2),
-      **self.createDamage("quick shot", 15, ["strength"], _range = 5),
-      **self.createDamage("half draw", 20, ["strength"], _range = 7),
-      **self.createDamage("arrow throw", 10, ["strength"], _range = 5),
-      **self.createDamage("heal override", 6, ["strength", "dexterity"], _range = 2),
-      **self.createDamage("stab", 10, ["strength", "dexterity"], _range = 1),
-      **self.createDamage("feint", 5, ["dexterity"], _range = 1),
-      **self.createDamage("chain", 15, ["strength"], _range = 1),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = [], _range = 1):
@@ -66,10 +60,11 @@ class DamageHandler:
         total_damage += attacker.stats.get(stat);
       else:
         total_damage += defender.stats.get(stat);
-    return self.attemptCritical(total_damage * damage.get("multiplier"), attacker) * attacker.getFatigueMultiplier();
+    multiplier = self.combat_handler.attack_handler.gore_handler.getMultiplier(defender);
+    return self.attemptCritical(total_damage * damage.get("multiplier") * multiplier, attacker) * attacker.getFatigueMultiplier();
   
   def __calculateDmg(self, dmg, attacker):
-    return (self.attemptCritical(dmg, attacker) * self.combat_handler.attack_handler.gore_handler.getMultiplier()) * attacker.getFatigueMultiplier();
+    return (self.attemptCritical(dmg, attacker) * self.combat_handler.attack_handler.gore_handler.getMultiplier(attacker.enemy)) * attacker.getFatigueMultiplier();
   
   def calculateDamage(self, name, attacker, defender, dmg = 0, ignore_defense = False):
     total_damage = 0;
@@ -81,14 +76,13 @@ class DamageHandler:
       if ignore_defense is False: total_damage = round(self.reduceDamage(self.__calculateDmg(dmg, attacker), defender));
       else: total_damage = round(self.__calculateDmg(dmg, attacker));
 
-    if total_damage > 0:
-      ratio = defender.stats["max health"] / total_damage;
-      if ratio <= 0.009: self.ui.panelPrint("[bold]BOUNDLESS![reset]");
-      elif ratio <= 0.01: self.ui.panelPrint("[bold red]TRANSCENDENT![reset]");
-      elif ratio <= 0.09: self.ui.panelPrint("[bold green]BRILLIANT![reset]");
-      elif ratio <= 0.2: self.ui.panelPrint("[bold yellow]FANTASTIC![reset]");
-      elif ratio <= 0.5: self.ui.panelPrint("[bold blue]EXCELLENT![reset]");
-      elif ratio <= 0.75: self.ui.panelPrint("[bold cyan]GREAT![reset]"); 
-      elif ratio == 1: self.ui.panelPrint("[bold yellow]IMPRESSIVE![reset]"); 
+    ratio = total_damage / defender.stats["max health"]
+    if ratio >= 100: self.ui.panelPrint("[bold]BOUNDLESS![reset]")
+    elif ratio >= 50: self.ui.panelPrint("[bold red]TRANSCENDENT![reset]")
+    elif ratio >= 10: self.ui.panelPrint("[bold green]BRILLIANT![reset]")
+    elif ratio >= 5: self.ui.panelPrint("[bold yellow]FANTASTIC![reset]")
+    elif ratio >= 2: self.ui.panelPrint("[bold blue]EXCELLENT![reset]")
+    elif ratio >= 1.5: self.ui.panelPrint("[bold cyan]GREAT![reset]")
+    elif 0.99 <= ratio <= 1.01: self.ui.panelPrint("[bold yellow]IMPRESSIVE![reset]")
     return total_damage;
     

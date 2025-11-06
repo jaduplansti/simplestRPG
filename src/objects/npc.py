@@ -16,7 +16,7 @@ class NPC(Character):
     self.block_chance = 0;
     self.flee_chance = 0;
     self.taunt_chance = 0;
-    
+  
   def getLoot(self):
     if self.any_loot is True: return getItem(choices(list(ITEMS))[0]);
     elif len(self.loot) == 0: return None;
@@ -52,7 +52,7 @@ class NPC(Character):
     active_parts = [part for part, is_ok in self.bodyparts.items() if is_ok];
     return f"target {choice(active_parts)}";
 
-  def getAction(self, ui):
+  def __getAction(self, ui):
     _move = self.shouldMove();
     if _move != None: return _move;
     #action = self.customAction(ui);
@@ -64,7 +64,15 @@ class NPC(Character):
     elif self.stats["health"] <= self.stats["max health"] * 0.20:
       return choices(["flee", "block", ""], [self.flee_chance, self.block_chance, 0.5])[0];
     else: return choices(["attack", "block"], [self.attack_chance, self.block_chance])[0];
-
+  
+  def getAction(self, ui): # clean this up next update
+    _move = self.__getAction(ui);
+    try:
+      if randint(1, 3) == 1 and _move not in ["retreat", "advance"]: ui.printDialogueFile(self.name, self.name, _move, None, True);
+    except KeyError:
+      pass;
+    return _move;
+    
 def createNpc(
   name,
   level = 1,
@@ -97,8 +105,10 @@ def getNPC(name):
   return deepcopy(NPCS[name]);
   
 NPCS = {
-  "slime" : createNpc("slime", level = [1, 5], basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
-  "goblin" : createNpc("goblin", basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
-  "ñayéroÀ" : createNpc("ñayéroÀ", boss = True, level = [20, 50], basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
-  "exodus" : createNpc("exodus", boss = True, level = [20, 50], basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
+  "slime": createNpc("slime", level = [1, 5], basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
+  "goblin": createNpc("goblin", level = [3, 7], basic_actions = [0.8, 0.2, 0, 0], any_loot = True),
+  "rat": createNpc("rat", level = [2, 6], basic_actions = [0.75, 0.25, 0, 0], any_loot = True),
+  "wolf": createNpc("wolf", level = [4, 8], basic_actions = [0.7, 0.3, 0, 0], any_loot = True),
+  "bandit": createNpc("bandit", level = [5, 9], basic_actions = [0.7, 0.25, 0.05, 0], any_loot = True),
+  "skeleton": createNpc("skeleton", level = [6, 10], basic_actions = [0.7, 0.2, 0.1, 0], any_loot = True),
 };
