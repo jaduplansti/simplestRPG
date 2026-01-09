@@ -25,3 +25,22 @@ Take a look at [CHANGELOG](changelog.txt)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+# Screenshots
+
+![title](screenshots/s1.png)
+
+
+![dungeon](screenshots/s2.png)
+
+
+![encounter](screenshots/s3.png)
+
+
+![combat menu](screenshots/s4.png)
+
+
+![in combat](screenshots/s5.png)
+
+
+![combat end](screenshots/s6.png)
