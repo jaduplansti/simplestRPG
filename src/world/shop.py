@@ -345,7 +345,8 @@ class Shop(SubMenu):
   def handleStoryEvents(self):
     if self.game.story_handler.progress == 7: self.game.story_handler.scene7(self.dave);
     elif self.game.story_handler.progress == 8: self.game.story_handler.scene8(self.dave);
-  
+    elif self.game.story_handler.progress == 9 and randint(1, 3) == 1: self.game.story_handler.scene9();
+
   def handlePlayerEvent(self):
     if not all(self.game.player.bodyparts.values()):
       cost = self.game.player.level * 20;
@@ -360,7 +361,7 @@ class Shop(SubMenu):
         self.game.player.stats["health"] = self.game.player.stats["max health"];
         self.ui.printDialogue(self.dave.name, f"all good! lets get back to business.");
       else: self.ui.printDialogue(self.dave.name, "alrighty then.");
-    self.ui.awaitKey();
+      self.ui.awaitKey();
     
   def enter(self):
     self.ui.clear();

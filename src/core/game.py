@@ -6,8 +6,7 @@ from interface.menu import Menu;
 from random import choices, randint;
 import os;
 
-from world.exploration import Exploration, AREAS;
-from time import sleep;
+from time import sleep, time;
 from subprocess import run;
 
 from objects.item import getItem, ITEMS;
@@ -23,6 +22,8 @@ from objects.character_class import getClass, CLASSES;
 from world.story import Story;
  
 from mechanics.clock import Clock;
+from world.home import Home;
+from world.exploration import Exploration;
 
 class Game:
   """ 
@@ -58,7 +59,8 @@ class Game:
       "type speed" : 0.01,
       "delay speed" : 0.5,
     }
-  
+    self.last_saved_playtime = time();
+    
   def getArea(self, name):
     """
     Gets an area from the self.areas
@@ -109,7 +111,7 @@ class Game:
     self.ui.clear();
     self.audio_handler.play("start.wav");
     self.handleLoad();
-    AREAS[self.player.location]["handler"](self).enter();
+    Home(self).enter()
     
   def handleMainMenu(self):
     """This is self explanatory"""
@@ -130,30 +132,6 @@ class Game:
       self.ui.animatedPrint("[red]another enemy appears![reset]");
       self.ui.awaitKey();
       return self.initiateFight();
-      
-  def handleCombatInitiateMenu(self, combat_handler):
-    """
-    Handles combat initiation usually before the actual combat starts.
-    
-    Parameters:
-    combat_handler, an instance of the CombatHandler class.
-    
-    Returns:
-    boolean, this is to leave the initiation menu.
-    """
-    
-    while True:
-      self.menu.showCombatInitiateMenu();
-      option = self.ui.getInput();
-      
-      if option == "fight":
-        return combat_handler.handleCombatNpc();
-      elif option == "bail":
-        break;
-      elif option == "talk":
-        pass;
-      
-      self.ui.awaitKey();
       
   def giveQuest(self, name):
     if self.player.giveQuest(name) != -1:
@@ -259,7 +237,7 @@ class Game:
     self.ui.showHeader("Save Slots", "#");
     
     if os.path.exists(sys.path[0] + "/saves") != True:
-      self.handleName();
+      self.handleCharacterCreation();
       return;
      
     player_data = {};
@@ -276,7 +254,7 @@ class Game:
       self.ui.animatedPrint(f"character {option} does not exist!");
       self.ui.animatedPrint(f"create {option}? (y/n)");
       if self.ui.getInput().lower() == "y":
-        self.handleName(option);
+        self.handleCharacterCreation(option);
         return;
       else:
         self.handleQuit();
@@ -301,6 +279,7 @@ class Game:
     
     self.ui.showStatus("saving", 2);
     self.player.story_progress = self.story_handler.progress;
+    self.savePlaytime();
     self.player.save();
   
   def handleEquipmentDetail(self, part):
@@ -431,7 +410,7 @@ class Game:
     self.ui.animatedPrint(f"[yellow]{self.player.name}[reset] sees their bed and gets ready to sleep.");
     self.ui.barPrint("[blue]Energy[reset]", self.player.energy, 100, speed = 0.1);
     self.ui.animatedPrintFile("sleep", "rested", [self.player.name]);
-    self.ui.panelPrint(f"[bold blue]ENERGY and HP[reset] RESTORED");
+    self.ui.panelPrint(f"[bold blue]ENERGY[reset] and [bold green]HP[reset] RESTORED");
 
     self.player.energy = 100;
     self.player.stats["health"] = self.player.stats["max health"];
@@ -445,8 +424,7 @@ class Game:
       self.player.name = self.ui.getInput();
     else:
       self.player.name = name;
-    self.giveClass(self.player, "peasant");
-    self.story_handler.scene1();
+    
     
   def handleSettings(self):
     """Handles game settings, see self.settings."""
@@ -478,3 +456,28 @@ class Game:
       self.handleQuit();
     except FileNotFoundError:
       self.ui.panelPrint("FAILED TO DELETE", "center", "settings");
+  
+  def savePlaytime(self):
+    self.player.playtime = self.fetchPlaytime();
+    self.last_saved_playtime = time();
+    
+  def fetchPlaytime(self):
+    return (time() - self.last_saved_playtime) + self.player.playtime;
+  
+  def handleClassSelect(self):
+    while True:
+      self.menu.showCharacterClasses();
+      _class = self.ui.getInput();
+      
+      if _class in ["swordsman", "peasant"]: 
+        self.giveClass(self.player, _class);
+        return;
+      else:
+        self.ui.normalPrint("thats not a class.\n");
+        self.ui.awaitKey();
+ 
+  def handleCharacterCreation(self, name = None):
+    self.handleName(name);
+    self.handleClassSelect();
+    self.story_handler.intro();
+    self.exploration_handler.explore();

@@ -10,9 +10,9 @@ class Character:
     self.name = name
     self.level = 1
     self.exp = 0;
-    self.position = 0;
+    self.position = [3, 2]
     
-    self.location = "home";
+    self.location = None;
     self.money = 1
     self.energy = 100
     self.hunger = 100;
@@ -58,6 +58,8 @@ class Character:
     self.commonly_used_skills = [];
     
     self.story_progress = 0;
+    self.playtime = 0;
+    self.current_map = "map1"
     
   def to_dict(self):
     return {
@@ -81,7 +83,9 @@ class Character:
       "title": self.title,
       "magic": self.magic,
       "area_data": self.area_data,
+      "current_map": self.current_map,
       "story_progress": self.story_progress,
+      "playtime": self.playtime,
       "bodyparts": self.bodyparts,
       "skills": {k: v.to_dict() if v else None for k, v in self.skills.items()},
       "inventory": {
@@ -109,6 +113,7 @@ class Character:
     char.points = data["points"]
     char.title = data["title"]
     char.area_data = data["area_data"]
+    char.current_map = data["current_map"];
     char.equipment = {
       k: Equipment.from_dict(v) if v else None for k, v in data["equipment"].items()
     }
@@ -125,8 +130,9 @@ class Character:
     }
 
     char.magic = data["magic"]
-    char.story_progress = data["story_progress"]
+    char.story_progress = data["story_progress"];
     char.bodyparts = data["bodyparts"];
+    char.playtime = data["playtime"];
     return char;
 
   def save(self):

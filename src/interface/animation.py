@@ -68,7 +68,7 @@ class Animator:
       self.ui.clearLine();
       sleep(0.03);
 
-  def transitionClosing(self, block="█", random = False):
+  def transitionClosing(self, speed = 0.0001, block="█"):
     self.ui.clear()
     width, height = self.ui.getSize()
 
@@ -80,8 +80,7 @@ class Animator:
             middle_space = " " * (width - step * 2)
             line = f"{left}{middle_space}{right}"
             self.ui.normalPrint(line)
-        if random: sleep(uniform(0.01, 0.09))
-        else: sleep(0.01);
+        sleep(speed);
 
     for step in range(width // 2 + 1):
         self.ui.clear()
@@ -91,8 +90,7 @@ class Animator:
             middle_space = " " * (step * 2)
             line = f"{left}{middle_space}{right}".ljust(width)
             self.ui.normalPrint(line)
-        if random: sleep(uniform(0.01, 0.09))
-        else: sleep(0.01);    
+        sleep(speed);    
         self.ui.clear()
 
   def animateTitle(self):
@@ -223,3 +221,16 @@ class Animator:
           pos += 1;
           sleep(speed);
     return [False, pos, bar_length, targets, hit_targets];
+   
+  def matrixIntro(self):
+    self.ui.clear();
+    self.ui.normalPrint("(1.) [green]connecting..[reset]");
+    sleep(3);
+    self.ui.normalPrint("(2.) [yellow]connection established![reset]");
+    sleep(4);
+    
+    for n in range(100):
+      self.ui.normalPrint("(!!!) [red]fatal error occured![reset]");
+      sleep(0.01);
+    sleep(5);
+    self.ui.clear();

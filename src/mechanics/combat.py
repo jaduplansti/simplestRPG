@@ -18,7 +18,8 @@ class CombatHandler:
     
     self.previous_action = "";
     self.won = None;
-    
+    self.ran = False;
+  
   def initiateFightNpc(self, character, name):
     self.game.audio_handler.play("battle_start.wav");
     self.game.animator.transition();
@@ -29,12 +30,11 @@ class CombatHandler:
     
     self.defender = npc;
     self.defender.enemy = self.attacker;
-    self.attacker.clearStatus();
+
+    self.attacker.zone = 4;
+    self.defender.zone = 5;
     
-    self.attacker.zone = randint(1, 8);
-    self.defender.zone = randint(1, 8);
-    
-    self.game.handleCombatInitiateMenu(self);
+    return self.handleCombatInitiateMenu();
   
   def __handleWin(self):
     if self.tryBerserkNpc(self.defender) is False:
@@ -116,8 +116,8 @@ class CombatHandler:
       return False;
   
   def useHunger(self, attacker):
-    if attacker.hunger > 10 and attacker.berserk != True and attacker.energy < 80:
-      attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (attacker.hunger * 0.2));
+    if attacker.hunger > 10 and attacker.berserk != True:
+      attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (2 * attacker.stats["defense"]));
       attacker.energy = min(100, attacker.energy + 20);
       attacker.hunger = max(0, attacker.hunger - 5);
     else:
@@ -138,10 +138,10 @@ class CombatHandler:
     self.attack_handler.handlePassiveSkills("death", self.attacker, self.defender);
     self.attack_handler.handlePassiveSkills("death", self.defender, self.attacker);
     if self.attacker.stats["health"] <= 0:
-      self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] killed [yellow]{self.attacker.name}[reset]");
+      self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] won against [yellow]{self.attacker.name}[reset]");
       self.won = self.defender.name;
     elif self.defender.stats["health"] <= 0:
-      self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] killed [yellow]{self.defender.name}[reset]");
+      self.ui.animatedPrint(f"[yellow]{self.attacker.name}[reset] won against [yellow]{self.defender.name}[reset]");
       won = self.__handleWin();
       if won is False: return False;
       self.game.player.trackQuest(self.game, self);
@@ -207,8 +207,16 @@ class CombatHandler:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name}'s arms are broken — they can’t use any skills or items.[reset]", "arms");
       return;
       
-    if option == "items": self.game.handleUseItem(self);
-    elif option == "skills": self.game.handleUseSkill(None, self, attacker, defender);
+    if option == "items": 
+      self.game.handleUseItem(self);
+      self.ui.clear();
+      self.game.animator.transition();
+      self.ui.showHeader("Combat Logs", "=");
+    elif option == "skills": 
+      self.game.handleUseSkill(None, self, attacker, defender);
+      self.ui.clear();
+      self.game.animator.transition();
+      self.ui.showHeader("Combat Logs", "=");
     else: return -1;
     
   def handleMovementOption(self, option, attacker, defender):
@@ -307,3 +315,27 @@ class CombatHandler:
     self.ui.printDialogue(lost.name, "...");
     self.ui.normalPrint("([red]skill[reset]) or ([cyan]mercy[resey])\n");
     # todo here
+  
+  def handleCombatInitiateMenu(self): # i moved this from game to combat.py
+    while True:
+      self.game.menu.showCombatInitiateMenu();
+      option = self.ui.getInput();
+      
+      if option == "fight":
+        return self.handleCombatNpc();
+      elif option == "run":
+        return self.handleRun();
+      elif option == "interact":
+        pass;
+      self.ui.awaitKey();
+  
+  def handleRun(self):
+    if randint(1, 3) == 1:
+      self.ui.animatedPrint(f"{self.attacker.name} ran away from {self.defender.name}!");
+      return;
+      
+    self.ui.animatedPrint(f"{self.attacker.name} tried to run away, but {self.defender.name} blocked them!");
+    self.ui.printDialogue(self.attacker.name, "damn it!");
+    self.ui.awaitKey();
+    self.handleCombatNpc();
+    

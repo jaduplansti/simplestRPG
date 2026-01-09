@@ -36,7 +36,7 @@ class Clock:
   def isDay(self):
     with self.lock:
       return self.is_day
-    
+  
   def watchTime(self):
     while True:
       sleep(1)

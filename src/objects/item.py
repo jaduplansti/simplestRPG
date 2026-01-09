@@ -247,10 +247,18 @@ def use_potion(item, game, combat_handler, user):
 
 def use_scroll(item, game, combat_handler, user):
   if item.name == "scroll of instant death" and combat_handler != None:
-    combat_handler.defender.stats["health"] = 0;
-    game.ui.animatedPrint(f"[yellow]{user.name}[reset] used a [bold cyan]scroll of instant death[reset]!");
-    game.ui.animatedPrint(f"[bold red]{combat_handler.defender.name} feels their life force drain away!");
-  
+    game.ui.printDialogue(user.name, "[bold green]voé tàhé iéjräqß[reset]");
+    game.ui.printDialogue(user.name, "[bold red]ßhßék brúkx tbeyà[reset]");
+    
+    if randint(1, 2) == 1:
+      game.ui.printDialogue(defender.name, "urkk!");
+      game.ui.animatedPrint(f"{user.name} used a scroll of instant death, instantly killing {combat_handler.defender.name}!");
+      combat_handler.defender.stats["health"] = 0;
+    else:
+      game.ui.printDialogue(user.name, "urkk!");
+      game.ui.animatedPrint(f"{user.name} used a scroll of instant death, however it backfired!");
+      user.stats["health"] = 0;
+      
   elif item.name == "scroll of repair":
     game.menu.showEquipmentMenu(user);
     game.ui.animatedPrint("which equipment to repair? e.g bodypart");
@@ -263,12 +271,6 @@ def use_scroll(item, game, combat_handler, user):
     except KeyError:
       game.ui.animatedPrint("not a valid bodypart");
   
-  elif item.name == "scroll of teleport":
-    location = game.ui.getInput();
-    user.usedItem(item.name);
-    game.ui.clear();
-    game.exploration_handler.move(location);
-   
 def use_sword(item, game, combat_handler, user):
   if user.equipItem(item) != True:
     game.ui.animatedPrint(f"[yellow]{user.name}[reset] already has a [yellow]{user.equipment[item.bodypart].name}[reset] on their [italic green]{item.bodypart}[reset]");
@@ -406,15 +408,8 @@ def use_artifact(item, game, combat_handler, user):
 
 ITEMS = {
   "seal of origin": {
-  "item": Item(
-    name="seal of origin",
-    rarity = "legendary",
-    rank = "S",
-    weight = 0.3,
-    _type="misc",
-    desc="An ancient seal that lets its bearer choose any basic class."
-  ),
-  "action": use_artifact
+    "item": Item(name="seal of origin", rarity = "legendary", rank = "S", weight = 0.3, _type="misc", desc="An ancient seal that lets its bearer choose any basic class."),
+    "action": use_artifact
   },
   "dave ticket": {
     "item": Item(name="dave ticket", _type="misc", desc="A ticket made by dave, allows adventurers to gain rewards!"),
@@ -445,7 +440,7 @@ ITEMS = {
     "action": use_sword
   },
   "ashrend sword": {
-    "item": Item(name="ashrend sword", max_durability=800, durability=800, rank="A", rarity="legendary", weight=18.5, bodypart="right arm", _type="sword", _class = "swordsman", desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
+    "item": Item(name="ashrend sword", max_durability=1600, durability=1600, rank="A", rarity="legendary", weight=18.5, bodypart="right arm", _type="sword", _class = "swordsman", desc="A legendary sword said to be forged in the heart of a volcano. It glows with a faint, fiery aura and feels surprisingly light."),
     "action": use_sword
   },
   "kevins sword": {
@@ -489,8 +484,8 @@ ITEMS = {
     "action": use_potion
   },
   "scroll of teleport": {
-    "item": Item(name="scroll of teleport", rank="C", rarity="rare", weight=0.2, _type="scroll", desc="A scroll that allows the user to instantly teleport to a known location."),
-    "action": use_scroll,
+    "item": Item(name="scroll of teleport", rank="C", rarity="unobtainable", weight=0.2, _type="scroll", desc="A scroll that allows the user to instantly teleport to a known location."),
+    "action": None,
   },
   "wooden arrow": {
     "item": Item(name="wooden arrow", rank="D", rarity="common", weight=1.5, _type="arrow", desc="A simple wooden arrow. The standard ammunition for most bows."),

@@ -16,7 +16,7 @@ class NPC(Character):
     self.block_chance = 0;
     self.flee_chance = 0;
     self.taunt_chance = 0;
-  
+    
   def getLoot(self):
     if self.any_loot is True: return getItem(choices(list(ITEMS))[0]);
     elif len(self.loot) == 0: return None;
@@ -98,7 +98,8 @@ def createNpc(
     
   for loot in loots:
     npc.putLoot(loot[0], loot[1]);
-    
+  
+  if npc.name == "azaroth": npc.stats["strength"] *= 3;
   return npc;
   
 def getNPC(name):
@@ -111,4 +112,5 @@ NPCS = {
   "wolf": createNpc("wolf", level = [4, 8], basic_actions = [0.7, 0.3, 0, 0], any_loot = True),
   "bandit": createNpc("bandit", level = [5, 9], basic_actions = [0.7, 0.25, 0.05, 0], any_loot = True),
   "skeleton": createNpc("skeleton", level = [6, 10], basic_actions = [0.7, 0.2, 0.1, 0], any_loot = True),
+  "azaroth": createNpc("azaroth", boss = True, level = [100, 200], basic_actions = [0.9, 0.1, 0, 0], any_loot = True),
 };

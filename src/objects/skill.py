@@ -26,7 +26,7 @@ class Skill:
       return True;
       
   def giveExp(self, limit):
-    self.exp += 2 * randint(1, limit);
+    self.exp += 5 * randint(1, limit);
     return self.levelUp();
     
   def use(self, combat_handler = None, attacker = None, defender = None):
@@ -73,23 +73,23 @@ def action_normal_damage(skill, combat_handler, attacker, defender): # generic s
       dmg = attacker.stats["strength"] * getattr(attacker, "flow_meter", 1);
       combat_handler.ui.panelAnimatedPrint(f"{attacker.name} launched an [yellow]uppercut[reset], striking [green]{defender.name}[reset] for [red]{dmg}[reset] damage!", skill.name);
       attacker.attackEnemy(dmg, combat_handler);
-
+    
   elif skill.name == "trislash":
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
-    combat_handler.ui.printDialogue(attacker.name, ["my blade, your death..", "taste my blade!", "thrice, thats your end."]);
-    combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] drew their sword and slashed [yellow]{defender.name}[reset] 1x");
-    combat_handler.game.audio_handler.play("slash1.wav");
    
-    combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset]'s sword rotated and thrusted [yellow]{defender.name}[reset] 2x");
+    combat_handler.game.audio_handler.play("slash1.wav");
     combat_handler.game.audio_handler.play("thrust2.wav");
-    combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}[reset] put every ounce of strength and cut [yellow]{defender.name}[reset] 3x");
     combat_handler.game.audio_handler.play("slash2.wav");
 
     dmg = combat_handler.attack_handler.damage_handler.calculateDamage(None, attacker, defender, (attacker.stats["strength"] + randint(50, 60)) * 2.5);
-    combat_handler.ui.panelAnimatedPrint(f"{attacker.name} drew their blade and sliced [yellow]{defender.name}[reset] 3x, dealing [red]{dmg}[reset] damage!", skill.name);
+    combat_handler.ui.panelAnimatedPrint(f"{attacker.name} drew their blade and sliced [yellow]{defender.name}[reset] 3x, dealing a whopping [red]{dmg}[reset] damage!", skill.name);
     attacker.attackEnemy(dmg, combat_handler);
     combat_handler.attack_handler.consumeEquipment(attacker, ["left arm", "right arm"], dmg * 0.4);
-  
+    
+    if skill.level >= 2 and randint(1, 3):
+      combat_handler.ui.animatedPrint(f"[yellow]{attacker.name}'s[reset] slashes cut deeper, leaving gashes that continuously drain HP.");
+      defender.giveStatus("bleeding", 4);
+    
   elif skill.name == "blade blink":
     if combat_handler.attack_handler.validateAttack(attacker, defender, None, skill.range) is False: return;
     combat_handler.ui.printDialogue(attacker.name, ["dont blink..", "watch me!"]);
@@ -121,7 +121,7 @@ def action_normal_recover(skill, combat_handler, attacker, defender):
     combat_handler.ui.printDialogue(attacker.name, "restrict thou sinner.");
     combat_handler.ui.panelAnimatedPrint(f"[yellow]{attacker.name}[reset] channels divine energy at [yellow]{defender.name}[reset], binding them in place!", "divine restriction");
     defender.giveStatus("stunned", 5);
-    
+  
 def action_normal_misc(skill, combat_handler, attacker, defender):
   if skill.name == "analyze":
     combat_handler.ui.printDialogue(attacker.name, "analysis!");
@@ -209,12 +209,12 @@ SKILLS = {
   
   # attack skills
   "uppercut" : {
-    "skill" : Skill("uppercut", "a rising punch that can stagger enemies.", 15, "C", range = 1, _style = "basic", max_level = 3), 
+    "skill" : Skill("uppercut", "a rising punch that can stagger enemies.", 15, "C", range = 1, _style = None, max_level = 3), 
     "action" : action_normal_damage
   },  
   
   "trislash" : {
-    "skill" : Skill("trislash", "triple the slash, triple the fun.", 25, "C+", range = 2, _style = "sword1"), 
+    "skill" : Skill("trislash", "triple the slash, triple the fun.", 25, "C+", range = 2, _style = "sword1", max_level = 2), 
     "action" : action_normal_damage
   },
   "blade blink" : {
@@ -236,7 +236,7 @@ SKILLS = {
     "skill" : Skill("divine restriction", "chains of a sinner, restricting for 5 stacks..", 30, "C+", range = 3, _style = "bible1"), 
     "action" : action_normal_recover
   },
- 
+  
  # passives
   "hyper precision" : {
     "skill" : Skill("hyper precision", "you see flaws in every stance, your attacks have a 50% to block break!", 0, "C+", range = 0, passive = True, passive_type = "attack", _style = "sword1"), 

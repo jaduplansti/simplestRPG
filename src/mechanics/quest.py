@@ -58,25 +58,9 @@ def completeQuest(quest, character, game):
     game.ui.animatedPrint("you gain [yellow]10000[reset] exp!");
     game.givePlayerExp(10000);
   
-  character.removeQuest(quest.name);
-
-def upgradeRank(quest, character, game):
-  next_rank = "";
-  current_rank = character.guild_hall["rank"];
+  character.removeQuest(quest.name)
   
-  rank_order = ["E", "D", "C", "B", "A", "S"];
-  if current_rank in rank_order:
-    idx = rank_order.index(current_rank);
-    if idx + 1 < len(rank_order): next_rank = rank_order[idx + 1];
-
 QUESTS = {
-  "goblin cleanup": Quest(
-    "goblin cleanup",
-    "show the goblins the hate you feel by killing 4 goblins",
-    condition=["goblin", 4],
-    _type="kill",
-    rank="E",
-  ),
   "pest control": Quest(
     "pest control",
     "crush 4 slimes to death..",
@@ -84,10 +68,10 @@ QUESTS = {
     _type="kill",
     rank="E",
   ),
-  "fallen heart": Quest(
-    "fallen heart",
-    "kill a fallen knight",
-    condition=["fallen knight", 1],
+  "hero of sylira": Quest(
+    "hero of sylira",
+    "defend your home town.",
+    condition = ["knight", 7],
     _type="kill",
     rank="D",
   ),

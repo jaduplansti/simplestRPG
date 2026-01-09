@@ -1,6 +1,8 @@
 from rich.table import Table;
+from rich.align import Align;
 from rich import print, box;
 from interface.art import ARTS;
+from time import time;
 
 class Menu():
   def __init__(self, game):
@@ -58,7 +60,10 @@ class Menu():
     info += f"[red]health[reset]: {character.stats["health"]}/{character.stats["max health"]}\n";
     info += f"[blue]energy[reset]: {character.energy}\n";
     info += f"[purple]hunger[reset]: {character.hunger}\n";
-    info += f"[bold]points[reset]: [green]{character.points}[reset]\n\n"
+    info += f"[bold]points[reset]: [green]{character.points}[reset]\n"
+    
+    if self.game.isPlayer(character): info += f"playtime: {round(self.game.fetchPlaytime() / 3600, 2)} hr\n\n";
+    else: info += "\n";
     
     info += f"[green]stats[reset]:\n"
     for stat in character.stats:
@@ -95,7 +100,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold red]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.7.4[reset] ([bold blue]ALPHA[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.5[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -106,10 +111,10 @@ class Menu():
       pass;
       
     self.ui.animatedPrint(f"[yellow]{self.game.player.name}[reset] encounters a [cyan]{self.game.player.enemy.name}[cyan]!");
-    self.ui.printTreeMenu("[green](options)[reset]\n", ["[red]fight[reset]", "[red]bail[reset]", "[purple]talk[reset]"]);
+    self.ui.printTreeMenu("[green](options)[reset]\n", ["[red]fight[reset]", "[red]run[reset]", "[purple]interact[reset]"]);
+    
     self.showTip();
-    if self.game.player.level + 3 < self.game.player.enemy.level: self.ui.panelPrint(f"[red]LEVEL GAP (you < 3)[reset]!", "center");
-
+  
   def showCombatMenu(self, combat_handler, character):
     self.ui.clear();
     self.ui.showHeader(f"{character.name} vs {character.enemy.name}", "≈");
@@ -200,3 +205,11 @@ class Menu():
       self.ui.panelPrint(f"[green]{bar}[reset] ({round(percent, 1)}%)", "center", "mastery");
       
     self.ui.normalPrint("≈ [cyan]back[reset]\n");
+
+  def showCharacterClasses(self):
+    self.ui.clear();
+    self.ui.showSeperator("-", "CHOOSE CLASS");
+    self.ui.normalPrint("[bold]{peasant}[reset]\n  NO STAT BUFF\n  The lowest of the low, this is where it begins.\n");
+    self.ui.normalPrint("[bold]{swordsman}[reset]\n  STR +25\n  A disciplined fighter who reads openings and strikes with precision\n");
+    self.ui.showSeperator("-");
+   

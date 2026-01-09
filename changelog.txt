@@ -234,7 +234,7 @@
 • added archer attack style, very fun (half draw, quick shot, arrow throw)
 • added cleanse potion, remove all status effects
 • you can now unequip items!
-• energy can be increased! (1 energy every 5 levels)
+• energy can be increased! (1 energy every 5 levels) (removed)
 • all potions can accidentally inflict poison! (replacing expiry)
 
 [version 2.6.3] (minigames removed)
@@ -429,3 +429,18 @@
 • added a skill encyclopedia, access it by typing skills at home.
 • added basic skill levels.
 • dave aka the shop can now heal and fix your limbs in emergencies, just go to his shop.
+
+[version 2.7.5]
+• added playtime tracking
+• increased base skill exp increase from 2 -> 5.
+• added level to trislash skill
+• rewrote exploration system 
+• added 2d exploration
+• rewrote story
+• added character creation menu, class selection menu.
+• fixed some bugs
+• tweaked combat
+• added 2d dungeon exploration, randomly generated endless floors!
+• buffed ashrend sword durability to 800 -> 1600
+• made scroll of teleport unobtainable
+• reworked scroll of instant death, can now backfire.

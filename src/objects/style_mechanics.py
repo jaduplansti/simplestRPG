@@ -47,9 +47,5 @@ def handleSword1Mechanic(attacker, defender, style, move, combat_handler, dmg = 
     defender.sword_weakness = choice([bp for bp in defender.bodyparts if bp != defender.sword_weakness]);
     attacker.true_crit = True;
     attacker.giveStatus("parrying", 1);
-  
-  #if combat_handler.attack_handler.handleRange(None, attacker, defender, 1) and randint(1, 2) == 1:
-   # combat_handler.move(1, defender.direction, attacker);
 
-  
  

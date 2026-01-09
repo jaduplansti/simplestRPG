@@ -124,7 +124,7 @@ class DefenseHandler:
       self.ui.animatedPrint(f"{defender.name}'s parry sends a shockwave through {attacker.name}'s guard, breaking their stance!")
       attacker.status["parrying"] = [False, 0]
       
-  def handleParry(self, attacker, defender):
+  def handleParry(self, attacker, defender): # refactor this
     if self.combat_handler.getOpponentTurnOption(defender) in ["atk", "attack"] and attacker.status["stunned"][0] is False:
       if self.combat_handler.attack_handler.handleRange(None, attacker, defender, 2) is False: return;
       elif defender.status["stunned"][0] is True: return;
@@ -226,7 +226,7 @@ class AttackHandler:
       
     elif attacker.stats["strength"] > defender.stats["defense"]:
       self.ui.panelAnimatedPrintFile("block", "block broken", [defender.name, attacker.name], "block");
-      self.ui.panelPrint(f"[red]BlOCK BREAK![reset]");
+      self.ui.panelPrint(f"[red]BLOCK BREAK![reset]");
       defender.status["blocking"] = [False, 0];
       defender.giveStatus("stunned", 2);
       return True;

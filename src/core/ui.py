@@ -128,11 +128,14 @@ class UI:
     return self.strings[key][n];
   
   def getDialogue(self, key, subkey, n, rand = False):
-    if n is None: dialogues = self.dialogues[key][subkey];
-    else: dialogues = self.dialogues[key][subkey][n];
-    if rand is True and isinstance(dialogues, list): return choice(dialogues);
-    else: return dialogues;
-    
+    try:
+      if n is None: dialogues = self.dialogues[key][subkey];
+      else: dialogues = self.dialogues[key][subkey][n];
+      if rand is True and isinstance(dialogues, list): return choice(dialogues);
+      else: return dialogues;
+    except KeyError:
+      return None;
+      
   def normalPrint(self, s):
     """ print. """
     print(s);
@@ -158,17 +161,22 @@ class UI:
     self.newLine();
     self.enableEcho();
     
-  def panelPrint(self, s, alignment = None, title = "", color = "white", expand = True, centered = False, joint = False):
+  def panelPrint(self, s, alignment = None, title = "", color = "white", expand = True, centered = False, joint = False, box_style = box.SQUARE):
     """prints a panel."""
-    if centered is True: self.normalPrint(Align.center(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand)));
-    else: self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand));
+    if centered is True: self.normalPrint(Align.center(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand, box = box_style)));
+    else: self.normalPrint(Panel(Text().from_markup(s, justify = alignment), title = title, border_style = color, expand = expand, box = box_style));
     
     if joint is True:
       self.normalPrint(Align.center("||"));
       self.normalPrint(Align.center("||"));
     else: self.newLine();
+  
+  def panelAnimatedPrintClear(self, text, title):
+    panel = self.panelAnimatedPrint(text, title);
+    panel_lines = len(self.console.render_lines(panel))
+    self.clearLine(panel_lines + 1);
     
-  def panelAnimatedPrint(self, text, title):
+  def panelAnimatedPrint(self, text, title, box_type = box.SQUARE):
     """
     typewriter effect inside a panel.
     
@@ -186,7 +194,7 @@ class UI:
     self.input_handler.disableInput();
     current_text = ""
     formatted_text = Text.from_markup(text)
-    panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0])
+    panel = Panel("", title=title, border_style=choices(["red", "green", "blue", "cyan", "magenta", "yellow", "bright_blue", "bright_magenta", "bright_cyan"])[0], box = box_type)
     with Live(panel, console=self.console, refresh_per_second=60) as live:
       for n, ch in enumerate(formatted_text):
         panel.renderable = formatted_text[0:n + 1];
@@ -195,7 +203,8 @@ class UI:
     self.newLine();
     sleep(self.game.settings["delay speed"]);
     self.input_handler.enableInput();
-
+    return panel;
+    
   def animatedPrintFile(self, key, n, args):
 	  formatted_s = self.getString(key, n).format(*args);
 	  self.animatedPrint(formatted_s);
@@ -219,13 +228,16 @@ class UI:
     self.input_handler.enableInput();
 
   def printDialogue(self, name, s):
-    if not isinstance(s, list): self.animatedPrint(f"{name}: {s}", punc = True);
-    else: self.animatedPrint(f"{name}: {choices(s)[0]}", punc = True);
+    if not isinstance(s, list): self.animatedPrint(f"[bold]{name}[reset]: {s}", punc = True);
+    else: self.animatedPrint(f"[bold]{name}[reset]: {choices(s)[0]}", punc = True);
   
   def printDialogueFile(self, name, key, subkey, n = None, rand = False, args = []):
-    formatted_s = self.getDialogue(key, subkey, n, rand).format(*args);
-    self.printDialogue(name, formatted_s);
-    
+    try:
+      formatted_s = self.getDialogue(key, subkey, n, rand).format(*args);
+      self.printDialogue(name, formatted_s);
+    except AttributeError:
+      return None;
+      
   def printTreeMenu(self, title, options): 
     if len(options) == 0: return;
     
@@ -246,12 +258,14 @@ class UI:
     print("");
   
   def getKey(self, s = "", end = "\n"):
-    self.normalPrint(s + end);
-    return readkey();
-  
+    key = readkey();
+    self.clearLine(1);
+    return key;
+    
   def awaitKey(self):
-    self.getKey("([bold red]press anything to continue[reset])");
-  
+    self.normalPrint("([bold red]press anything to continue[reset])");
+    self.getKey();
+    
   def input(self, s = ""):
     _input = input(s + " > ");
     return _input;
@@ -316,7 +330,7 @@ class UI:
         if status in ["blocking", "parrying"]: symbol = "⬆";
         else: symbol = "⬇";
         statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1] - 1}x[reset] {symbol})");
-    
+   
     self.normalPrint(f"{name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
     self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.energy / 100)*100:.2f}%[reset]) {energy_bar}")
     if self.game.isPlayer(character): self.normalPrint(f"Hunger: [bold cyan]{round(character.hunger)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.hunger / 100)*100:.2f}%[reset]) {hunger_bar}\n")
@@ -356,7 +370,7 @@ class UI:
       Text(ARTS[art].strip("\n"), justify="center"),
       padding=(1, 4),
       expand=False,
-      box=box.DOUBLE
+      box=box.ROUNDED
     )
     centered_panel = Align.center(panel)
     print(centered_panel);
@@ -385,3 +399,13 @@ class UI:
   def flush(self):
     sys.stdout.flush();
   
+  def getChoice(self, dialogues):
+    try:
+      for index, option in enumerate(dialogues):
+        print(f"{index + 1}. {option}");
+      self.newLine();
+      chosen_dialogue = int(self.input("say"));
+      self.newLine();
+      return chosen_dialogue;
+    except ValueError:
+      return 0;

@@ -28,7 +28,7 @@ class Home(SubMenu):
     self.ui.normalPrint(f"its currently {"day" if self.game.clock.isDay() else "night"} time.\n");
     
     if self.page == 1:
-      self.ui.panelPrint("[green]stats[reset] (📈)\n[cyan]items[reset] (💼)\n[purple]spar[reset] (🤺)\n[blue]gear[reset] (🪖)\n[yellow]next[reset] (↪)",
+      self.ui.panelPrint("[green]stats[reset] (📈)\n[cyan]items[reset] (💼)\n[purple]skills[reset] (✨)\n[blue]gear[reset] (🪖)\n[yellow]next[reset] (↪)",
       "center"
       "commands",
       expand = False,
@@ -44,7 +44,7 @@ class Home(SubMenu):
       );
     
     else:
-      self.ui.panelPrint("[cyan]cook[reset] (🍳)\n[yellow]farm[reset] (🌾)\n[blue]skills[reset] (✨)\n[yellow]back[reset] (↩)",
+      self.ui.panelPrint("[cyan]cook[reset] (🍳)\n[yellow]farm[reset] (🌾)\n[yellow]back[reset] (↩)",
       "center"
       "commands",
       expand = False,
@@ -56,7 +56,6 @@ class Home(SubMenu):
       {
         "items" : self.game.handleUseItem, 
         "stats" : self.game.handleStatsMenu,
-        "spar" : self.game.initiateFight,
         "sleep" : self.game.handleSleep,
         "settings" : self.game.handleSettings,
         "gear" : self.game.handleEquipment,

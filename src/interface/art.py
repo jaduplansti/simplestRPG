@@ -97,7 +97,18 @@ RAT = r"""
      .::!JJ?!7YJ^:   J7  
    .^^:::^!7!!~^^^^~!~.  
               ..::..     """  
-              
+ 
+AZAROTH = r"""
+        .: :.       
+      ~~?GP5^^      
+   :7:P&BBBGG5.J?   
+   JPPP7B#GP5G7J!   
+   !!:^5B&BBJ^7P!   
+   ^7!G@#B###Y.:.   
+   :.77#P!YJ#P!     
+      ~B: . 7P^     
+      ::    .^^ """;
+
 DAVE_SHOP = r"""
     ZVVXWWWWWVTY    
    VYWXWXSXVXYWZV   
@@ -120,5 +131,6 @@ ARTS = {
   "wolf": WOLF,
   "rat": RAT,
   "skeleton": SKELETON,
+  "azaroth": AZAROTH,
   "dave shop": DAVE_SHOP,
 }
