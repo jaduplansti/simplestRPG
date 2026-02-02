@@ -15,6 +15,7 @@ class Character:
     self.location = None;
     self.money = 1
     self.energy = 100
+    self.max_energy = 100;
     self.hunger = 100;
     
     self.berserk = False;
@@ -45,7 +46,6 @@ class Character:
     self.equipment = {"head": None, "chest": None, "left arm": None, "right arm": None, "boots": None}
     self.bodyparts = {"head" : True, "arms" : True, "legs": True};
     
-    
     self.attack_style = "basic"
     self._class = Class("Classless");
     
@@ -69,6 +69,7 @@ class Character:
       "position": self.position,
       "location": self.location,
       "money": self.money,
+      "max_energy": self.max_energy,
       "energy": self.energy,
       "hunger": self.hunger,
       "status": self.status,
@@ -105,6 +106,7 @@ class Character:
     char.location = data["location"]
     char.money = data["money"]
     char.energy = data["energy"]
+    char.max_energy = data["max_energy"];
     char.hunger = data["hunger"]
     char.status = data["status"]
     char.berserk = data["berserk"]
@@ -213,13 +215,14 @@ class Character:
   def tryLevelUp(self): 
     leveled_up = False
     while self.canLevelUp():
-      if (self.level % 5) == 0: self.energy += 1;
+      self.max_energy += 5;
+      self.energy = self.max_energy;
       self.exp -= (self.level * 100)
-      self.level += 1
+      self.level += 1;
       self.points += 2;
       self.statLevelUp()
-      leveled_up = True
-    return leveled_up
+      leveled_up = True;
+    return leveled_up;
   
   def statLevelUp(self):
     for stat in self.stats:
@@ -266,12 +269,10 @@ class Character:
     return "cyan"
   
   def getFatigueMultiplier(self):
-    if self.energy <= 25:
+    if self.energy <= self.max_energy * 0.2:
       return 0.25;
-    elif self.energy <= 50:
+    elif self.energy <= self.max_energy * 0.5:
       return 0.5;
-    elif self.energy <= 75:
-      return 0.8;
     return 1;
       
   def deductEnergy(self):

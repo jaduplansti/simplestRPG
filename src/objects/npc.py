@@ -27,7 +27,7 @@ class NPC(Character):
     self.loot_chance.append(chance);
   
   def goBerserk(self):
-    self.energy = 100;
+    self.energy = self.max_energy;
     for stat in self.stats:
       self.stats[stat] *= 1.5;
     self.stats["health"] = self.stats["max health"];
@@ -39,7 +39,7 @@ class NPC(Character):
         self.stats[stat] += 30;
         self.stats["health"] = self.stats["max health"];
       elif stat == "luck": self.stats[stat] += 0.001;
-      else: self.stats[stat] += 3;
+      else: self.stats[stat] += 6;
   
   def shouldMove(self):
     if (self.stats["health"] < self.enemy.stats["health"]) and (abs(self.zone - self.enemy.zone) < 2) and (randint(1, 3) == 1):
@@ -95,11 +95,12 @@ def createNpc(
   
   for _ in range(npc.level):
     npc.statLevelUp();
+    npc.max_energy += 5;
+    npc.energy = npc.max_energy;
     
   for loot in loots:
     npc.putLoot(loot[0], loot[1]);
   
-  if npc.name == "azaroth": npc.stats["strength"] *= 3;
   return npc;
   
 def getNPC(name):
@@ -113,4 +114,6 @@ NPCS = {
   "bandit": createNpc("bandit", level = [5, 9], basic_actions = [0.7, 0.25, 0.05, 0], any_loot = True),
   "skeleton": createNpc("skeleton", level = [6, 10], basic_actions = [0.7, 0.2, 0.1, 0], any_loot = True),
   "azaroth": createNpc("azaroth", boss = True, level = [100, 200], basic_actions = [0.9, 0.1, 0, 0], any_loot = True),
+  "goblin chief": createNpc("goblin chief", boss = True, level = [20, 25], basic_actions = [0.9, 0.1, 0, 0], any_loot = True),
+  "dark slime": createNpc("dark slime", boss = True, level = [15, 20], basic_actions = [0.9, 0.1, 0, 0], any_loot = True),
 };

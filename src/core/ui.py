@@ -321,7 +321,7 @@ class UI:
     else: color = "red";
     
     health_bar = self.showBar(character.stats["health"], character.stats["max health"], 6, color);
-    energy_bar = self.showBar(character.energy, 100, 6, "blue");
+    energy_bar = self.showBar(character.energy, character.max_energy, 6, "blue");
     hunger_bar = self.showBar(character.hunger, 100, 6, "purple");
 
     for status in character.status:
@@ -332,7 +332,7 @@ class UI:
         statuses += (f"([bold purple]{status}[reset] [bold green]{character.status[status][1] - 1}x[reset] {symbol})");
    
     self.normalPrint(f"{name} HP: [bold green]{round(character.stats["health"])}[reset]/[bold green]{character.stats["max health"]}[reset]\n([bold red]{(character.stats["health"] / character.stats["max health"])*100:.2f}%[reset]) {health_bar}")
-    self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.energy / 100)*100:.2f}%[reset]) {energy_bar}")
+    self.normalPrint(f"Energy: [bold cyan]{round(character.energy)}[reset]/[bold cyan]{character.max_energy}[reset]\n([bold green]{(character.energy / character.max_energy)*100:.2f}%[reset]) {energy_bar}")
     if self.game.isPlayer(character): self.normalPrint(f"Hunger: [bold cyan]{round(character.hunger)}[reset]/[bold cyan]{100}[reset]\n([bold green]{(character.hunger / 100)*100:.2f}%[reset]) {hunger_bar}\n")
     else: self.normalPrint("");
     if statuses != "": self.normalPrint(f"{statuses}\n");

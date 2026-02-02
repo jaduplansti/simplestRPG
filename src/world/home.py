@@ -71,4 +71,5 @@ class Home(SubMenu):
     );
     
   def enter(self):
+    self.game.audio_handler.play("home.mp3", vol = 0.5, repeat = "-");
     self.handleHome();

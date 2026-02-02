@@ -8,12 +8,12 @@ class AudioHandler:
     self.track_limit = 6;
     self.game = game;
     
-  def play(self, track, loop = False):
+  def play(self, track, repeat = 0, vol = 1):
     self.cleanTracks();
     self.trackFull();
     
     proc = subprocess.Popen(
-      ["play", f"tracks/{track}"],
+      ["play", f"tracks/{track}", "vol", str(vol), "repeat", str(repeat)],
       stdin = subprocess.DEVNULL,
       stdout = subprocess.DEVNULL,
       stderr = subprocess.DEVNULL,

@@ -111,11 +111,13 @@ class Game:
     self.ui.clear();
     self.audio_handler.play("start.wav");
     self.handleLoad();
+    self.audio_handler.popTracks();
     Home(self).enter()
     
   def handleMainMenu(self):
     """This is self explanatory"""
     self.animator.animateTitle();
+    self.audio_handler.play("main_menu.mp3", vol = 0.5, repeat = "-")
     self.handleMenu({"start" : self.handleStart, "quit" : self.handleQuit}, self.menu.showMainMenu);
   
   def initiateFight(self):

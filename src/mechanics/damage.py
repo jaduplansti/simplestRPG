@@ -8,16 +8,16 @@ class DamageHandler:
     
     self.attack_damages = {
       # basic moves
-      **self.createDamage("punch", 10, ["strength"], _range = 1),
-      **self.createDamage("strong punch", 20, ["strength"], _range = 1),
-      **self.createDamage("double punch", 10, ["strength"], _range = 1),
+      **self.createDamage("punch", 5, ["strength"], _range = 1),
+      **self.createDamage("strong punch", 6, ["strength"], _range = 1),
+      **self.createDamage("double punch", 4, ["strength", "dexterity"], _range = 1),
       **self.createDamage("slam", 0, ["defense", "strength"], _range = 1),
       
       # sword1 moves
-      **self.createDamage("slash", 30, ["strength"], _range = 2),
-      **self.createDamage("thrust", 25, ["strength", "defense"], _range = 3),
-      **self.createDamage("iron reversal", 30, ["strength"], _range = 1),
-      **self.createDamage("blade dance", 40, ["strength"], _range = 2),
+      **self.createDamage("slash", 13, ["strength"], _range = 2),
+      **self.createDamage("thrust", 15, ["strength", "defense"], _range = 3),
+      **self.createDamage("iron reversal", 15, ["strength"], _range = 1),
+      **self.createDamage("blade dance", 20, ["strength"], _range = 2),
     }
    
   def createDamage(self, name, basedmg, stats, multiplier = 1, origin = "attacker", ignores = [], _range = 1):

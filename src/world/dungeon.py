@@ -6,6 +6,8 @@ from mechanics.combat import CombatHandler;
 from objects.npc import NPCS;
 from time import sleep;
 
+# fix dis shit
+
 TRAPS = ["spike_trap", "poison_trap"];
 
 class Dungeon:
@@ -16,10 +18,10 @@ class Dungeon:
     self.map_explorer = map_explorer;
     self.floor = 0;
     self.current_map = [];
-    self.maps = [];
-    self.saved_positions = [];
     self.old_position = None;
-
+    
+    self.cause_of_death = "";
+    
   def generateBlank(self, width, height):
     self.current_map = [];
     for y in range(height):
@@ -52,42 +54,38 @@ class Dungeon:
   
       if preset == 1:
         if canPlaceWall(y, x):
-          self.current_map[y][x] = "wall"
+          self.current_map[y][x] = "wall2"
   
       elif preset == 2:
         length = randint(2, 5)
         for i in range(length):
           nx = x + i
           if nx < width - 1 and canPlaceWall(y, nx):
-            self.current_map[y][nx] = "wall"
+            self.current_map[y][nx] = "wall2"
   
       else:
         length = randint(2, 5)
         for i in range(length):
           ny = y + i
           if ny < height - 1 and canPlaceWall(ny, x):
-            self.current_map[ny][x] = "wall"
+            self.current_map[ny][x] = "wall2"
   
   def generateStair(self, width, height):
     sy = randint(1, height - 2);
     sx = randint(1, width - 2);
     self.current_map[sy][sx] = "stairDown";
 
-    while True:
-      uy = randint(1, height - 2);
-      ux = randint(1, width - 2);
-      if self.current_map[uy][ux] == None:
-        self.current_map[uy][ux] = "stairUp";
-        break;
-  
   def generateEnemy(self, width, height):
     for n in range(randint(1, self.floor + 1)):
       uy = randint(1, height - 2);
       ux = randint(1, width - 2);
       
-      enemy = choice(list(NPCS));
-      self.current_map[uy][ux] = enemy;
-  
+      while True:
+        enemy = choice(list(NPCS));
+        if NPCS[enemy].boss is True: continue;
+        self.current_map[uy][ux] = enemy;
+        break;
+        
   def generateTrap(self, width, height):
     for n in range(self.floor + 1):
       uy = randint(1, height - 2);
@@ -95,13 +93,28 @@ class Dungeon:
       
       trap = choice(TRAPS);
       self.current_map[uy][ux] = trap;
-
+  
+  def generateBoss(self, width, height):
+    uy = randint(1, height - 2);
+    ux = randint(1, width - 2);
+      
+    while True:
+      if self.floor == 5: boss = "dark slime";
+      elif self.floor == 10: boss = "goblin chief";
+      else: boss = None;
+      
+      self.current_map[uy][ux] = boss;
+      break;
+    
   def generateMap(self, width, height):
     self.generateBlank(width, height);
     self.generateBorder(width, height);
-    self.generateRandomWalls(width, height);
-    self.generateTrap(width, height);
-    self.generateEnemy(width, height);
+    if self.floor == 0 or (self.floor % 5) != 0:
+      self.generateRandomWalls(width, height);
+      self.generateTrap(width, height);
+      self.generateEnemy(width, height);
+    else:
+      self.generateBoss(width, height);
     self.generateStair(width, height);
     
   def findTile(self, tile):
@@ -112,39 +125,21 @@ class Dungeon:
     return None;
     
   def goDown(self):
-    self.maps.append(self.current_map);
-    self.saved_positions.append(self.player.position);
+    if self.enemiesRemaining() is True: 
+      self.ui.printDialogue(self.game.player.name, "i cant go down yet.. there are enemies left.");
+      self.ui.awaitKey();
+      self.explore();
+      
     self.floor += 1;
-  
     self.generateMap(20, 10);
-  
-    stair = self.findTile("stairUp");
-    if stair:
-      y, x = stair;
-      placed = False;
-      for dy, dx in [(0,-1),(0,1),(-1,0),(1,0)]:
-        ny, nx = y + dy, x + dx;
-        if 0 <= ny < len(self.current_map) and 0 <= nx < len(self.current_map[0]):
-          if self.current_map[ny][nx] == None:
-            self.player.position = [ny, nx];
-            placed = True;
-            break;
-      if not placed:
-        self.player.position = [1, 1];
-    else:
-      self.player.position = [1, 1];
+    position = [randint(1, 8), randint(1, 18)];
+    self.player.position = position;
     self.current_map[self.player.position[0]][self.player.position[1]] = "plr";
     self.explore();
     
   def goUp(self):
-    if self.maps:
-      self.current_map = self.maps.pop();
-      self.player.position = self.saved_positions.pop();
-      self.floor -= 1;
-      self.explore();
-    else:
-      self.player.position = self.old_position;
-      self.game.exploration_handler.explore();
+    self.player.position = self.old_position;
+    self.game.exploration_handler.explore();
   
   def moveEnemy(self, width, height, aggro_range=5):
     py, px = self.player.position
@@ -205,7 +200,8 @@ class Dungeon:
   def explore(self):
     self.ui.showStatus("rendering map!", 0.3);
     self.ui.clear();
-    self.map_explorer.placePlayer(self.player.position, self.current_map);
+    if self.map_explorer.findObject("plr", self.current_map) != True: self.map_explorer.placePlayer(self.game.player.position, self.current_map);
+
     interacted = None;
 
     with Input(keynames="curses") as input_generator:
@@ -220,11 +216,15 @@ class Dungeon:
               interacted = [enemyNear[1], enemyNear[2]];
               break;
             self.moveEnemy(20, 10);
+            self.useStats();
             live.update(Panel(self.map_explorer.render(self.current_map, dungeon = self)), refresh=True);
     
     if self.game.player.stats["health"] <= 0:
       self.dungeonFail();
-    elif interacted[0] == "inventory":
+    else: self.handleInteraction(interacted);
+    
+  def handleInteraction(self, interacted):
+    if interacted[0] == "inventory":
       self.game.handleUseItem();
       self.explore();
     elif interacted[0] == "stairUp":
@@ -235,30 +235,83 @@ class Dungeon:
       pass;
     elif interacted[0] in NPCS:
       self.handleEncounter(interacted, interacted[0])
+    elif interacted[0] == "wall2":
+      y, x = interacted[1];
+      self.current_map[y][x] = None;
+      self.explore();
     elif interacted[0] in TRAPS:
       self.checkTrapped(interacted[0]);
       self.explore();
+    
+  def rewardPlayer(self):
+    self.ui.clear();
   
+    gold_gain = randint(20, 40) * self.floor;
+    exp_gain = randint(100, 500) * self.floor;
+  
+    self.game.player.money += gold_gain;
+    self.game.givePlayerExp(exp_gain);
+    self.game.player.tryLevelUp();
+  
+    self.ui.panelPrint(
+      f"[yellow]🏆 DUNGEON CLEARED[reset]\n"
+      f"────────────────────────\n"
+      f"[blue]Floor Reached[reset] : {self.floor}\n"
+      f"[yellow]Gold Earned[reset]   : +{gold_gain}g\n"
+      f"[green]EXP Gained[reset]    : +{exp_gain} exp\n"
+      f"[bold]Cause Of Death[reset] (°)\n ({self.cause_of_death})\n"
+    );
+  
+    self.ui.awaitKey();
+    if self.floor == 0: self.ui.printDialogue(self.game.player.name, "ouch, i think i need to get stronger.");
+    else: self.ui.printDialogue(self.game.player.name, "that was... not bad, i can do better next time.");
+    self.ui.awaitKey();
+    
   def dungeonFail(self):
     self.player.position = self.old_position;
+    self.rewardPlayer();
     self.game.exploration_handler.explore();
   
   def checkTrapped(self, trap):
     if trap == "spike_trap":
       self.player.giveDamage(self.game.player.stats["max health"] * 0.1);
+      if self.game.player.stats["health"] <= 0: self.cause_of_death = "impaled on a iron spike";
     if trap == "poison_trap":
       self.player.giveStatus("poisoned", 3)
-      
+
   def handleEncounter(self, interacted, enemy):
     combat_handler = CombatHandler(self.game);
     combat_handler.initiateFightNpc(self.player, enemy);
     self.ui.awaitKey();
-    if combat_handler.won != self.player.name: self.explore();
+    if combat_handler.won != self.player.name: 
+      self.cause_of_death = f"defeated by [bold yellow]{enemy}![reset]";
+      self.dungeonFail();
     self.current_map[interacted[1][0]][interacted[1][1]] = None;
+    self.map_explorer.under_player = None;
     self.explore();
     
   def enter(self):
+    if self.game.player.stats["health"] <= 0:
+      self.game.exploration_handler.explore();
+    
     self.old_position = self.player.position;
     self.player.position = [1, 1];
     self.generateMap(20, 10);
     self.explore();
+  
+  def enemiesRemaining(self):
+    for objs in self.current_map:
+      for obj in objs:
+        if obj in NPCS:
+          return True;
+    return False;
+    
+  def useStats(self):
+    if self.game.player.stats["health"] <= 10:
+      self.cause_of_death = "succumbed to starvation";    
+    
+    if self.game.player.hunger <= 10:
+      self.game.player.stats["health"] = max(0, self.game.player.stats["health"] - 10);
+      self.game.player.energy = max(0, self.game.player.energy - 0.5);
+    else:
+      self.game.player.hunger = max(0, self.game.player.hunger - 1);

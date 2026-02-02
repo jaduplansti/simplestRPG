@@ -96,11 +96,11 @@ class CombatHandler:
         self.ui.animatedPrint(message);
   
   def handleFatigue(self, attacker):
-    if attacker.energy <= 10:
+    if attacker.energy <= attacker.max_energy * 0.05:
       self.ui.panelAnimatedPrint(f"[red]{attacker.name} passes out from exhaustion.[reset]", "fatigue");
       attacker.stats["health"] = 0;
       return "passed out";
-    elif attacker.energy <= 25 and not isinstance(attacker, NPC):
+    elif attacker.energy <= attacker.max_energy * 0.4 and not isinstance(attacker, NPC):
       self.ui.panelAnimatedPrintFile("fatigue handler", "exhausted", [attacker.name], "fatigue");
     else:
       return False;
@@ -117,9 +117,9 @@ class CombatHandler:
   
   def useHunger(self, attacker):
     if attacker.hunger > 10 and attacker.berserk != True:
-      attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (2 * attacker.stats["defense"]));
-      attacker.energy = min(100, attacker.energy + 20);
-      attacker.hunger = max(0, attacker.hunger - 5);
+      attacker.stats["health"] = min(attacker.stats["max health"], attacker.stats["health"] + (attacker.stats["health"] * 0.05));
+      attacker.energy = min(attacker.max_energy, attacker.energy + randint(10, 20));
+      attacker.hunger = max(0, attacker.hunger - randint(1, 3));
     else:
       attacker.stats["health"] -= round(attacker.stats["health"] * 0.02);
       attacker.energy -= round(attacker.energy * 0.02);
@@ -138,6 +138,7 @@ class CombatHandler:
     self.attack_handler.handlePassiveSkills("death", self.attacker, self.defender);
     self.attack_handler.handlePassiveSkills("death", self.defender, self.attacker);
     if self.attacker.stats["health"] <= 0:
+      if self.handlePlayerBerserk(self.attacker, self.defender) is True: return False;
       self.ui.animatedPrint(f"[yellow]{self.defender.name}[reset] won against [yellow]{self.attacker.name}[reset]");
       self.won = self.defender.name;
     elif self.defender.stats["health"] <= 0:
@@ -338,4 +339,33 @@ class CombatHandler:
     self.ui.printDialogue(self.attacker.name, "damn it!");
     self.ui.awaitKey();
     self.handleCombatNpc();
-    
+  
+  def handlePlayerBerserk(self, attacker, defender):
+    if randint(1, 6) == 1:
+      attacker.stats["health"] = attacker.stats["max health"] * 0.3
+      self.ui.printDialogue(attacker.name, [
+        "…not yet.",
+        "No—this isn’t over.",
+        "Tch. Not here.",
+        "Heh… still breathing."
+      ]);
+      self.ui.printDialogue(attacker.name, [
+        "This is not where I die.",
+        "I refuse to fall here.",
+        "My body can still move.",
+        "Pain means I'm alive."
+      ]);
+      self.ui.printDialogue(attacker.name, [
+        "[red]RAAAGH!![reset]",
+        "[red]GRAAAHH!![reset]",
+        "[red]HNNNGH…![reset]",
+        "[red]RRRAAAAGH!![reset]"
+      ]);
+      self.ui.panelPrint("[bold red]Hxalxh Rx;stored¡[reset]")
+      
+      if randint(1, 3) == 1 and attacker.attack_style == "basic": 
+        for n in range(1, randint(1, 4)):
+          self.attack_handler.handleAttack(attacker, defender);
+        
+      return True;
+    return False;

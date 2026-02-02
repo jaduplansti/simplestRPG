@@ -444,3 +444,21 @@
 • buffed ashrend sword durability to 800 -> 1600
 • made scroll of teleport unobtainable
 • reworked scroll of instant death, can now backfire.
+
+[version 2.7.6]
+• nerfed damages.
+• sword1 is based off fencing, damage output is reduced by 50%, target their limbs correctly to deal 1.2x more damage.
+• nerfed regen, healing only 5% of max hp and 10 energy per turn 
+• added osts, ingame music.
+• added player berserk
+• fixed scroll of instant death bug
+• open world, more maps!
+• max energy can now be increased!
+• energy is restored during level up
+• added new bosses, goblin chief and dark slime
+• tweaked dungeons, increased difficulty (cannot proceed withput clearing floor)
+• dungeon rewards
+• the dungeon now consumes hunger, every move consumes 0.5 hunger, you lose 10 hp per move if your hunger is below 20.
+• added cause of death in dungeon end menu
+• combat now consumes (1 - 3) hunger instead of (5 - 12)
+

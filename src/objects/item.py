@@ -251,7 +251,7 @@ def use_scroll(item, game, combat_handler, user):
     game.ui.printDialogue(user.name, "[bold red]ßhßék brúkx tbeyà[reset]");
     
     if randint(1, 2) == 1:
-      game.ui.printDialogue(defender.name, "urkk!");
+      game.ui.printDialogue(combat_handler.defender.name, "urkk!");
       game.ui.animatedPrint(f"{user.name} used a scroll of instant death, instantly killing {combat_handler.defender.name}!");
       combat_handler.defender.stats["health"] = 0;
     else:
@@ -407,12 +407,8 @@ def use_artifact(item, game, combat_handler, user):
     user.giveDamage(randint(1, 999));
 
 ITEMS = {
-  "seal of origin": {
-    "item": Item(name="seal of origin", rarity = "legendary", rank = "S", weight = 0.3, _type="misc", desc="An ancient seal that lets its bearer choose any basic class."),
-    "action": use_artifact
-  },
-  "dave ticket": {
-    "item": Item(name="dave ticket", _type="misc", desc="A ticket made by dave, allows adventurers to gain rewards!"),
+  "abyss fragment": {
+    "item": Item(name="abyss fragment", rarity = "???", rank = "SSS", weight = 1, _type="misc", desc="A fragment of the abyss, who knows what it can do."),
     "action": None
   },
   "wooden sword": {

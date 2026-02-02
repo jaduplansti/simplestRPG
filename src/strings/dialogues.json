@@ -332,5 +332,55 @@
       "[blue]*flaps wings* nothing yet…[reset]",
       "[blue]*squeaks softly* bored…[reset]"
     ]
+  },
+  
+  "azaroth": {
+    "hurt": [
+      "[red]GRAAAH! You dare wound me?![reset]",
+      "[red]Foolish human… that barely scratches me![reset]",
+      "[red]ARGH! Insolent pest![reset]"
+    ],
+    "attack": [
+      "[green]Feel the abyss’s wrath![reset]",
+      "[green]I will crush you under darkness![reset]",
+      "[green]Taste despair, mortal![reset]"
+    ],
+    "attack fail": [
+      "[green]Impossible… you evade me?![reset]",
+      "[green]Pathetic, yet… clever.[reset]",
+      "[green]How? I am unstoppable![reset]"
+    ],
+    "block": [
+      "[yellow]*shadows swirl* You cannot touch me![reset]",
+      "[yellow]*demonic aura manifests* Stand aside![reset]"
+    ],
+    "block fail": [
+      "[yellow]*growl* Hmph, a mere scratch…[reset]",
+      "[yellow]*snarl* You think that hurts me?[reset]"
+    ],
+    "berserk": [
+      "[red]I am eternal fury![reset]",
+      "[red]All will fall before me![reset]",
+      "[red]Embrace oblivion![reset]"
+    ],
+    "death": [
+      "[red]No… not… again…[reset]",
+      "[red]The darkness… fades…[reset]",
+      "[red]This… cannot… be…[reset]"
+    ],
+    "flee": [
+      "[cyan]This isn’t over… I return![reset]",
+      "[cyan]You’ve not seen the last of me![reset]"
+    ],
+    "taunt": [
+      "[magenta]Pathetic mortal… do you tremble?[reset]",
+      "[magenta]You cannot hope to defeat me![reset]",
+      "[magenta]Your courage will crumble… like the rest![reset]"
+    ],
+    "idle": [
+      "[blue]*shadows ripple* waiting…[reset]",
+      "[blue]*smoldering gaze* patience…[reset]",
+      "[blue]*low growl* anticipating your failure…[reset]"
+    ]
   }
 }

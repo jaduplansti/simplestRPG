@@ -29,6 +29,7 @@ class Story:
   
   def intro(self):
     self.ui.clear();
+    self.game.audio_handler.popTracks();
     self.ui.normalPrint("-- [green]would you like to skip chapter 1[reset] --\n");
     self.ui.normalPrint("(yes) or (no)\n");
     option = self.ui.getInput();
@@ -60,24 +61,23 @@ class Story:
     self.scene2();
     
   def scene2(self):
-    self.__startScene();
-    self.ui.showHeader("Memories", "+");
+    self.__startScene()
+    self.ui.showHeader("Memories", "+")
+    self.ui.printDialogue("elira", "Stay sharp. The air’s wrong… we’re close.");
+    self.ui.printDialogue("asta", "Heh. So this is it, huh? Kinda hard to believe.");
+    self.ui.printDialogue(self.game.player.name, "You sound nervous.");
+    self.ui.printDialogue("asta", "What? Me? No— just thinking how insane this story’s gonna sound when we’re done.");
+    self.ui.printDialogue("elira", "Assuming you survive long enough to tell it.");
+    self.ui.printDialogue("asta", "…Yeah. Fair.");
+    self.ui.printDialogue("roman", f"{self.game.player.name}.");
+    option = self.ui.getChoice(["Yeah?", "What’s wrong?"]);
     
-    self.ui.printDialogue("elira", "Guys focus! the demon lord is just up ahead.");
-    self.ui.printDialogue("asta", "Hell yeah, cant wait to be famous, id be king!");
-    self.ui.printDialogue(self.game.player.name, "Not sure man, i dont think a loner like you can.");
-    self.ui.printDialogue("asta", "What? no way, for your information i go outside my room every week.");
+    self.ui.printDialogue("roman", "We’ll hold back whatever crawls out of the shadows.");
+    self.ui.printDialogue("roman", "You push forward. End this [italic yellow]here[reset].");
     
-    self.ui.printDialogue("elira", "Hehe, not with your lazy attitude.");
-    self.ui.printDialogue("asta", "Tch. you have a point..");
-    self.ui.printDialogue("roman", f"Hey {self.game.player.name}?");
-    option = self.ui.getChoice(["What is it?", "Huh?"]);
-    
-    self.ui.printDialogue("roman", f"We'll stay and handle the small fries.");
-    self.ui.printDialogue("roman", f"Go and finish this [italic yellow]once and for all[reset].");
     self.__endScene();
     self.scene3();
-  
+    
   def scene3(self):
     self.__startScene();
     self.ui.showHeader("Memories", "+");
@@ -103,10 +103,10 @@ class Story:
     self.game.player = backup;
     self.ui.awaitKey();
     
-    if combat.won == self.game.player.name: self.scene3a();
-    else: self.scene3b();
+    if combat.won == self.game.player.name: self.scene4a();
+    else: self.scene4b();
     
-  def scene3a(self):
+  def scene4a(self):
     self.__startScene();
     self.ui.printDialogue(self.game.player.name, "[red]Augh![reset] Damn it...");
     self.ui.panelPrint("Forgotten Hero\n\n+25 all stats", "center", "title acquired");
@@ -125,10 +125,10 @@ class Story:
     self.ui.printDialogue("elira", "Roman and the others already agreed. You outlived your usefulness.");
     self.ui.printDialogue("elira", "So this is goodbye, hero~");
     self.ui.printDialogue(self.game.player.name, "[red]ELIRA![reset]");
-    self.ui.animatedPrint("You Have Died.");
     self.__endScene();
-  
-  def scene3b(self):
+    self.scene5();
+    
+  def scene4b(self):
     self.__startScene();
     self.ui.animatedPrint("[red]You struggle to breathe, barely clinging to your dear life.[reset]");
     self.ui.animatedPrint("[magenta]Azaroth grabs you by the neck and strangles you.[reset]");
@@ -142,11 +142,22 @@ class Story:
     self.ui.printDialogue("[magenta]azaroth[reset]", "Ah that woman? she'll make a good breeding slave for our orcs, well if she survives.");
     self.ui.printDialogue(self.game.player.name, "You mother fucke-");
     self.__endScene();
+    self.scene5();
     
-  def scene4(self):
+  def scene5(self):    
     self.__startScene();
-    self.ui.printDialogue("???", f"So do you remember now, {self.game.player.name}?");
-    option = self.ui.getChoice(["Yeah..", "A bit, buts its a bit hazy.."]);
+    self.ui.printDialogue("???", f"So… it’s coming back to you now, {self.game.player.name}.");
+    option = self.ui.getChoice(["Yeah…", "Fragments. It’s still hazy."]);
+    self.ui.printDialogue("???", "That’s enough for now.");
+    self.ui.printDialogue("???", "If you remembered everything at once… you wouldn’t survive it.");
+    self.ui.printDialogue("???", "You died as a hero.");
+    self.ui.printDialogue("???", "What walks forward won’t be one anymore.");
+    self.ui.printDialogue("???", "Take this. It will anchor you to what remains.");
+    self.game.givePlayerItem("abyss fragment");
+    self.ui.printDialogue("???", "When you wake up… don’t look for answers.");
+    self.ui.printDialogue("???", "The world will find you first.");
+    self.ui.animatedPrint("[dim]Your vision fades. The cold stone beneath you vanishes.[reset]");
+    self.ui.animatedPrint("[dim]Wind. Silence. An unfamiliar sky.[reset]");
     self.__endScene();
     
   def handleStory(self, combat_handler = None): # this function runs the scene, for the current progress.

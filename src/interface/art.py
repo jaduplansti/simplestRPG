@@ -109,6 +109,35 @@ AZAROTH = r"""
       ~B: . 7P^     
       ::    .^^ """;
 
+DARK_SLIME = r"""
+      .!JYJJJJJYY?^      
+     ?GJ^.      :!P5:    
+    5B^         :  JB:   
+   7&!  ..      !^  BY   
+  ?B? ^PG5^   :5BY~ Y#^  
+~PY^ :#&777   ~&B~J^ ?P?.
+#7^J .P#B?  .  JB#P^! .BG
+!5GBY  :.^7JJ7^ .:.5G~?B5
+ .G~5J!!5J5&&&&5: .B5#J: 
+ .#7 GY?G  P&#YYPPP7^G   
+ .7^ G7^Y  7&7  .G^ J&~  
+    ^#5    ~B.  :B^ ~?:  
+     :.    !B.  .~.    """
+
+GOBLIN_CHIEF = r"""
+     .?YJ!.         
+     ~Y??YJ         
+     .   :77~:      
+        !P5PP55!    
+    .^!J5PGGPG7:    
+     JPPPPPGB5      
+   ~7J55PGGYYP7:    
+  JGY!??YPGPY~JPJ:  
+ !BGGJ?YPPGGJ  7PJ  
+ ^YPPGPPP5PGP~ ~!^. 
+   ..:^5B!.!GGYJ    
+      .^~~^:!!^.. """
+
 DAVE_SHOP = r"""
     ZVVXWWWWWVTY    
    VYWXWXSXVXYWZV   
@@ -132,5 +161,7 @@ ARTS = {
   "rat": RAT,
   "skeleton": SKELETON,
   "azaroth": AZAROTH,
+  "dark slime": DARK_SLIME,
+  "goblin chief": GOBLIN_CHIEF,
   "dave shop": DAVE_SHOP,
 }

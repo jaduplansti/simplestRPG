@@ -100,7 +100,7 @@ class Menu():
     self.ui.normalPrint("≈ [bold red]simplestRpg[reset] ≈");
     self.ui.normalPrint("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈");
 
-    self.ui.normalPrint("\n• version [green]2.7.5[reset] ([bold blue]ALPHA[reset]) •\n")
+    self.ui.normalPrint("\n• version [green]2.7.6[reset] ([bold blue]ALPHA[reset]) •\n")
     self.ui.printTreeMenu("(options)\n", ["[green]start[reset]", "[yellow]quit[reset]"]);
     
   def showCombatInitiateMenu(self):
@@ -209,7 +209,7 @@ class Menu():
   def showCharacterClasses(self):
     self.ui.clear();
     self.ui.showSeperator("-", "CHOOSE CLASS");
-    self.ui.normalPrint("[bold]{peasant}[reset]\n  NO STAT BUFF\n  The lowest of the low, this is where it begins.\n");
+    self.ui.normalPrint("[bold]{peasant}[reset]\n  NO STAT BUFF\n  The lowest of the low, however it is very versatile\n");
     self.ui.normalPrint("[bold]{swordsman}[reset]\n  STR +25\n  A disciplined fighter who reads openings and strikes with precision\n");
     self.ui.showSeperator("-");
    

@@ -10,9 +10,7 @@ class Player(Character):
     super().__init__(name);
     self.quests = {};   # { quest_name: Quest }
     
-    self.addItemToInventory(getItem("seal of origin"));
-    self.addItemToInventory(getItem("ashrend sword"));
-    self.addItemToInventory(getItem("wheat"), 1);
+    #self.addItemToInventory(getItem("ashrend sword"));
 
   def to_dict(self):
     data = super().to_dict();

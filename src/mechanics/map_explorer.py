@@ -5,10 +5,25 @@ class MapExplorer:
   def __init__(self, game):
     self.game = game;
     self.ui = game.ui;
-
+    self.under_player = None;
+    
   def getSymbol(self, obj):
-    if obj == "wall":
+    if obj is None:
+      return "[dim].[reset]";
+    if "path" in obj:
+      return " ";
+    elif obj == "wall":
       return "#";
+    elif obj == "wall2":
+      return "[dim]#[reset]";
+    elif obj == "water":
+      return "[blue]≈[reset]"
+    elif obj == "tree":
+      return "[green]T[reset]";
+    elif obj == "bush":
+      return "[green]&[reset]";
+    elif obj == "rock":
+      return "[dim]O[reset]";
     elif obj == "plr":
       return "[yellow]Y[reset]";
     elif obj == "home":
@@ -35,12 +50,14 @@ class MapExplorer:
       return "[bold green]g[reset]";
     elif obj == "azaroth":
       return "[red]A[reset]";
+    elif obj == "dark slime":
+      return "[magenta]S[reset]";
+    elif obj == "goblin chief":
+      return "[green]G[reset]";
     elif obj == "spike_trap":
       return "∆";
     elif obj == "poison_trap":
       return "[dim green]~[reset]"
-    elif obj == None:
-      return "[dim].[reset]";
     else:
       return "?";
 
@@ -48,7 +65,6 @@ class MapExplorer:
     rendered = ""
     
     if dungeon is None: vision_radius = 10;
-    # find player
     px = py = None
     for i, row in enumerate(smap):
       for j, obj in enumerate(row):
@@ -63,7 +79,7 @@ class MapExplorer:
         if px is not None and abs(px - x) <= vision_radius and abs(py - y) <= vision_radius:
           rendered += self.getSymbol(obj)
         else:
-          rendered += " "  # fog / unseen
+          rendered += " "
       rendered += "\n"
   
     if dungeon is None:
@@ -72,7 +88,10 @@ class MapExplorer:
       return f"{self.dungeonBar(smap, dungeon)}\n\n{rendered}"
       
   def placePlayer(self, pos, smap):
-    smap[pos[0]][pos[1]] = "plr";
+    x, y = pos;
+    self.under_player = smap[x][y];
+    smap[x][y] = "plr";
+    self.game.player.position = [x, y];
 
   def interact(self, smap):
     x, y = self.game.player.position;
@@ -105,18 +124,24 @@ class MapExplorer:
 
     if nx < 0 or ny < 0 or nx >= len(smap) or ny >= len(smap[0]):
       return None;
-
-    if smap[nx][ny] != None and smap[nx][ny] not in TRAPS:
+    
+    if smap[nx][ny] != None and "path" in smap[nx][ny]:
+      self.game.exploration_handler.changeMap(smap[nx][ny]);
+      return None;
+      
+    if smap[nx][ny] != None and (smap[nx][ny] not in TRAPS) and (smap[nx][ny] not in ["grass", "water", "bush"]):
       return None;
 
     old_object = smap[nx][ny];
-    smap[x][y] = None;
+    smap[x][y] = self.under_player;
+    self.under_player = smap[nx][ny];
     self.game.player.position = [nx, ny];
     smap[nx][ny] = "plr";
     
     if dungeon != None and old_object in TRAPS: 
       dungeon.checkTrapped(old_object);
-    
+      self.under_player = None;
+
   def exploreBar(self, smap):
     hp = self.game.player.stats["health"];
     max_hp = self.game.player.stats["max health"];
@@ -150,7 +175,7 @@ class MapExplorer:
     max_hp = stats["max health"];
   
     energy = self.game.player.energy;
-    max_energy = 100;
+    max_energy = self.game.player.max_energy;
   
     hunger = self.game.player.hunger;
     max_hunger = 100;
@@ -165,10 +190,14 @@ class MapExplorer:
     hp_filled = int(hp / max_hp * bar_len) if max_hp > 0 else 0;
     en_filled = int(energy / max_energy * bar_len) if max_energy > 0 else 0;
     hu_filled = int(hunger / max_hunger * bar_len) if max_hunger > 0 else 0;
-  
+    
+    if self.game.player.hunger <= 20:
+      hu_bar = "[red]" + "█" * hu_filled + "[dim]" + "█" * (bar_len - hu_filled) + "[reset]";
+    else:
+      hu_bar = "[yellow]" + "█" * hu_filled + "[dim]" + "█" * (bar_len - hu_filled) + "[reset]";
+
     hp_bar = "[green]" + "█" * hp_filled + "[dim]" + "█" * (bar_len - hp_filled) + "[reset]";
     en_bar = "[cyan]" + "█" * en_filled + "[dim]" + "█" * (bar_len - en_filled) + "[reset]";
-    hu_bar = "[yellow]" + "█" * hu_filled + "[dim]" + "█" * (bar_len - hu_filled) + "[reset]";
   
     nearby = [];
     for dx, dy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
@@ -181,9 +210,23 @@ class MapExplorer:
   
     nearby_line = "  ".join(nearby) if nearby else "[dim]None[reset]";
   
-    line1 = f"HP {hp_bar} {hp}/{max_hp}\nEN {en_bar} {energy}/{max_energy}";
-    line2 = f"HU {hu_bar} {hunger}/{max_hunger}\nLv {level} Floor {floor}";
+    if self.game.player.energy <= self.game.player.max_energy * 0.2:
+      line1 = f"HP {hp_bar} {hp}/{max_hp}\nEN {en_bar} {energy}/{max_energy} ([bold green]DANGER[reset])";
+    else:
+      line1 = f"HP {hp_bar} {hp}/{max_hp}\nEN {en_bar} {energy}/{max_energy}";
+    
+    if self.game.player.hunger <= 20:
+      line2 = f"HU {hu_bar} {hunger}/{max_hunger} ([bold red]LOW[reset])\nLv {level} Floor {floor}";
+    else:
+      line2 = f"HU {hu_bar} {hunger}/{max_hunger}\nLv {level} Floor {floor}";
+    
     line3 = f"Nearby: {nearby_line}";
   
     return line1 + "\n" + line2 + " " + line3;
-     
+  
+  def findObject(self, name, smap):
+    for y in smap:
+      for x in y:
+        if x == name:
+          return True;
+    return False;
